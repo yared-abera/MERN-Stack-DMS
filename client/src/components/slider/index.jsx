@@ -13,12 +13,7 @@ console.log(images); // Array of imported images
 
 
 
-// const images = [
-//   "https://via.placeholder.com/800x400/FF5733/ffffff?text=Slide+1",
-//   "https://via.placeholder.com/800x400/33FF57/ffffff?text=Slide+2",
-//   "https://via.placeholder.com/800x400/3357FF/ffffff?text=Slide+3",
-//   "https://via.placeholder.com/800x400/F0A500/ffffff?text=Slide+4",
-// ];
+ 
 
 const Slider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,7 +36,7 @@ const Slider = () => {
   };
 
   return (
-    <div className="  border-2 border-blue-500 relative  mx-5 my-5  overflow-hidden rounded-xl shadow-lg">
+    <div className="   relative  mx-5 my-5  overflow-hidden rounded-xl shadow-lg">
       {/* Slider Container */}
       <div className="flex items-center justify-center w-full h-[400px] overflow-hidden">
         <motion.img
