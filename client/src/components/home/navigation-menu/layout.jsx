@@ -2,20 +2,19 @@ import React from 'react'
 import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
-import { useSelector, useDispatch } from 'react-redux';
-import { toggleTheme } from '../../../store/common/ThemeSlice';import {   useNavigate } from 'react-router-dom';
+import {   useNavigate } from 'react-router-dom';
 
 function  NavBar() {
 
   return (
-     <nav className="bg-white/20 backdrop-blur-xl top-0 w-full 
+     <nav className="   bg-white/20 backdrop-blur-xl top-0 w-full 
      shadow-lg relative items-center container mx-auto 
       p-4 mt-0 justify-around " > 
       <div className='  flex items-center justify-between '>
       
        <div className='text-center'>
           {/* logo */}
-          <h1 className='text-3xl dark:text-white'>wkudms</h1>
+          <h1 className='text-3xl'>wkudms</h1>
 
         </div> 
        {/* menu items*/}
@@ -24,10 +23,10 @@ function  NavBar() {
               to="home"
               smooth={true}
               duration={1000}
-              className="text-lg dark:text-white flex items-center  w-1/3   space-x-7  rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
+              className="text-lg flex items-center  w-1/3   space-x-7  rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
              >
               
-              <FaHome className="mr-1 " size={16} color={theme === 'dark' ? 'white' : 'black'}/>
+              <FaHome className="mr-1" size={16} color="black"/>
                HOME
           </Link>
           <Link
