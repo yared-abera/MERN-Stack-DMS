@@ -3,15 +3,15 @@ import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
 import { useSelector, useDispatch } from 'react-redux';
-import { toggleTheme } from '../../../store/common/ThemeSlice';
+import { toggleTheme } from '../../../store/common/ThemeSlice';import {   useNavigate } from 'react-router-dom';
+
 function  NavBar() {
-  const theme = useSelector((state) => state.theme.mode);
-  const dispatch = useDispatch();
+
   return (
-     <nav className="bg-white/20 dark:bg-black backdrop-blur-xl top-0 w-full 
+     <nav className="bg-white/20 backdrop-blur-xl top-0 w-full 
      shadow-lg relative items-center container mx-auto 
       p-4 mt-0 justify-around " > 
-      <div className='flex items-center justify-between '>
+      <div className='  flex items-center justify-between '>
       
        <div className='text-center'>
           {/* logo */}
@@ -50,8 +50,8 @@ function  NavBar() {
           </Link>
         </div>
         <div className='flex items-center space-x-6  '>
-         <button className='dark:text-white' onClick={() =>dispatch(toggleTheme())}> {theme === 'dark' ? 'Light' : 'Dark'} Mode</button> 
-          <button className='bold bg-blue-500 dark:text-white dark:bg-blue-600 hover:bg-blue-400  py-2  px-8  rounded-2xl '>LOGIN</button>
+          <Moon  size={24} color="black" />
+          <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl '>LOGIN</button>
           {/* menu bar sheet */}
           
         </div>

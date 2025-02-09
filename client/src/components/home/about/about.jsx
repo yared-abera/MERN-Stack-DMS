@@ -18,6 +18,11 @@ export default function AboutUs() {
             <FaBuilding className="text-blue-700 dark:text-white text-4xl mx-auto" />
             <h3 className="text-lg dark:text-white font-semibold mt-4">Established</h3>
             <p className="text-gray-600 dark:text-white">Founded in 2010 to serve university students</p>
+        <div className="grid md:grid-cols-2  lg:grid-cols-4 gap-8">
+          <div className="bg-white shadow-lg p-6 rounded-xl text-center">
+            <FaBuilding className="text-blue-700 text-4xl mx-auto" />
+            <h3 className="text-lg font-semibold mt-4">Established</h3>
+            <p className="text-gray-600">Founded in 2010 to serve university students</p>
           </div>
 
           <div className="bg-white dark:bg-gradient-to-r from-gray-900 via-cyan-700 to-blue-900 shadow-lg p-6 rounded-xl text-center">
