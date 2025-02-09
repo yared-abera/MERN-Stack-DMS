@@ -34,7 +34,7 @@ const Slider = () => {
   };
 
   return (
-    <div className="   relative  mx-5 my-5  overflow-hidden rounded-xl shadow-lg">
+    <div className="dark:bg-gray-800 relative  mx-5 my-5  overflow-hidden rounded-xl shadow-lg">
       {/* Slider Container */}
       <div className="flex items-center justify-center  mx-auto h-[400px] overflow-hidden">
         <motion.img
