@@ -4,13 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
-const images = import.meta.glob("../../assets/photo/*.{png,jpg,jpeg,svg}", { eager: true });
+const images = import.meta.glob("../../../assets/photo/*.{png,jpg,jpeg,svg}", { eager: true });
 
 const imageList = Object.values(images).map((img) => img.default);
 
 console.log(images); // Array of imported images
-
-
 
 
  
@@ -38,7 +36,7 @@ const Slider = () => {
   return (
     <div className="   relative  mx-5 my-5  overflow-hidden rounded-xl shadow-lg">
       {/* Slider Container */}
-      <div className="flex items-center justify-center w-full h-[400px] overflow-hidden">
+      <div className="flex items-center justify-center  mx-auto h-[400px] overflow-hidden">
         <motion.img
           key={currentIndex}
           src={imageList[currentIndex]}
@@ -55,7 +53,7 @@ const Slider = () => {
       {/* Navigation Buttons */}
       <Button
         variant="ghost"
-        className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
+        className="absolute top-1/2 left-2 ml-10 transform -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
         onClick={prevSlide}
       >
         <ChevronLeft className="w-6 h-6" />
@@ -63,10 +61,10 @@ const Slider = () => {
 
       <Button
         variant="ghost"
-        className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
+        className="absolute top-1/2 right-2 mr-10 transform -translate-y-1/2 bg-black/30 text-white p-2 rounded-full"
         onClick={nextSlide}
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-12 h-12" />
       </Button>
 
       {/* Indicators */}

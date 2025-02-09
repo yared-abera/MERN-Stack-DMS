@@ -1,7 +1,7 @@
 import React from 'react'
 import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
- 
+import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
 
 function  NavBar() {
 
@@ -17,29 +17,33 @@ function  NavBar() {
 
         </div> 
        {/* menu items*/}
-        <div className='hidden space-x-6 md:flex '>
+        <div className='hidden space-x-6 md:flex  lg:w-1/3 '>
         <Link
               to="home"
               smooth={true}
               duration={1000}
-              className="text-lg py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
+              className="text-lg flex items-center  w-1/3   space-x-7  rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
              >
+              
+              <FaHome className="mr-1" size={16} color="black"/>
                HOME
           </Link>
           <Link
               to="about"
               smooth={true}
               duration={1000}
-              className="text-lg py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
+              className="flex items-center text-lg py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
              >
+              <FaInfoCircle className="mr-1" size={16} color="black"/>
               ABOUT
           </Link>
           <Link
               to="contact"
               smooth={true}
               duration={1000}
-              className="text-lg py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
+              className="text-lg   flex items-center py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer md:w-fit"
              >
+              <FaPhone className="mr-1" size={16} color="black"/>
               CONTACT
           </Link>
         </div>
