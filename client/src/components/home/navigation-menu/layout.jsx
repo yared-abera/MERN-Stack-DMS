@@ -2,14 +2,16 @@ import React from 'react'
 import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
+import {   useNavigate } from 'react-router-dom';
 
 function  NavBar() {
+  const navigate=useNavigate()
 
   return (
-     <nav className="bg-white/20 backdrop-blur-xl top-0 w-full 
+     <nav className="   bg-white/20 backdrop-blur-xl top-0 w-full 
      shadow-lg relative items-center container mx-auto 
       p-4 mt-0 justify-around " > 
-      <div className='flex items-center justify-between '>
+      <div className='  flex items-center justify-between '>
       
        <div className='text-center'>
           {/* logo */}
@@ -49,7 +51,7 @@ function  NavBar() {
         </div>
         <div className='flex items-center space-x-6  '>
           <Moon  size={24} color="black" />
-          <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl '>LOGIN</button>
+          <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl ' onClick={()=>navigate('/auth/logIn')}>LOGIN</button>
           {/* menu bar sheet */}
           
         </div>

@@ -11,7 +11,7 @@ export default function AboutUs() {
         </div>
 
         {/* Dormitory Details */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2  lg:grid-cols-4 gap-8">
           <div className="bg-white shadow-lg p-6 rounded-xl text-center">
             <FaBuilding className="text-blue-700 text-4xl mx-auto" />
             <h3 className="text-lg font-semibold mt-4">Established</h3>
