@@ -11,7 +11,7 @@ const theme = useSelector((state) => state.theme.mode);
 const dispatch = useDispatch();
 
   return (
-     <nav className="   bg-white/20 backdrop-blur-xl top-0 w-full 
+     <nav className="   bg-white/20 dark:bg-black backdrop-blur-xl top-0 w-full 
      shadow-lg relative items-center container mx-auto 
       p-4 mt-0 justify-around " > 
       <div className='  flex items-center justify-between '>

@@ -24,7 +24,7 @@ export default function LogInLayout() {
           <motion.p
             className="md:text-3xl sm:text-2xl font-bold  font-serif text-white opacity-40"
             initial={{ x: -10 }}
-            animate={{ x: 110 }}
+            animate={{ x: 40 }}
             transition={{ duration: 4, ease: "easeInOut", repeat: Infinity,repeatDelay:2 }}
           >
             DORMITORY MANAGMENT SYSTEM
