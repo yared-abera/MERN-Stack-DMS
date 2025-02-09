@@ -1,11 +1,14 @@
 import React from 'react'
-import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
 import {   useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../../../store/common/ThemeSlice";
 
 function  NavBar() {
-  const navigate=useNavigate()
+const navigate = useNavigate();
+const theme = useSelector((state) => state.theme.mode);
+const dispatch = useDispatch();
 
   return (
      <nav className="   bg-white/20 backdrop-blur-xl top-0 w-full 
@@ -15,7 +18,7 @@ function  NavBar() {
       
        <div className='text-center'>
           {/* logo */}
-          <h1 className='text-3xl'>wkudms</h1>
+          <h1 className='text-3xl dark:text-white'>wkudms</h1>
 
         </div> 
        {/* menu items*/}
@@ -27,31 +30,32 @@ function  NavBar() {
               className="text-lg flex items-center  w-1/3   space-x-7  rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
              >
               
-              <FaHome className="mr-1" size={16} color="black"/>
-               HOME
+              <FaHome className="mr-1" size={16} color={theme === 'dark' ? 'white' : 'black'}/>
+              HOME
           </Link>
           <Link
               to="about"
               smooth={true}
               duration={1000}
-              className="flex items-center text-lg py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
+              className="flex dark:text-white items-center text-lg py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
              >
-              <FaInfoCircle className="mr-1" size={16} color="black"/>
+              <FaInfoCircle className="mr-1" size={16} color={theme === 'dark' ? 'white' : 'black'}/>
               ABOUT
           </Link>
           <Link
               to="contact"
               smooth={true}
               duration={1000}
-              className="text-lg   flex items-center py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer md:w-fit"
+              className="text-lg dark:text-white  flex items-center py-1 px-3 w-1/3 rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer md:w-fit"
              >
-              <FaPhone className="mr-1" size={16} color="black"/>
+              <FaPhone className="mr-1" size={16} color={theme === 'dark' ? 'white' : 'black'}/>
               CONTACT
           </Link>
         </div>
         <div className='flex items-center space-x-6  '>
-          <Moon  size={24} color="black" />
-          <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl ' onClick={()=>navigate('/auth/logIn')}>LOGIN</button>
+        <button onClick={() => dispatch(toggleTheme())}> {theme === 'dark' ? 'Light' : 'Dark'} Mode
+      </button>
+      <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl ' onClick={()=>navigate('/auth/logIn')}>LOGIN</button>
           {/* menu bar sheet */}
           
         </div>

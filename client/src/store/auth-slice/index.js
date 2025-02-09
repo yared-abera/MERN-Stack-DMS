@@ -23,11 +23,11 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-      setUser:(state, action)=> {
-
-      } 
+        setUser: (state, action) => {
+            // reducer logic here
+        }
     },
-})
+});
 
-export  const {setUser} = authSlice.actions
-export default authSlice.reducer 
+export const { setUser } = authSlice.actions;
+export default authSlice.reducer;
