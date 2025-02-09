@@ -15,9 +15,6 @@ export default function LogIn() {
   return (
     <div className="w-auto p-10 rounded-lg shadow-md ">
         <div className="">
-
-       
-
       <CommonForm
         formControls={logInForm}
         formData={formData}
