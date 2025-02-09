@@ -1,10 +1,23 @@
- import {createSlice}  from"@reduxjs/toolkit";
+ import {createAsyncThunk, createSlice}  from"@reduxjs/toolkit";
+import axios from "axios";
 
 const initialState = {
     user: null,
     isAuthenticated: false,
     isLoading: false,
 }
+
+export const  LogIN=createAsyncThunk('/auth/LogIn',async (formData)=>{
+  try {
+    const result= await axios.post("http://localhost:5000/api/auth/logIn",formData);
+    return result
+    
+  } catch (error) {
+    console.log(error,'from logIn');
+    
+  }
+  
+})
 
 const authSlice = createSlice({
     name: "auth",
