@@ -3,7 +3,7 @@ import { FaBuilding, FaMapMarkerAlt, FaBed, FaUsers } from "react-icons/fa";
 export default function AboutUs() {
   return (
     <div className="bg-gray-100  dark:bg-gray-800  py-12" id="about">
-      <div className="  dark:bg-gray-600 py-6  rounded-2xl max-w-6xl mx-auto px-6">
+       <div className="  dark:bg-gray-600 py-6  rounded-2xl max-w-6xl mx-auto px-6">
         {/* Dormitory Overview */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold dark:text-white text-blue-700 ">About Our Dormitory</h2>
@@ -18,11 +18,6 @@ export default function AboutUs() {
             <FaBuilding className="text-blue-700 dark:text-white text-4xl mx-auto" />
             <h3 className="text-lg dark:text-white font-semibold mt-4">Established</h3>
             <p className="text-gray-600 dark:text-white">Founded in 2010 to serve university students</p>
-        <div className="grid md:grid-cols-2  lg:grid-cols-4 gap-8">
-          <div className="bg-white shadow-lg p-6 rounded-xl text-center">
-            <FaBuilding className="text-blue-700 text-4xl mx-auto" />
-            <h3 className="text-lg font-semibold mt-4">Established</h3>
-            <p className="text-gray-600">Founded in 2010 to serve university students</p>
           </div>
 
           <div className="bg-white dark:bg-gradient-to-r from-gray-900 via-cyan-700 to-blue-900 shadow-lg p-6 rounded-xl text-center">
@@ -43,6 +38,7 @@ export default function AboutUs() {
             <p className="text-gray-600 dark:text-white">Over 2,000 students housed comfortably</p>
           </div>
         </div>
+         
 
         {/* Additional Info */}
         <div className="mt-12 grid md:grid-cols-2 gap-8">
@@ -72,5 +68,6 @@ export default function AboutUs() {
         </div>
       </div>
     </div>
+    
   );
 }

@@ -3,8 +3,13 @@ import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
 import {   useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "../../../store/common/ThemeSlice";
 
 function  NavBar() {
+const navigate = useNavigate();
+const theme = useSelector((state) => state.theme.mode);
+const dispatch = useDispatch();
 
   return (
      <nav className="   bg-white/20 backdrop-blur-xl top-0 w-full 
@@ -14,7 +19,7 @@ function  NavBar() {
       
        <div className='text-center'>
           {/* logo */}
-          <h1 className='text-3xl'>wkudms</h1>
+          <h1 className='text-3xl dark:text-white'>wkudms</h1>
 
         </div> 
        {/* menu items*/}
@@ -49,8 +54,9 @@ function  NavBar() {
           </Link>
         </div>
         <div className='flex items-center space-x-6  '>
-          <Moon  size={24} color="black" />
-          <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl '>LOGIN</button>
+        <button onClick={() => dispatch(toggleTheme())}> {theme === 'dark' ? 'Light' : 'Dark'} Mode
+      </button>
+      <button className='bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl ' onClick={()=>navigate('/auth/logIn')}>LOGIN</button>
           {/* menu bar sheet */}
           
         </div>
