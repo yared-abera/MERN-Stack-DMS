@@ -4,6 +4,9 @@ import { useSelector } from "react-redux"
 import { useEffect } from "react"
 import LogIn from "./pages/auth/login";
 import LogInLayout from "./components/auth/layout";
+import Admin from "./pages/Admin/dashbord";
+import AdminLayout from "./components/admin/layout";
+ 
 function App() {
  
   const theme = useSelector((state) => state.theme.mode);
@@ -24,6 +27,12 @@ function App() {
         <Route path="/" element={<Home/>} />
         <Route path="/auth" element={<LogInLayout />}>
           <Route path="logIn" element={<LogIn />}/> 
+        </Route>
+
+        <Route path="/admin" element ={<AdminLayout/>}>
+         <Route path="dashbord" element={<Admin/>}/>
+         <Route path="manage" element />
+         <Route path="account" element/>
         </Route>
       </Routes>
  
