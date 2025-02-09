@@ -1,5 +1,4 @@
 import React from 'react'
-import { Moon } from 'lucide-react'
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
 import {   useNavigate } from 'react-router-dom';
@@ -31,8 +30,8 @@ const dispatch = useDispatch();
               className="text-lg flex items-center  w-1/3   space-x-7  rounded-xl hover:bg-blue-500 hover:scale-110 duration-1000 cursor-pointer"
              >
               
-              <FaHome className="mr-1" size={16} color="black"/>
-               HOME
+              <FaHome className="mr-1" size={16} color={theme === 'dark' ? 'white' : 'black'}/>
+              HOME
           </Link>
           <Link
               to="about"
