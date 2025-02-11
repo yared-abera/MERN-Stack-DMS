@@ -1,3 +1,5 @@
+import {  LayoutDashboard,   MessageSquareShareIcon,   Settings,   } from "lucide-react"
+ 
 
 export const logInForm=[
     {
@@ -16,4 +18,29 @@ export const logInForm=[
         componentType: 'input',
 
     },
+]
+
+
+export const adminSideBar=[
+    {
+        id:1,
+        label:'Dashbord',
+        path:'/admin/dashbord',
+        icon: LayoutDashboard,
+        
+    },
+    {
+        id:2,
+        label:'Manage Account',
+        path:'/admin/manage',
+        icon:MessageSquareShareIcon
+        
+    },
+    {
+        id:3,
+        label:'setting',
+        path:'/admin/setting',
+        icons:Settings
+        
+    }
 ]

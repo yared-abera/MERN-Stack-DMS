@@ -7,6 +7,8 @@ import LogInLayout from "./components/auth/layout";
 import Admin from "./pages/Admin/dashbord";
 import AdminLayout from "./components/admin/layout";
 import { ProctorManagerLayout } from './pages/proctorManager/index'
+import ManageAccount from "./pages/Admin/manageAccount";
+ 
 function App() {
  
   const theme = useSelector((state) => state.theme.mode);
@@ -31,7 +33,7 @@ function App() {
 
         <Route path="/admin" element ={<AdminLayout/>}>
          <Route path="dashbord" element={<Admin/>}/>
-         <Route path="manage" element />
+         <Route path="manage" element={<ManageAccount/>}/>
          <Route path="account" element/>
         </Route>
         <Route path="/proctor-manager" element={<ProctorManagerLayout/>} />
