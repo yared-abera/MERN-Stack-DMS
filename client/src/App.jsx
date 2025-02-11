@@ -6,6 +6,7 @@ import LogIn from "./pages/auth/login";
 import LogInLayout from "./components/auth/layout";
 import Admin from "./pages/Admin/dashbord";
 import AdminLayout from "./components/admin/layout";
+import ManageAccount from "./pages/Admin/manageAccount";
  
 function App() {
  
@@ -31,7 +32,7 @@ function App() {
 
         <Route path="/admin" element ={<AdminLayout/>}>
          <Route path="dashbord" element={<Admin/>}/>
-         <Route path="manage" element />
+         <Route path="manage" element={<ManageAccount/>}/>
          <Route path="account" element/>
         </Route>
       </Routes>
