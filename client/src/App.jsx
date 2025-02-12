@@ -6,7 +6,7 @@ import LogIn from "./pages/auth/login";
 import LogInLayout from "./components/auth/layout";
 import Admin from "./pages/Admin/dashbord";
 import AdminLayout from "./components/admin/layout";
-import { ProctorManagerLayout } from './pages/proctorManager/index'
+import ProctorManagerLayout  from './components/proctor-manager/Layout';
 import ManageAccount from "./pages/Admin/manageAccount";
  
 function App() {
