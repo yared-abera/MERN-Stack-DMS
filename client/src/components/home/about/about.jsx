@@ -31,8 +31,8 @@ export default function AboutUs() {
             <h3 className="text-lg font-semibold mt-4 dark:text-white">Accommodation</h3>
             <p className="text-gray-600 dark:text-white">Fully furnished rooms with modern facilities</p>
           </div>
-
-          <div className="bg-white dark:bg-gradient-to-r from-gray-900 via-cyan-700 to-blue-900  shadow-lg p-6 rounded-xl text-center">
+ 
+          <div className="bg-#2c46e4 dark:bg-gradient-to-r from-gray-900 via-cyan-700 to-blue-900  shadow-lg p-6 rounded-xl text-center">
             <FaUsers className="text-red-700 dark:text-white text-4xl mx-auto" />
             <h3 className="text-lg dark:text-white font-semibold mt-4">Capacity</h3>
             <p className="text-gray-600 dark:text-white">Over 2,000 students housed comfortably</p>

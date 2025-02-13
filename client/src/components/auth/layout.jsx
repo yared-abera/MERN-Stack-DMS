@@ -21,14 +21,16 @@ export default function LogInLayout() {
           <img className="text-white" src={img} alt="" />
         </div>
         <div className="mt-2">
-          <motion.p
+          {/* <motion.p
             className="md:text-3xl sm:text-2xl font-bold  font-serif text-white opacity-40"
             initial={{ x: -10 }}
             animate={{ x: 40 }}
             transition={{ duration: 4, ease: "easeInOut", repeat: Infinity,repeatDelay:2 }}
-          >
+          > */}
+          <p className="md:text-3xl sm:text-2xl font-bold  font-serif text-white opacity-40" >
             DORMITORY MANAGMENT SYSTEM
-          </motion.p>
+            </p>
+          {/* </motion.p> */}
         </div>
       </header>
       <section className="w-full h-full flex-1  flex items-center justify-center ">
