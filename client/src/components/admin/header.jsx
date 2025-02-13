@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CalendarX, LogOut, UserCog } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   const NowDate = new Date();
@@ -21,13 +22,15 @@ export default function Header() {
   const toggleCalendar = () => {
     setShowCalendar(!showCalendar);
   };
+
+  const navigate=useNavigate()
   //
   return (
-    <header className="sticky top-0 z-10 flex  h-20 items-center gap-4 border-b bg-background w-full shadow-lg">
-      <div className="flex w-full items-center justify-around">
-        <div className="flex items-center justify-between w-auto gap-8">
-          <Button>Search</Button>
-          <Input type="text" placeholder="Search user by Using User Name " className='transition-all duration-300 ease-in-out md:hover:w-30' />
+    <header className="fixed top-0 ml-3   w-full z-50 flex h-20 items-center justify-between px-4 border-b bg-background shadow-lg md:px-8 lg:justify-around lg:gap-4">
+    
+        <div className="flex items-start justify-between gap-3 ">
+          <Button className='sm:ml-3'>Search</Button>
+          <Input type="text" placeholder="Search user by Using User Name " className='transition-all duration-300 ease-in-out  dark:text-white ' />
        
         </div>
         <div className="flex justify-between items-center gap-6">
@@ -50,11 +53,11 @@ export default function Header() {
           </div>
         </div>
 
-        <div>
+        <div className="mr-8">
         <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="bg-black cursor-pointer ">
-            <AvatarFallback className="bg-black   text-white font-extrabold  ">
+          <Avatar className="bg-black cursor-pointer dark:bg-white ">
+            <AvatarFallback className="bg-black dark:bg-white dark:text-black  text-white font-extrabold  ">
               xu
             </AvatarFallback>
           </Avatar>
@@ -63,8 +66,8 @@ export default function Header() {
           <DropdownMenuLabel>Logged in as  </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem  >
-            <UserCog className="m-2 w-4 h-4" />
-            Accoutnt
+            <UserCog className="m-2 w-4 h-4" onClick={()=>navigate('/admin/account')} />
+             Account
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem  >
@@ -74,7 +77,9 @@ export default function Header() {
         </DropdownMenuContent>
       </DropdownMenu>
         </div>
-      </div>
+
+        <div></div>
+    
     </header>
   );
 }
