@@ -8,7 +8,13 @@ import Admin from "./pages/Admin/dashbord";
 import AdminLayout from "./components/admin/layout";
 import ProctorManagerLayout  from './components/proctor-manager/Layout';
 import ManageAccount from "./pages/Admin/manageAccount";
- 
+import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
+import RegisterBlock from "./pages/proctorManager/RegisterBlockPage";
+import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
+import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
+import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
+import GenerateReport from "./pages/proctorManager/GenerateReportPage";
+
 function App() {
  
   const theme = useSelector((state) => state.theme.mode);
@@ -36,8 +42,16 @@ function App() {
          <Route path="manage" element={<ManageAccount/>}/>
          <Route path="account" element/>
         </Route>
-        <Route path="/proctor-manager" element={<ProctorManagerLayout/>} />
+        <Route path="/proctorManager" element={<ProctorManagerLayout/>}  >
+          <Route path="generateReport" element={ <GenerateReport/>}/>
+          <Route path="profile" element={<ProfileManagement/>}/>
+          <Route path="viewFeedback"element={<ViewFeedback/>}/>
+          <Route path="viewMaintenance"element={<ViewMaintenance/>}/>
+          <Route path="registerStudent"element={<RegisterStudent/>}/>
+          <Route path="registerBlock"element={<RegisterBlock/>}/>
+        </Route>
       </Routes>
+      
  
  
  

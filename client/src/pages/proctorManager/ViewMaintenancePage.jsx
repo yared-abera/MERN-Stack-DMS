@@ -2,7 +2,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
-export const ViewMaintenance = () => {
+ const ViewMaintenance = () => {
     const maintenanceData = [
       { id: 1, block: "Block 1", issue: "Leaking pipe", status: "Pending" },
       { id: 2, block: "Block 2", issue: "Broken window", status: "In Progress" },

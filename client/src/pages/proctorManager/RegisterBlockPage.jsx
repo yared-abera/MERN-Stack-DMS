@@ -1,24 +1,24 @@
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export const ProfileManagement = () => {
+const RegisterBlock = () => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Profile Management</CardTitle>
+          <CardTitle>Register Block</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-4">
-            <Input placeholder="Name" />
-            <Input placeholder="Email" />
-            <Input type="password" placeholder="Password" />
-            <Button type="submit">Update Profile</Button>
+            <Input placeholder="Block Name" />
+            <Input placeholder="Location" />
+            <Input type="number" placeholder="Capacity" />
+            <Button type="submit">Register Block</Button>
           </form>
         </CardContent>
       </Card>
     );
   };
 
+  export default RegisterBlock;
  
