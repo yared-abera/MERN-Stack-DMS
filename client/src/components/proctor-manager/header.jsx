@@ -49,7 +49,7 @@ export default function Header() {
         <div className="relative">
           <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
             <UserCircle size={28} />
-            <span className="hidden lg:block">Admin</span>
+            <span className="hidden lg:block">User</span>
           </button>
         </div>
       </div>
