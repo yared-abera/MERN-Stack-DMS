@@ -26,16 +26,12 @@ const items = [
     icon: Inbox,
   },
   {
-    title: "Settings",
-    url: "/admin/setting",
+    title: "My Account",
+    url: "/admin/account",
     icon: Settings,
   },
   
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
+ 
 
 ]
 
