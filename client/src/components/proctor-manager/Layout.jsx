@@ -10,10 +10,12 @@ export default function ProctorManagerLayout() {
         <SideBarComponent />
          
      <main className="flex-1 flex flex-col">
-           <Header /> 
-          <div className="sticky top-0 mt-8 z-20">
-            <SidebarTrigger />
-          </div>
+        <div className="sticky top-0 mt-8 z-20">
+            <div className="flex">
+            <SidebarTrigger size="icon" />
+            <Header />
+            </div>
+          </div>  
           <Outlet className="flex-1 p-4" />
         </main>
       </div>
