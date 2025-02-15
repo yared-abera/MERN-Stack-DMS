@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-export default function Account() {
+export default function StudDeanAccount() {
   return (
     <div className="w-full min-h-screen  mt-20 overflow-hidden">
       <div className="flex flex-col gap-2 p-4   ">

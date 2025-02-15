@@ -1,14 +1,23 @@
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
-import { CalendarX, LogOut, UserCog } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { CalendarX, LogOut, Search, UserCog } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { SidebarTrigger } from "../ui/sidebar";
 
 export default function Header() {
   const NowDate = new Date();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [time, setTime] = useState();
 
   useEffect(() => {
@@ -23,63 +32,165 @@ export default function Header() {
     setShowCalendar(!showCalendar);
   };
 
-  const navigate=useNavigate()
-  //
-  return (
-    <header className="fixed top-0 ml-3   w-full z-50 flex h-20 items-center justify-between px-4 border-b bg-background shadow-lg md:px-8 lg:justify-around lg:gap-4">
-    
-        <div className="flex items-start justify-between gap-3 ">
-          <Button className='sm:ml-3'>Search</Button>
-          <Input type="text" placeholder="Search user by Using User Name " className='transition-all duration-300 ease-in-out  dark:text-white ' />
-       
-        </div>
-        <div className="flex justify-between items-center gap-6">
-          <div>
-            <Button
-              className="  border-none cursor-pointer   mt-2  "
-              onClick={toggleCalendar}
-            >
-              <CalendarX size='25' />
-            </Button>
-            {showCalendar && (
-              <div className="bg-none border-spacing-0 cursor-pointer font-semibold m-2">
-                <h3> Date: {NowDate.toLocaleDateString()}</h3>
-              </div>
-            )}
-          </div>
-          <div>
-            {" "}
-            <span className="font-sans text-lg font-bold">{time}</span>
-          </div>
-        </div>
+  const navigate = useNavigate();
+  function handleSearch() {
+    setShowSearch(!showSearch);
+  }
 
-        <div className="mr-8">
-        <DropdownMenu>
+  return (
+    <header className="fixed   top-0  w-full z-10 h-auto flex  p-4  border-b bg-background shadow-lg    lg:gap-4">
+      <div className="text-left flex items-start justify-start">
+        <SidebarTrigger />
+      </div>
+
+    
+ <div className="flex-1 flex   gap-4  ">
+  <div className="flex  justify-between gap-3 sm:ml-1 w-full  ">
+    <Button className="hidden md:inline-flex  ">Search</Button>
+    <Button className="inline-flex md:hidden  " size="sm" onClick={handleSearch}>
+      <Search />
+    </Button>
+    <Input
+      type="text"
+      placeholder="Search user by Using User Name"
+      className="hidden md:inline-flex transition-all duration-300 ease-in-out dark:text-white flex-1"
+    />
+    {showSearch ? (
+      <Input
+        type="text"
+        placeholder="Search user by Using User Name"
+        className="md:hidden transition-all duration-300 ease-in-out dark:text-white flex-1"
+      />
+    ) : (
+      <div className="flex items-center justify-center flex-1 ">
+        <Button
+          className={showCalendar ? "hidden" : "border-none cursor-pointer "}
+          onClick={toggleCalendar}
+        >
+          <CalendarX />
+        </Button>
+        {showCalendar && (
+          <div
+            className="bg-none border-spacing-0 cursor-pointer font-semibold  flex-1"
+            onClick={toggleCalendar}
+          >
+            <h3>Date: {NowDate.toLocaleDateString()}</h3>
+          </div>
+        )}
+      </div>
+    )}
+    <div className="flex-1">
+      <span className="font-sans md:text-lg md:font-bold sm:text-sm sm:font-semibold">
+        {time}
+      </span>
+    </div>
+    <div className="md:mr-20 sm:ml-2 flex-1">
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="bg-black cursor-pointer dark:bg-white ">
-            <AvatarFallback className="bg-black dark:bg-white dark:text-black  text-white font-extrabold  ">
+          <Avatar className="bg-black cursor-pointer dark:bg-white">
+            <AvatarFallback className="bg-black dark:bg-white dark:text-black text-white font-extrabold">
               xu
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="right" className="w-56">
-          <DropdownMenuLabel>Logged in as  </DropdownMenuLabel>
+          <DropdownMenuLabel>Logged in as</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem  >
-            <UserCog className="m-2 w-4 h-4" onClick={()=>navigate('/admin/account')} />
-             Account
+          <DropdownMenuItem>
+            <UserCog className="m-2 w-4 h-4" onClick={() => navigate("/admin/account")} />
+            Account
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem  >
-            <LogOut className="w-4 h-4 m-2 " />
+          <DropdownMenuItem>
+            <LogOut className="w-4 h-4 m-2" />
             LogOut
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-        </div>
+    </div>
+  </div>
+</div>
 
-        <div></div>
-    
     </header>
+   
   );
 }
+  {/* <div className=" w-full flex justify-center gap-4 bg-red-700 ">
+        <div className="flex items-center justify-between gap-3 sm:ml-1 ">
+          <Button className="hidden md:inline-flex">Search</Button>
+          <Button
+            className="inline-flex  md:hidden"
+            size="sm"
+            onClick={handleSearch}
+          >
+            <Search />
+          </Button>
+          <Input
+            type="text"
+            placeholder="Search user by Using User Name"
+            className="hidden md:inline-flex transition-all duration-300 ease-in-out dark:text-white"
+          />{" "}
+       
+          {showSearch ? (
+            <Input
+              type="text"
+              placeholder="Search user by Using User Name"
+              className=" md:hidden transition-all duration-300 ease-in-out dark:text-white"
+            />
+          ) : (
+            <div className="flxe items-center justify-center">
+              <Button
+                className={
+                  showCalendar ? "hidden" : " border-none cursor-pointer   "
+                }
+                onClick={toggleCalendar}
+              >
+                <CalendarX />
+              </Button>{" "}
+              {showCalendar && (
+                <div
+                  className="bg-none border-spacing-0 cursor-pointer font-semibold m-2"
+                  onClick={toggleCalendar}
+                >
+                  <h3> Date: {NowDate.toLocaleDateString()}</h3>{" "}
+                </div>
+              )}
+            </div>
+          )}
+       
+
+        <div>
+          <span className="font-sans md:text-lg md:font-bold sm:text-sm  sm:font-semibold">
+            {time}
+          </span>
+        </div>
+
+        <div className="md:mr-20 sm:ml-2  ">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="bg-black cursor-pointer dark:bg-white ">
+                <AvatarFallback className="bg-black dark:bg-white dark:text-black  text-white font-extrabold  ">
+                  xu
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" className="w-56">
+              <DropdownMenuLabel>Logged in as </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <UserCog
+                  className="m-2 w-4 h-4"
+                  onClick={() => navigate("/admin/account")}
+                />
+                Account
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOut className="w-4 h-4 m-2 " />
+                LogOut
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        </div>
+      </div> */}

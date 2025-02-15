@@ -12,7 +12,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
-  SidebarItem,
+   
   SidebarFooter,
 } from "@/components/ui/sidebar"; // Import ShadCN Sidebar components
 import { cn } from "@/lib/utils";
