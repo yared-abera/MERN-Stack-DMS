@@ -15,7 +15,7 @@ import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
 import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
 import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
 import GenerateReport from "./pages/proctorManager/GenerateReportPage";
-
+import StudentDashboard from "./components/student/layout"
 function App() {
   const theme = useSelector((state) => state.theme.mode);
   useEffect(() => {
@@ -49,11 +49,12 @@ function App() {
           <Route path="registerStudent"element={<RegisterStudent/>}/>
           <Route path="registerBlock"element={<RegisterBlock/>}/>
         </Route>
-      </Routes>
- 
- 
- 
-     
+      
+  
+        <Route path="/student" element={<StudentDashboard/>}>
+
+         </Route>
+     </Routes>
      </div>
   )
 }

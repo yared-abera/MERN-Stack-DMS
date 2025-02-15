@@ -29,9 +29,7 @@ export default function SideBarComponent() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(setUpdateAllocation(!updateAllocation);
-  }, [updateAllocation]);
+   
   return (
     <Sidebar className={cn("bg-white shadow-md transition-all", isOpen ? "w-64" : "w-16")}>
       <SidebarHeader className="flex items-center justify-between p-4">
