@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
+import { Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../../../store/common/ThemeSlice";
@@ -49,7 +50,7 @@ function NavBar() {
             />
             ABOUT
           </Link>
-          <Link
+          <Link 
             to="contact"
             smooth={true}
             duration={1000}
@@ -64,10 +65,12 @@ function NavBar() {
           </Link>
         </div>
         <div className="flex items-center space-x-6  ">
-          <button onClick={() => dispatch(toggleTheme())}>
-            {" "}
-            {theme === "dark" ? "Light" : "Dark"} Mode
-          </button>
+          <button
+          className="p-2 rounded-md text-gray-700 dark:text-gray-300"
+          onClick={() => dispatch(toggleTheme())}
+        >
+          {theme === "dark" ? <Sun size={24} /> : <Moon size={24}  />}
+        </button>
           <button
             className="bold bg-blue-500 hover:bg-blue-400  py-2  px-8  rounded-2xl "
             onClick={() => navigate("/auth/logIn")}

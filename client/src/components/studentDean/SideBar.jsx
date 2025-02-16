@@ -20,7 +20,7 @@ const StudDeanSideBar = [
   },
   {
     title: "Dorm Allocation",
-    url: "/dean/allocate",
+    url: "/dean/dorm",
     icon: LayoutGrid,
   },
   {

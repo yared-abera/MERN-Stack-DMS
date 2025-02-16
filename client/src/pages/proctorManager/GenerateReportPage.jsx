@@ -2,7 +2,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
- export const GenerateReport = () => {
+ 
+
+ const  GenerateReport = () => {
     return (
       <Card>
         <CardHeader>
@@ -27,5 +29,7 @@ import { Button } from "@/components/ui/button";
       </Card>
     );
   };
+
+  export default GenerateReport;
 
   

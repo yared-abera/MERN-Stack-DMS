@@ -34,18 +34,18 @@ export default function StudDeanAccount() {
 
             <p>email</p>
             <p>zu@gmail.com</p>
-            <div className='block' >
-            <Button>View Detail</Button>
-          </div>
-           
+            <div className="block">
+              <Button>View Detail</Button>
+            </div>
           </div>
         </div>
 
-        <div className="w-full  border-solid shadow-md mt-8 px-7">
+        <div className="w-full  border-solid shadow-md mt-8 ">
           <div>
-            <div className="flex justify-between items-start">
+            <div className="flex items-center justify-between gap-2">
               <h1>Address & contact </h1>
-              <Button>edit</Button>
+
+              <Button className="text-right">edit</Button>
             </div>
 
             <div className="grid grid-cols-2 gap-1 w-full">

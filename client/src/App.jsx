@@ -6,14 +6,19 @@ import LogIn from "./pages/auth/login";
 import LogInLayout from "./components/auth/layout";
 import Admin from "./pages/Admin/dashbord";
 import AdminLayout from "./components/admin/layout";
-import { ProctorManagerLayout } from './pages/proctorManager/index'
+import ProctorManagerLayout  from './components/proctor-manager/Layout';
 import ManageAccount from "./pages/Admin/manageAccount";
 import Account from "./pages/Admin/account";
 import StudentDeanLayout from "./components/studentDean/layout";
 import StudentDeanHome from "./pages/studentDean";
-import DormAllocation from './pages/studentDean/allocation';
-import StudDeanAccount from "./pages/studentDean/account";
+import DormAllocation from "./pages/studentDean/allocation";
 import StudentInfo from "./pages/studentDean/viewStudentInfo";
+import StudDeanAccount from "./pages/studentDean/account";
+import StudentLayout from "./components/student/studentLayout";
+import StudentHome from "./pages/student/home";
+import ViewDorm from "./pages/student/viewDorm";
+import ReportMaintenace from "./pages/student/maintenanceIssue";
+import StudentAccount from "./pages/student/account";
  
 
 function App() {
@@ -42,18 +47,28 @@ function App() {
           <Route path="account" element={<Account />} />
         </Route>
         <Route path="/proctor-manager" element={<ProctorManagerLayout/>} />
+      
+ 
+   
+      <Route path="/dean" element={<StudentDeanLayout/>}>
+          <Route path="home" element={<StudentDeanHome/>} />
+          <Route path="dorm" element={<DormAllocation/>} />
+          <Route path="info" element={<StudentInfo/>} />
+          <Route path="account" element={<StudDeanAccount/>} />
+        </Route>
 
         
-        <Route path="/dean" element={<StudentDeanLayout/>}>
-        <Route path="home" element={<StudentDeanHome/>}/>
-        <Route path="allocate" element={<DormAllocation/>}/>
-        <Route path="account" element={<StudDeanAccount/>}/>
-        <Route path="info" element={<StudentInfo/>}/>
-
+      <Route path="/student" element={<StudentLayout/>}>
+          <Route path="home" element={<StudentHome/>} />
+          <Route path="dorm" element={<ViewDorm/>} />
+          <Route path="issue" element={<ReportMaintenace/>} />
+          <Route path="account" element={<StudentAccount/>} />
         </Route>
-      </Routes>
-    </div>
-  );
+        </Routes>
+ 
+     
+     </div>
+  )
 }
 
 export default App;

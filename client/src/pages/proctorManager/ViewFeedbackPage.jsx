@@ -1,7 +1,8 @@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-export const ViewFeedback = () => {
+  const  ViewFeedback = () => {
+
     const feedbackData = [
       { id: 1, block: "Block 1", feedback: "Great facilities!", date: "2023-10-01" },
       { id: 2, block: "Block 2", feedback: "Needs more cleaning.", date: "2023-10-02" },
@@ -36,4 +37,6 @@ export const ViewFeedback = () => {
     );
   };
 
-  export default ViewFeedback;
+  export default ViewFeedback
+
+ 
