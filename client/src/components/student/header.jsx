@@ -54,12 +54,12 @@ export default function StudentHeader() {
     <>
       <div className="fixed top-0 w-full z-10 h-auto py-3 shadow-lg border-solid     ">
         <div className="hidden md:inline-flex w-full">
-          <div className="w-[65%]  flex items-center justify-evenly h-full gap-1">
+          <div className="w-[65%] flex items-center justify-evenly h-full gap-1">
             {headerComponent.map((item, index) => (
               <Link
                 key={index}
                 to={item.url}
-                className={`flex sm:px-1 sm:py-2 dark:text-black  md:px-4 md:py-3 rounded-md hover:bg-sky-500 ${
+                className={`flex sm:px-1 sm:py-2 dark:text-black   md:px-4 md:py-3 rounded-md hover:bg-sky-500 ${
                   location.pathname === item.url
                     ? "bg-blue-500 text-white"
                     : "bg-sky-50"
