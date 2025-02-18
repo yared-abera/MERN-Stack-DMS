@@ -15,12 +15,12 @@ import { Sidebar, SidebarContent, SidebarHeader, SidebarMenuItem } from "@/compo
 import { cn } from "@/lib/utils";
 
 const navigationItems = [
-  { id: "registerBlock", label: "Register Block", icon: LayoutDashboard, url:"/proctorManager/registerBlock" },
-  { id: "registerStudent", label: "Register Student", icon: Users , url:"/proctorManager/registerStudent"},
-  { id: "viewFeedback", label: "View Feedback", icon: MessageSquare , url:"/proctorManager/viewFeedback"},
-  { id: "viewMaintenance", label: "View Maintenance", icon: Wrench , url:"/proctorManager/viewMaintenance"},
-  { id: "generateReport", label: "Generate Report", icon: FileText , url:"/proctorManager/generateReport"},
-  { id: "profile", label: "Profile", icon: User , url:"/proctorManager/profile"},
+  { id: "registerBlock", label: "Register Block", icon: LayoutDashboard, url:"/proctor-manager/registerBlock" },
+  { id: "registerStudent", label: "Register Student", icon: Users , url:"/proctor-manager/registerStudent"},
+  { id: "viewFeedback", label: "View Feedback", icon: MessageSquare , url:"/proctor-manager/viewFeedback"},
+  { id: "viewMaintenance", label: "View Maintenance", icon: Wrench , url:"/proctor-manager/viewMaintenance"},
+  { id: "generateReport", label: "Generate Report", icon: FileText , url:"/proctor-manager/generateReport"},
+  { id: "profile", label: "Profile", icon: User , url:"/proctor-manager/profile"},
 ];
 
 export default function SideBarComponent() {
