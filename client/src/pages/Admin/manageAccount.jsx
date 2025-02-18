@@ -93,7 +93,8 @@ export default function ManageAccount() {
         <Sheet>
           <SheetTrigger>
             {" "}
-            <Button className='mr-6 sm:text-sm md:text-base'>Create Account</Button>
+            <Button className='hidden md:mr-6 '>Create Account</Button>
+            <Button className='inline-flex md:hidden mr-2' size='sm'>Create Account</Button>
           </SheetTrigger>
           <SheetContent
             className="w-[400px] sm:w-[540px] overflow-auto  "

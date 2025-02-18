@@ -9,6 +9,18 @@ import AdminLayout from "./components/admin/layout";
 import ProctorManagerLayout  from './components/proctor-manager/Layout';
 import ManageAccount from "./pages/Admin/manageAccount";
 import Account from "./pages/Admin/account";
+import StudentDeanLayout from "./components/studentDean/layout";
+import StudentDeanHome from "./pages/studentDean";
+import DormAllocation from "./pages/studentDean/allocation";
+import StudentInfo from "./pages/studentDean/viewStudentInfo";
+import StudDeanAccount from "./pages/studentDean/account";
+import StudentLayout from "./components/student/studentLayout";
+import StudentHome from "./pages/student/home";
+import ViewDorm from "./pages/student/viewDorm";
+import ReportMaintenace from "./pages/student/maintenanceIssue";
+import StudentAccount from "./pages/student/account";
+ 
+
 import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
 import RegisterBlock from "./pages/proctorManager/RegisterBlockPage";
 import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
@@ -41,20 +53,29 @@ function App() {
           <Route path="manage" element={<ManageAccount />} />
           <Route path="account" element={<Account />} />
         </Route>
-        <Route path="/proctorManager" element={<ProctorManagerLayout/>}  >
-          <Route path="generateReport" element={ <GenerateReport/>}/>
-          <Route path="profile" element={<ProfileManagement/>}/>
-          <Route path="viewFeedback"element={<ViewFeedback/>}/>
-          <Route path="viewMaintenance"element={<ViewMaintenance/>}/>
-          <Route path="registerStudent"element={<RegisterStudent/>}/>
-          <Route path="registerBlock"element={<RegisterBlock/>}/>
-        </Route>
+        <Route path="/proctor-manager" element={<ProctorManagerLayout/>} />
       
-  
-        <Route path="/student" element={<StudentDashboard/>}>
+ 
+   
+      <Route path="/dean" element={<StudentDeanLayout/>}>
+          <Route path="home" element={<StudentDeanHome/>} />
+          <Route path="dorm" element={<DormAllocation/>} />
+          <Route path="info" element={<StudentInfo/>} />
+          <Route path="account" element={<StudDeanAccount/>} />
+        </Route>
 
-         </Route>
-     </Routes>
+        
+      <Route path="/student" element={<StudentLayout/>}>
+          <Route path="home" element={<StudentHome/>} />
+          <Route path="dorm" element={<ViewDorm/>} />
+          <Route path="issue" element={<ReportMaintenace/>} />
+          <Route path="account" element={<StudentAccount/>} />
+        </Route>
+      </Routes>
+ 
+ 
+ 
+     
      </div>
   )
 }
