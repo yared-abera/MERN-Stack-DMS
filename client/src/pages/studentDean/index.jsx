@@ -1,4 +1,4 @@
-import img from "../../assets/photo/gibi.jpg";
+import img from "../../assets/img/gibi.jpg";
 import logo from "../../assets/img/University_logo.png";
 import { Button } from "@/components/ui/button";
 
