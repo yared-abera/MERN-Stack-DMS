@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { motion } from "framer-motion";
+
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -16,20 +16,31 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {setUpdateAllocation} from "../../store/common/sidebarSlice";
+import {useDispatch,useSelector} from "react-redux"
 
-const RegisterStudent = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  
+const RegisterStudent = () => { 
+  const dispatch = useDispatch();
+  const openDialog= useSelector((state) => state.sidebar.updateAllocation);
+  const [isOpen, setIsOpen] = useState(`${openDialog}`);
+
+  useEffect(() => {
+    
+    setIsOpen(Boolean(openDialog));
+
+}, [openDialog]);  
+
+const handleOpenChange = (newOpenState) => {
+    setIsOpen(newOpenState);
+    if(!newOpenState){
+        dispatch(setUpdateAllocation())
+    }
+};
+
   return (
-    <div>
-      {/* Button to Open Modal */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button onClick={() => setIsOpen(true)}>Register Student</Button>
-        </DialogTrigger>
-
-        {/* Sliding Modal - Appears Below Header & Right of Sidebar */}
-        <DialogContent className="   m-auto z-50">
+    <div> 
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>  
+        <DialogContent className="m-auto z-50">
           <motion.div
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}

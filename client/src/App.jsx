@@ -19,6 +19,12 @@ import StudentHome from "./pages/student/home";
 import ViewDorm from "./pages/student/viewDorm";
 import ReportMaintenace from "./pages/student/maintenanceIssue";
 import StudentAccount from "./pages/student/account";
+import RegisterBlock from "./pages/proctorManager/RegisterBlockPage";
+import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
+import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
+import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
+import GenerateReport from "./pages/proctorManager/GenerateReportPage";
+import ProctorLayout from "./components/proctor/layout";
 import Comment from "./pages/student/comment";
  
 
@@ -47,10 +53,23 @@ function App() {
           <Route path="manage" element={<ManageAccount />} />
           <Route path="account" element={<Account />} />
         </Route>
-        <Route path="/proctor-manager" element={<ProctorManagerLayout/>} />
-      
- 
-   
+        
+        <Route path="/proctor-manager" element={<ProctorManagerLayout/>}>
+          <Route path="RegisterBlock" element={<RegisterBlock/>} />
+          <Route path="RegisterStudent" element={<RegisterStudent/>} />
+          <Route path="ViewFeedback" element={<ViewFeedback/>} />
+          <Route path="ViewMaintenance" element={<ViewMaintenance />} />
+          <Route path="GenerateReport" element={<GenerateReport/>} />
+        </Route>
+
+        <Route path="/proctor" element={<ProctorLayout/>}>
+          {/* <Route path="RegisterBlock" element={<RegisterBlock/>} />
+          <Route path="RegisterStudent" element={<RegisterStudent/>} />
+          <Route path="ViewFeedback" element={<ViewFeedback/>} />
+          <Route path="ViewMaintenance" element={<ViewMaintenance />} />
+          <Route path="GenerateReport" element={<GenerateReport/>} /> */}
+        </Route>
+
       <Route path="/dean" element={<StudentDeanLayout/>}>
           <Route path="home" element={<StudentDeanHome/>} />
           <Route path="dorm" element={<DormAllocation/>} />
@@ -58,7 +77,6 @@ function App() {
           <Route path="account" element={<StudDeanAccount/>} />
         </Route>
 
-        
       <Route path="/student" element={<StudentLayout/>}>
           <Route path="home" element={<StudentHome/>} />
           <Route path="dorm" element={<ViewDorm/>} />
@@ -66,7 +84,10 @@ function App() {
           <Route path="account" element={<StudentAccount/>} />
           <Route path="comment" element={<Comment/>} />
         </Route>
-        </Routes>
+      
+      </Routes>
+ 
+ 
  
      
      </div>

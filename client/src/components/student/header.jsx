@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
+import { SidebarProvider } from "../ui/sidebar";
 
 import StudentSideBar from "./sideBar";
 const headerComponent = [
@@ -53,8 +53,11 @@ export default function StudentHeader() {
 
   return (
     <>
-      <div className="fixed top-0 w-full z-10 h-auto py-3 shadow-lg border-solid     ">
-        <div className="hidden md:inline-flex w-full">
+      <div className="fixed top-0   z-10 h-auto py-3 shadow-lg border-solid     ">
+        <div className="md:inline-flex  ">
+        <div className="flex text-left ">
+        < SidebarTrigger/>
+       </div>
           <div className="w-[65%] flex items-center justify-evenly h-full gap-1">
             {headerComponent.map((item, index) => (
               <Link
@@ -73,7 +76,7 @@ export default function StudentHeader() {
             ))}
           </div>
 
-          <div className="  w-[35%] flex items-center justify-around">
+          <div className=" flex items-center justify-around">
             <div>
               <h1 className="text-xl font-bold">{time}</h1>
             </div>

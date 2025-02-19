@@ -1,5 +1,4 @@
 import {   ChevronUp, Home, Inbox, Search, Settings, User2 } from "lucide-react"
-
 import {
   Sidebar,
   SidebarContent,

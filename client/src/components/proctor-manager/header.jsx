@@ -6,14 +6,14 @@ import { cn } from "@/lib/utils";
 export default function Header() {
   const [darkMode, setDarkMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle("dark");
   };
 
   return (
-    <header className="w-full bg-white dark:bg-gray-900 shadow-md p-4 flex justify-between items-center">
+    <header className="w-full bg-white dark:bg-gray-900 shadow-md px-8 flex justify-between items-center">
       {/* Logo & Name */}
       <div className="flex items-center gap-3">
         <button
