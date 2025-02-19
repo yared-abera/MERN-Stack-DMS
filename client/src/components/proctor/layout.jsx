@@ -1,28 +1,18 @@
- import { Outlet } from "react-router-dom";
- import { SidebarProvider } from "../ui/sidebar";
- import Header from "./header";
- import SideBarComponent from "./sideBar";
-  
+import { Outlet } from "react-router-dom";
+import Header from "./header";
+import { SidebarProvider} from "../ui/sidebar";
+import  ProctorSideBar from "./SideBar";
  
- export default function AdminLayout() {
-   return (
-     <SidebarProvider  >
-       <SideBarComponent />
-       <main className=" w-full flex ">
-         
-         <div className=" flex-1 flex flex-col gap-0.5 ml-4  w-full   ">
-         <div className=" fixed mt-8 z-20  h-7   mr-0">   
-          
-         </div>
-         
-         <div className=" flex-1 flex flex-col gap-0.5 ml-4  w-full relative ">
-           <Header />
-           <Outlet className="flex-1 " />
-         </div>
-         </div>
-       </main>
-     </SidebarProvider>
-     
-   );
- }
- 
+
+export default function ProctorLayout() {
+   
+  return (
+    <SidebarProvider  >
+      <ProctorSideBar />
+      <main className="w-full">
+        <Header />
+        <Outlet />
+      </main>
+    </SidebarProvider>
+  );
+}

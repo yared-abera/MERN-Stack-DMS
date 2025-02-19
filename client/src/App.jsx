@@ -19,12 +19,12 @@ import StudentHome from "./pages/student/home";
 import ViewDorm from "./pages/student/viewDorm";
 import ReportMaintenace from "./pages/student/maintenanceIssue";
 import StudentAccount from "./pages/student/account";
-import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
 import RegisterBlock from "./pages/proctorManager/RegisterBlockPage";
 import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
 import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
 import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
 import GenerateReport from "./pages/proctorManager/GenerateReportPage";
+import ProctorLayout from "./components/proctor/layout";
 function App() {
   const theme = useSelector((state) => state.theme.mode);
   useEffect(() => {
@@ -58,9 +58,15 @@ function App() {
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
           <Route path="GenerateReport" element={<GenerateReport/>} />
         </Route>
-      
- 
-   
+
+        <Route path="/proctor" element={<ProctorLayout/>}>
+          {/* <Route path="RegisterBlock" element={<RegisterBlock/>} />
+          <Route path="RegisterStudent" element={<RegisterStudent/>} />
+          <Route path="ViewFeedback" element={<ViewFeedback/>} />
+          <Route path="ViewMaintenance" element={<ViewMaintenance />} />
+          <Route path="GenerateReport" element={<GenerateReport/>} /> */}
+        </Route>
+
       <Route path="/dean" element={<StudentDeanLayout/>}>
           <Route path="home" element={<StudentDeanHome/>} />
           <Route path="dorm" element={<DormAllocation/>} />
@@ -68,13 +74,13 @@ function App() {
           <Route path="account" element={<StudDeanAccount/>} />
         </Route>
 
-        
       <Route path="/student" element={<StudentLayout/>}>
           <Route path="home" element={<StudentHome/>} />
           <Route path="dorm" element={<ViewDorm/>} />
           <Route path="issue" element={<ReportMaintenace/>} />
           <Route path="account" element={<StudentAccount/>} />
         </Route>
+      
       </Routes>
  
  
