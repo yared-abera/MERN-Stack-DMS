@@ -19,6 +19,7 @@ import StudentHome from "./pages/student/home";
 import ViewDorm from "./pages/student/viewDorm";
 import ReportMaintenace from "./pages/student/maintenanceIssue";
 import StudentAccount from "./pages/student/account";
+import Comment from "./pages/student/comment";
  
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
           <Route path="dorm" element={<ViewDorm/>} />
           <Route path="issue" element={<ReportMaintenace/>} />
           <Route path="account" element={<StudentAccount/>} />
+          <Route path="comment" element={<Comment/>} />
         </Route>
         </Routes>
  

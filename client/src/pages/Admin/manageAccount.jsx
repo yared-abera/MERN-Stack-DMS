@@ -23,7 +23,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserAccount } from "@/config/data";
+import { CreateAccount, LogIN } from "@/store/auth-slice";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import LogIn from "../auth/login";
 const intialFromData = {
   Fname: "",
   Mname: "",
@@ -32,8 +35,8 @@ const intialFromData = {
   userName: "",
   phoneNum: "",
   password: "",
+ // Confirm_password:'',
   sex: "",
-  id: "",
   role: "",
 };
 
@@ -44,57 +47,59 @@ export default function ManageAccount() {
       firstName: "John",
       lastName: "Doe",
       username: "johndoe",
-      role: "Admin"
+      role: "Admin",
     },
     {
       firstName: "Jane",
       lastName: "Smith",
       username: "janesmith",
-      role: "User"
+      role: "User",
     },
     {
       firstName: "Alice",
       lastName: "Johnson",
       username: "alicej",
-      role: "Moderator"
+      role: "Moderator",
     },
     {
       firstName: "Bob",
       lastName: "Brown",
       username: "bobbrown",
-      role: "User"
+      role: "User",
     },
     {
       firstName: "Charlie",
       lastName: "Davis",
       username: "charlied",
-      role: "Admin"
+      role: "Admin",
     },
     {
       firstName: "Jane",
       lastName: "Smith",
       username: "janesmith",
-      role: "User"
+      role: "User",
     },
   ];
+  const dispatch=useDispatch()
+   
   
-
   const onSubmit = (event) => {
     event.preventDefault();
+    dispatch(CreateAccount(formData))
+   
+
   };
 
   function iSFormValid() {
-    return Object.values(formData).every((item) => item != "");
+    return Object.values(formData).every((item) => item !== "");
   }
 
   return (
-    <div className="min-h-screen w-full p-2 flex flex-col  ">
-      <div className="flex items-end justify-end mt-20">
+    <div className="min-h-screen w-full p-2 flex flex-col mt-20   ">
+      <div className="flex items-end justify-end ">
         <Sheet>
           <SheetTrigger>
-            {" "}
-            <Button className='hidden md:mr-6 '>Create Account</Button>
-            <Button className='inline-flex md:hidden mr-2' size='sm'>Create Account</Button>
+            <Button className="text-sm md:text-base ">Create Account</Button>
           </SheetTrigger>
           <SheetContent
             className="w-[400px] sm:w-[540px] overflow-auto  "
@@ -200,7 +205,7 @@ export default function ManageAccount() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              { data.map((user, index) => (
+              {data.map((user, index) => (
                 <TableRow key={index}>
                   <TableCell>{user.firstName}</TableCell>
                   <TableCell>{user.lastName}</TableCell>
@@ -214,25 +219,23 @@ export default function ManageAccount() {
                       <Button variant="destructive">Delete</Button>
                       <div className="flex items-center gap-4">
                         <label className="flex flex-col items-center">
-                        <span className="ml-2">Activate</span>
+                          <span className="ml-2">Activate</span>
                           <input
                             type="radio"
                             name="status"
                             value="activate"
                             className="w-4 h-4 align-middle mt-1"
                           />
-                        
                         </label>
 
                         <label className="flex  flex-col items-center">
-                        <span className="ml-2">Deactivate</span>
+                          <span className="ml-2">Deactivate</span>
                           <input
                             type="radio"
                             name="status"
                             value="deactivate"
                             className="w-4 h-4 align-middle mt-1"
                           />
-                         
                         </label>
                       </div>
                     </div>

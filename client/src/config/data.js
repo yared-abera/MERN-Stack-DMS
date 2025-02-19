@@ -41,11 +41,11 @@ export const adminSideBar = [
     icons: Settings,
   },
 ];
- 
+
 export const UserAccount = [
   {
     label: "First Name",
-    fName: "Fname",
+    name: "Fname",
     componentType: "input",
     type: "text",
     placeholder: "Enter First Name",
@@ -66,7 +66,7 @@ export const UserAccount = [
   },
   {
     label: "Email",
-    name: "ename",
+    name: "email",
     componentType: "text",
     type: "email",
     placeholder: "Enter Email",
@@ -80,7 +80,7 @@ export const UserAccount = [
   },
   {
     label: "Phone Number",
-    name: "PhonNum",
+    name: "phoneNum",
     componentType: "text",
     type: "text",
     placeholder: "Enter Email",
@@ -102,13 +102,13 @@ export const UserAccount = [
     type: "password",
     placeholder: "Enter Password",
   },
-  {
-    label: "Confirm Password",
-    name: "password",
-    componentType: "text",
-    type: "password",
-    placeholder: "Confrim Password",
-  },
+  // {
+  //   label: "Confirm Password",
+  //   name: "Confirm_password",
+  //   componentType: "text",
+  //   type: "password",
+  //   placeholder: "Confrim Password",
+  // },
   {
     label: "Role",
     name: "role",
@@ -117,6 +117,149 @@ export const UserAccount = [
       { id: "studentDean", label: "Student Dean" },
       { id: "proctorManager", label: "Proctor Manager" },
       { id: "proctor", label: "proctor" },
+      { id: "admin", label: "Admin" },
     ],
   },
 ];
+
+export const Maintainance_Issue = [
+  {
+    label: "First Name",
+    name: "Fname",
+    placeholder: "Enter First Name",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Middle Name",
+    name: "Mname",
+    placeholder: "Enter Middle Name",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Last Name",
+    name: "Lname",
+    placeholder: "Enter Last Name",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Student Id",
+    name: "id",
+    placeholder: "Enter user id",
+    type: "text",
+    componentType: "input",
+  },
+ 
+  {
+    label: "Date",
+    name: "date",
+    
+    type: "date",
+    componentType: "input",
+  },
+  {
+    label: "Block",
+    name: "block",
+    placeholder: "Enter user Block",
+    type: "number",
+    componentType: "input",
+  },
+  {
+    label: "Dorm",
+    name: "dorm",
+    placeholder: "Enter user dorm",
+    type: "number",
+    componentType: "input",
+  },
+];
+ 
+
+export const typeOfIssue = [
+  {
+    label: 'Electricity Issue',
+    description: 'Problems related to electrical systems, such as power outages or faulty wiring.',
+    name:'electric'
+  },
+  {
+    label: 'Broken Window',
+    description: 'Windows that are cracked or completely broken.',
+    name:'window'
+  },
+  {
+    label: 'Broken Door',
+    description: 'Doors that do not close properly or are damaged.',
+    name:'door'
+  },
+  {
+    label: 'Missing Locker',
+    description: 'Lockers that are not available or have been removed.',
+    name:'locker'
+  },
+  {
+    label: 'Missing Bed',
+    description: 'Beds that are not present in the dormitory.',
+    name:'bed'
+  },
+  
+  {
+    label: 'Safety Concern',
+    description: 'Any issues related to safety, such as inadequate lighting or security.',
+    name:'safety'
+  },
+  {
+    label: 'Pest Infestation',
+    description: 'Presence of pests like rodents or insects in the dormitory.',
+    name:'past'
+  }
+];
+
+export const Comment_Report = [
+  {
+    label: "First Name",
+    name: "Fname",
+    placeholder: "Enter First Name",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Middle Name",
+    name: "Mname",
+    placeholder: "Enter Middle Name",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Last Name",
+    name: "Lname",
+    placeholder: "Enter Last Name",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Student Id",
+    name: "id",
+    placeholder: "Enter user id",
+    type: "text",
+    componentType: "input",
+  },
+  
+ 
+  {
+    label: "Date",
+    name: "date",
+    type: "date",
+    componentType: "input",
+  },
+
+  {
+    label: "Description",
+    name: "text_area",
+    placeholder: "Enter Desciption",
+    type: "textarea",
+    componentType: "input",
+  },
+  
+];
+ 

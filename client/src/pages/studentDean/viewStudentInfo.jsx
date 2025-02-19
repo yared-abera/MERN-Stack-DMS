@@ -34,6 +34,4 @@ export default function StudentInfo() {
     </div>
   );
 }
-{/**<Table>
-          
-        </Table> */}
+ 

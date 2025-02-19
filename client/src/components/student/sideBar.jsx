@@ -29,8 +29,8 @@ import { Link, useLocation } from "react-router-dom";
       icon: Bug,
     },
     {
-      label: "feadback",
-      url: "/student/issue",
+      label: "Comment",
+      url: "/student/comment",
       icon: MessageSquareShare ,
     },
   ];
