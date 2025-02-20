@@ -25,15 +25,21 @@ import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
 import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
 import GenerateReport from "./pages/proctorManager/GenerateReportPage";
 import ProctorLayout from "./components/proctor/layout";
+import ProctorHomePage from "./pages/proctor/homePage"
+import RegisterDorm from "./pages/proctor/registerDorm"
+import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
+import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
+import ProctorGenerateReport from "./pages/proctor/generateReport"
+import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
 function App() {
   const theme = useSelector((state) => state.theme.mode);
-  useEffect(() => {
-    if (theme === "dark") {
+   useEffect(() => {
+     if (theme === "dark") {
       document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
+     } else {
+       document.documentElement.classList.remove("dark");
+      }
+   }, [theme]);
 
   return (
     <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
@@ -60,11 +66,12 @@ function App() {
         </Route>
 
         <Route path="/proctor" element={<ProctorLayout/>}>
-          {/* <Route path="RegisterBlock" element={<RegisterBlock/>} />
-          <Route path="RegisterStudent" element={<RegisterStudent/>} />
-          <Route path="ViewFeedback" element={<ViewFeedback/>} />
-          <Route path="ViewMaintenance" element={<ViewMaintenance />} />
-          <Route path="GenerateReport" element={<GenerateReport/>} /> */}
+           <Route path="home" element={<ProctorHomePage/>} />
+          <Route path="dorm" element={<RegisterDorm/>} />
+          <Route path="register" element={<RegisterStudentPage/>} />
+          <Route path="info" element={<ProctorViewInfo/>} />
+          <Route path="report" element={<ProctorGenerateReport/>} />  
+          <Route path="issue" element={<MaintenanceIssuePage/>} /> 
         </Route>
 
       <Route path="/dean" element={<StudentDeanLayout/>}>

@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { toggleSidebar, setUpdateAllocation } from  "@/store/common/sidebarSlice";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+ 
 import {
   LayoutDashboard,
   Users,
@@ -25,8 +25,8 @@ const navigationItems = [
 
 export default function SideBarComponent() {
   const isOpen = useSelector((state) => state.sidebar.isOpen);
-  const updateAllocation = useSelector((state) => state.sidebar.updateAllocation);
-  const dispatch = useDispatch();
+   const updateAllocation = useSelector((state) => state.sidebar.updateAllocation);
+   const dispatch = useDispatch();
   const navigate = useNavigate();
 
    
@@ -36,7 +36,7 @@ export default function SideBarComponent() {
         <span className={cn("text-lg font-semibold", !isOpen && "hidden")}>
           Proctor Manager
         </span>
-        <Menu className="h-6 w-6 cursor-pointer" onClick={() => dispatch(toggleSidebar())} />
+         <Menu className="h-6 w-6 cursor-pointer" onClick={() => dispatch(toggleSidebar())}/>  
       </SidebarHeader>
       <SidebarContent>
         {navigationItems.map((item) => (
@@ -44,7 +44,7 @@ export default function SideBarComponent() {
             key={item.id}
            onClick={() => {
             navigate(item.url)
-            {item.id === "registerStudent" && dispatch(setUpdateAllocation(!updateAllocation))}
+             {item.id === "registerStudent" && dispatch(setUpdateAllocation(updateAllocation))}
            }
            } 
             className="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-100"

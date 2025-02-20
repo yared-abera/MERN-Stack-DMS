@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
- 
+
 import { Link, useLocation } from "react-router-dom"; // React Router imports
 
 const ProSideBar = [
@@ -51,7 +51,7 @@ const ProSideBar = [
 ];
 
 export default function ProctorSideBar() {
-
+  
   const location = useLocation(); // Get current location
 
   return (
@@ -71,6 +71,7 @@ export default function ProctorSideBar() {
                       className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
                         location.pathname === item.url ? "bg-blue-500 text-white" : ""
                       }`}
+                      
                     >
                       <item.icon />
                       <span className="text-xl ">{item.title}</span>
