@@ -23,10 +23,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { UserAccount } from "@/config/data";
-import { CreateAccount, LogIN } from "@/store/auth-slice";
+import { CreateAccount } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import LogIn from "../auth/login";
+ 
 const intialFromData = {
   Fname: "",
   Mname: "",

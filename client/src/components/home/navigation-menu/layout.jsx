@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-scroll";
 import { FaHome, FaInfoCircle, FaPhone } from "react-icons/fa";
 import { Moon, Sun } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {   useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleTheme } from "../../../store/common/ThemeSlice";
 
@@ -10,6 +10,7 @@ function NavBar() {
   const navigate = useNavigate();
   const theme = useSelector((state) => state.theme.mode);
   const dispatch = useDispatch();
+   
 
   return (
     <nav

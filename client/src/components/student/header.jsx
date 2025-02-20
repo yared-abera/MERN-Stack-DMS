@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { SidebarProvider } from "../ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 
 import StudentSideBar from "./sideBar";
 const headerComponent = [

@@ -1,12 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/home";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import LogIn from "./pages/auth/login";
 import LogInLayout from "./components/auth/layout";
-import Admin from "./pages/Admin/dashbord";
 import AdminLayout from "./components/admin/layout";
-import ProctorManagerLayout  from './components/proctor-manager/Layout';
+import ProctorManagerLayout from "./components/proctor-manager/Layout";
 import ManageAccount from "./pages/Admin/manageAccount";
 import Account from "./pages/Admin/account";
 import StudentDeanLayout from "./components/studentDean/layout";
@@ -26,10 +25,16 @@ import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
 import GenerateReport from "./pages/proctorManager/GenerateReportPage";
 import ProctorLayout from "./components/proctor/layout";
 import Comment from "./pages/student/comment";
- 
+import CheckAuth from "./components/common/checkAuth";
+import AdminDashboard from "./pages/Admin/dashbord";
+import { checkAuth } from "./store/auth-slice";
 
 function App() {
   const theme = useSelector((state) => state.theme.mode);
+  const { user, isAuthenticated, isLoading } = useSelector(
+    (state) => state.auth
+  );
+  const dispatch=useDispatch()
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -38,60 +43,106 @@ function App() {
     }
   }, [theme]);
 
+  
+  useEffect(()=>{
+    dispatch(checkAuth())
+  },[dispatch])
+
+ 
+  if(isLoading) return<div><h1 className="w-[100px] h-[20px] rounded-full">Loading...</h1></div>
+
+
   return (
     <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
       {/* common header  */}
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<LogInLayout />}>
+        <Route
+          path="/auth"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <LogInLayout />
+            </CheckAuth>
+          }
+        >
           <Route path="logIn" element={<LogIn />} />
         </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashbord" element={<Admin />} />
+        <Route
+          path="/admin"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <AdminLayout />
+            </CheckAuth>
+          }
+        > 
+          <Route path="dashboard" element={<AdminDashboard/>} />
           <Route path="manage" element={<ManageAccount />} />
           <Route path="account" element={<Account />} />
         </Route>
-        
-        <Route path="/proctor-manager" element={<ProctorManagerLayout/>}>
-          <Route path="RegisterBlock" element={<RegisterBlock/>} />
-          <Route path="RegisterStudent" element={<RegisterStudent/>} />
-          <Route path="ViewFeedback" element={<ViewFeedback/>} />
+
+        <Route
+          path="/proctor-manager"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <ProctorManagerLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="RegisterBlock" element={<RegisterBlock />} />
+          <Route path="RegisterStudent" element={<RegisterStudent />} />
+          <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
-          <Route path="GenerateReport" element={<GenerateReport/>} />
+          <Route path="GenerateReport" element={<GenerateReport />} />
         </Route>
 
-        <Route path="/proctor" element={<ProctorLayout/>}>
-          {/* <Route path="RegisterBlock" element={<RegisterBlock/>} />
-          <Route path="RegisterStudent" element={<RegisterStudent/>} />
-          <Route path="ViewFeedback" element={<ViewFeedback/>} />
+        <Route
+          path="/proctor"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <ProctorLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="RegisterBlock" element={<RegisterBlock />} />
+          <Route path="RegisterStudent" element={<RegisterStudent />} />
+          <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
-          <Route path="GenerateReport" element={<GenerateReport/>} /> */}
+          <Route path="GenerateReport" element={<GenerateReport />} />
         </Route>
 
-      <Route path="/dean" element={<StudentDeanLayout/>}>
-          <Route path="home" element={<StudentDeanHome/>} />
-          <Route path="dorm" element={<DormAllocation/>} />
-          <Route path="info" element={<StudentInfo/>} />
-          <Route path="account" element={<StudDeanAccount/>} />
+        <Route
+          path="/dean"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <StudentDeanLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="home" element={<StudentDeanHome />} />
+          <Route path="dorm" element={<DormAllocation />} />
+          <Route path="info" element={<StudentInfo />} />
+          <Route path="account" element={<StudDeanAccount />} />
         </Route>
 
-      <Route path="/student" element={<StudentLayout/>}>
-          <Route path="home" element={<StudentHome/>} />
-          <Route path="dorm" element={<ViewDorm/>} />
-          <Route path="issue" element={<ReportMaintenace/>} />
-          <Route path="account" element={<StudentAccount/>} />
-          <Route path="comment" element={<Comment/>} />
+        <Route
+          path="/student"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <StudentLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="home" element={<StudentHome />} />
+          <Route path="dorm" element={<ViewDorm />} />
+          <Route path="issue" element={<ReportMaintenace />} />
+          <Route path="account" element={<StudentAccount />} />
+          <Route path="comment" element={<Comment />} />
         </Route>
-      
       </Routes>
- 
- 
- 
-     
-     </div>
-  )
+    </div>
+  );
 }
 
 export default App;
