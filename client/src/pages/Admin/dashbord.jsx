@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-export default function Admin() {
+export default function AdminDashboard() {
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen  ">
       <div className=" mx-auto  mt-32   flex items-center justify-center flex-col ">

@@ -8,6 +8,9 @@ import Footer from '../../components/home/footer/index';
   function Home() {
   return (
      <>
+
+    
+     
      
      <NavBar/>
      <HomeHeader />

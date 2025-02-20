@@ -1,6 +1,8 @@
 import CommonForm from "@/components/common/form";
 import { logInForm } from "@/config/data";
+import { loginUser } from "@/store/auth-slice";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 const intialFormData = {
   userName: "",
   password: "",
@@ -8,8 +10,13 @@ const intialFormData = {
 
 export default function LogIn() {
   const [formData, setFormData] = useState(intialFormData);
+  const dispatch=useDispatch()
   const onSubmit = (event) => {
     event.preventDefault();
+    dispatch(loginUser(formData)).then(data=>{
+      console.log(data,"data from logIn user");
+      
+    })
   };
   
   return (

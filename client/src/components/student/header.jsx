@@ -1,6 +1,6 @@
 import { Bug, Home, LogOut, MessageSquareShare, UserCog, View,  } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { SidebarProvider } from "../ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 
 import StudentSideBar from "./sideBar";
 const headerComponent = [
@@ -31,8 +31,8 @@ const headerComponent = [
     icon: Bug,
   },
   {
-    label: "feedback",
-    url: "/student/issue",
+    label: "Comment",
+    url: "/student/comment",
     icon: MessageSquareShare  ,
   },
 ];
@@ -40,6 +40,7 @@ const headerComponent = [
 export default function StudentHeader() {
   const [time, setTime] = useState();
   const location = useLocation();
+  const navigate=useNavigate()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -98,7 +99,7 @@ export default function StudentHeader() {
                   <DropdownMenuItem>
                     <UserCog
                       className="m-2 w-4 h-4"
-                      onClick={() => navigate("/admin/account")}
+                      onClick={() => navigate("/student/account")}
                     />
                     Account
                   </DropdownMenuItem>

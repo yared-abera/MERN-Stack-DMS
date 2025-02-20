@@ -16,7 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 const items = [
   {
     title: "Dashbord",
-    url: "/admin/dashbord",
+    url: "/admin/dashboard",
     icon: Home,
   },
   {
@@ -46,8 +46,8 @@ export default function SideBarComponent() {
                 <SidebarMenuItem key={item.title}  className=' pl-0 ml-0 my-2'>
                   <SidebarMenuButton asChild>
                     <a href={item.url}  >
-                    <item.icon className="text-2xl font-extrabold " style={{ width: '40px', height: '25px' }} />
-                      <span className="font-bold text-lg text-muted-foreground ">{item.title}</span>
+                    <item.icon    />
+                      <span className="text-sm md:text-base font-bold">{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

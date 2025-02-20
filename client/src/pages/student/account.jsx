@@ -1,4 +1,6 @@
+import AccountPage from "@/components/common/Account";
+
 export default function StudentAccount() {
-    return <div>This is Account Page</div>;
+    return <AccountPage/>;
   }
   

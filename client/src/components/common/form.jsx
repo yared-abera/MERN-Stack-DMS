@@ -17,18 +17,16 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled,
- 
-
 }) {
   function renderInputsByComponentType(getControlItem) {
     let element = null;
-   
-    
+
     const value = formData[getControlItem.name] || "";
     switch (getControlItem.componentType) {
       case "input":
         element = (
           <Input
+          className='text-sm md:text-base'
             name={getControlItem.name}
             placeholder={getControlItem.placeholder}
             id={getControlItem.name}
@@ -76,7 +74,7 @@ function CommonForm({
           <Textarea
             name={getControlItem.name}
             placeholder={getControlItem.placeholder}
-            id={getControlItem.id}
+            id={getControlItem.name}
             value={value}
             onChange={(event) =>
               setFormData({
@@ -111,19 +109,24 @@ function CommonForm({
     return element;
   }
 
-
-   // const display=isLogIN:display:grid ,grid-d
+  // const display=isLogIN:display:grid ,grid-d
   return (
     <form onSubmit={onSubmit} className="w-full overflow-hidden">
-      <div className= 'flex flex-col gap-2' >
+      <div className="flex flex-col gap-2">
         {formControls.map((controlItem) => (
           <div className="grid grid-cols-2 w-full gap-4" key={controlItem.name}>
-            <Label className="mb-1 font-sans font-semibold  dark:text-white text-lg">{controlItem.label}</Label>
+            <Label className="mb-1 font-sans font-semibold text-sm  dark:text-white md:text-base">
+              {controlItem.label}
+            </Label>
             {renderInputsByComponentType(controlItem)}
           </div>
         ))}
       </div>
-      <Button disabled={isBtnDisabled} type="submit" className="mt-10 w-full  hover:bg-slate-500">
+      <Button
+        disabled={isBtnDisabled}
+        type="submit"
+        className="mt-10 w-full  hover:bg-slate-500"
+      >
         {buttonText || "Submit"}
       </Button>
     </form>
