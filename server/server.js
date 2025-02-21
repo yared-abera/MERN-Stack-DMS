@@ -24,7 +24,7 @@ mongoose
   });
 
 const app = express();
-
+////localhost:27017/DMS
 app.use(cookieParser());
 app.use(express.json());
 
@@ -46,7 +46,7 @@ app.use(
 );
 
  
-console.log("server")
+ 
 app.use("/api/auth/",auth_route);
 
 app.listen(PORT, () => {
