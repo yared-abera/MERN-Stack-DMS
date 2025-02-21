@@ -6,7 +6,7 @@ const jwt=require('jsonwebtoken')
 const UserAccount = async (req, res) => {
   try {
     const { Fname, Lname, Mname, phoneNum, email, password, role, sex, userName } = req.body;
-
+    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -98,7 +98,7 @@ const logInUser = async (req, res) => {
 };
 
 
-const LogOut=async(req,res)=>{
+const LogOut = async(req,res)=>{
  
  res.clearCookie("token").json({
     success: true,
