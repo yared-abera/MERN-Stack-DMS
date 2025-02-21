@@ -25,9 +25,12 @@ import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
 import GenerateReport from "./pages/proctorManager/GenerateReportPage";
 import ProctorLayout from "./components/proctor/layout";
 import Comment from "./pages/student/comment";
-import CheckAuth from "./components/common/checkAuth";
+import CheckAuthComponent from "./components/common/checkAuth";
 import AdminDashboard from "./pages/Admin/dashbord";
-import { checkAuth } from "./store/auth-slice";
+import { checkAuthorization } from "./store/auth-slice";
+import Notfound from "./components/common/notFound";
+import UnauthPage from "./components/common/unAuth-page";
+
 import ProctorHomePage from "./pages/proctor/homePage"
 import RegisterDorm from "./pages/proctor/registerDorm"
 import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
@@ -39,7 +42,11 @@ function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(checkAuthorization());
+  }, [dispatch]);
+
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -48,27 +55,32 @@ function App() {
     }
   }, [theme]);
 
-  
-  useEffect(()=>{
-    dispatch(checkAuth())
-  },[dispatch])
-
- 
-  if(isLoading) return<div><h1 className="w-[100px] h-[20px] rounded-full">Loading...</h1></div>
-
+  if (isLoading)
+    return (
+      <div>
+        <h1 className="w-[100px] h-[20px] rounded-full">Loading...</h1>
+      </div>
+    );
 
   return (
     <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
       {/* common header  */}
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+              <Home />
+            </CheckAuthComponent>
+          }
+        />
         <Route
           path="/auth"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <LogInLayout />
-            </CheckAuth>
+            </CheckAuthComponent>
           }
         >
           <Route path="logIn" element={<LogIn />} />
@@ -77,12 +89,12 @@ function App() {
         <Route
           path="/admin"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <AdminLayout />
-            </CheckAuth>
+            </CheckAuthComponent>
           }
-        > 
-          <Route path="dashboard" element={<AdminDashboard/>} />
+        >
+          <Route path="home" element={<AdminDashboard />} />
           <Route path="manage" element={<ManageAccount />} />
           <Route path="account" element={<Account />} />
         </Route>
@@ -90,9 +102,9 @@ function App() {
         <Route
           path="/proctor-manager"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <ProctorManagerLayout />
-            </CheckAuth>
+            </CheckAuthComponent>
           }
         >
           <Route path="RegisterBlock" element={<RegisterBlock />} />
@@ -102,7 +114,11 @@ function App() {
           <Route path="GenerateReport" element={<GenerateReport />} />
         </Route>
 
-        <Route path="/proctor" element={<ProctorLayout/>}>
+        <Route path="/proctor" 
+        element={
+          <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+              <ProctorLayout />
+            </CheckAuthComponent>}>
            <Route path="home" element={<ProctorHomePage/>} />
           <Route path="dorm" element={<RegisterDorm/>} />
           <Route path="register" element={<RegisterStudentPage/>} />
@@ -114,9 +130,9 @@ function App() {
         <Route
           path="/dean"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <StudentDeanLayout />
-            </CheckAuth>
+            </CheckAuthComponent>
           }
         >
           <Route path="home" element={<StudentDeanHome />} />
@@ -128,9 +144,9 @@ function App() {
         <Route
           path="/student"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <StudentLayout />
-            </CheckAuth>
+            </CheckAuthComponent>
           }
         >
           <Route path="home" element={<StudentHome />} />
@@ -139,6 +155,8 @@ function App() {
           <Route path="account" element={<StudentAccount />} />
           <Route path="comment" element={<Comment />} />
         </Route>
+        <Route path="/unauth-page" element={<UnauthPage/>} />
+        <Route path="*" element={<Notfound />} />
       </Routes>
     </div>
   );

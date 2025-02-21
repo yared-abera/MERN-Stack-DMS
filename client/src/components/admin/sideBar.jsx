@@ -16,7 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 const items = [
   {
     title: "Dashbord",
-    url: "/admin/dashboard",
+    url: "/admin/home",
     icon: Home,
   },
   {
