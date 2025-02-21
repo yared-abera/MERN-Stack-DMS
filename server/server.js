@@ -38,7 +38,7 @@ app.use(
 );
 
  
-console.log("server")
+ 
 app.use("/api/auth/",auth_route);
 
 app.listen(PORT, () => {
