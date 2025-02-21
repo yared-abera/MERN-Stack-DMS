@@ -28,7 +28,6 @@ import Comment from "./pages/student/comment";
 import CheckAuth from "./components/common/checkAuth";
 import AdminDashboard from "./pages/Admin/dashbord";
 import { checkAuth } from "./store/auth-slice";
-
 import ProctorHomePage from "./pages/proctor/homePage"
 import RegisterDorm from "./pages/proctor/registerDorm"
 import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
