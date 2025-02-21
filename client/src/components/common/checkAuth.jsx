@@ -1,48 +1,49 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 
 const roleRoutes = {
-  admin: "/admin/dashboard",
+  admin: "/admin/home",
   studentDean: "/dean/home",
   student: "/student/home",
-  proctorManager: "/proctor-manager/register-block",
-  proctor: "/proctor/register-block",
+  proctorManager: "/proctor-manager/RegisterBlock",
+  proctor: "/proctor/RegisterBlock",
 };
 
-export default function CheckAuth({ isAuthenticated, user, children }) {
+const roleBasePaths = {
+  admin: "/admin",
+  studentDean: "/dean",
+  student: "/student",
+  proctorManager: "/proctor-manager",
+  proctor: "/proctor",
+};
+
+export default function CheckAuthComponent({ isAuthenticated, user, children }) {
   const location = useLocation();
- console.log(isAuthenticated,"checkout");
- 
-  
-if (!isAuthenticated) {
-     
-  if (location.pathname === "/" || location.pathname.includes("logIn")) {
-    return children;  
+  const currentPath = location.pathname;
+
+  // Public paths that don't require authentication
+  const isPublicPath = ["/", "/auth/logIn"].includes(currentPath);
+
+  // 1. Handle unauthenticated users
+  if (!isAuthenticated) {
+    return isPublicPath ? children : <Navigate to="/auth/logIn" replace />;
   }
-    
-  return <Navigate to="/" />;
-}
-  // Get the user's role
+
+  // 2. Handle authenticated users
   const userRole = user?.role;
-  console.log(roleRoutes[userRole]);
+  const allowedBasePath = roleBasePaths[userRole];
+  const isAllowedPath = allowedBasePath ? currentPath.startsWith(allowedBasePath) : <Navigate to={'/unauth-page'}/>;
+   
   
 
-  // location.pathname === "/" || location.pathname.includes("logIn")
-  if (isAuthenticated) {
-   
-    if (location.pathname === "/" || location.pathname.includes("logIn")) {
-      return <Navigate to={roleRoutes[userRole]} />;
-    }
+  // Redirect to role dashboard if trying to access unauthorized routes
+  if (!isAllowedPath) {
+    return <Navigate to={roleRoutes[userRole]   } replace />;
+  }
 
-    // Check if the current path matches the user's role's path
-    const allowedPath = roleRoutes[userRole];
-
-    // If the current path does not match the user's allowed path, redirect them
-    if (location.pathname !== allowedPath) {
-      return <Navigate to={allowedPath} />;
-    }
+  // 3. Prevent access to login page when authenticated
+  if (currentPath === "/auth/logIn") {
+    return <Navigate to={roleRoutes[userRole]  } replace />;
   }
 
   return children;
 }
-
- 
