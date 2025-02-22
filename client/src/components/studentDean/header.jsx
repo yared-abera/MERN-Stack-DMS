@@ -12,6 +12,8 @@ import { LogOut, Search, UserCog } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
+import DarkMode from "../common/darkMode";
+import AvatarComponent from "../common/avatar";
 
 export default function Header() {
   const [showSearch, setShowSearch] = useState();
@@ -64,10 +66,7 @@ export default function Header() {
           ) : (
             <div className="flex pl-2 w-[85%] justify-around gap-1   ">
              
-              <div>
-                <Button className='hidden md:inline-flex'>Dark Mode</Button>
-                <Button className='inline-flex md:hidden' size='sm'>Dark Mode</Button>
-              </div>
+              <DarkMode/>
   
               <div>
                 <span className="font-sans md:text-lg md:font-bold sm:text-sm sm:font-semibold">
@@ -82,7 +81,7 @@ export default function Header() {
           )}
       
         <div className="ml-4 sm:ml-8 ">
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="bg-black cursor-pointer dark:bg-white">
                     <AvatarFallback className="bg-black dark:bg-white dark:text-black text-white font-extrabold">
@@ -106,7 +105,8 @@ export default function Header() {
                     LogOut
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
+              <AvatarComponent/>
             </div>
 
             </div>

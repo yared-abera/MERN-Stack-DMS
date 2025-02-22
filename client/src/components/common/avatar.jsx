@@ -7,9 +7,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+ 
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { LogOut,  UserCog } from "lucide-react";
+import { useDispatch, useSelector } from 'react-redux';
+import { LogOutUser } from '@/store/auth-slice';
 export default function AvatarComponent() {
+
+  const {user}=useSelector(state=>state.auth)
+  const dispatch=useDispatch()
+  
+  function handleLogOut(){
+    console.log("logOut button");
+    
+  dispatch(LogOutUser())
+  }
+
   return (
     
     <DropdownMenu>
@@ -21,7 +34,7 @@ export default function AvatarComponent() {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" className="w-56">
-        <DropdownMenuLabel>Logged in as</DropdownMenuLabel>
+        <DropdownMenuLabel>Logged in as <span className='text-violet-600 text-sm md:text-base'>{user?.username}</span> </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <UserCog
@@ -31,7 +44,7 @@ export default function AvatarComponent() {
           Account
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogOut}>
           <LogOut className="w-4 h-4 m-2" />
            LogOut
         </DropdownMenuItem>

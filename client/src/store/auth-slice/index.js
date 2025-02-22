@@ -4,7 +4,7 @@ import axios from "axios";
 const initialState = {
     user: null,
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: true,
 }
 
 export const loginUser=createAsyncThunk('/auth/LogIn',async (formData)=>{
@@ -54,7 +54,7 @@ export const checkAuthorization = createAsyncThunk(
 );
 
 
-export const LogOut=createAsyncThunk('/auth/LogOut',async ()=>{
+export const LogOutUser=createAsyncThunk('/auth/LogOut',async ()=>{
   try {
     const result= await axios.get("http://localhost:5000/api/auth/logOut",{
       withCredentials: true,
@@ -102,19 +102,7 @@ const authSlice = createSlice({
 
     extraReducers: (builder) => {
       builder
-        .addCase(CreateAccount.pending, (state) => {
-          state.isLoading = true;
-        })
-        .addCase(CreateAccount.fulfilled, (state, action) => {
-          state.isLoading = false;
-          state.user = null;
-          state.isAuthenticated = false;
-        })
-        .addCase(CreateAccount.rejected, (state, action) => {
-          state.isLoading = false;
-          state.user = null;
-          state.isAuthenticated = false;
-        })
+        
         .addCase(loginUser.pending, (state) => {
           state.isLoading = true;
           state.isAuthenticated=false
@@ -132,21 +120,24 @@ const authSlice = createSlice({
           state.isLoading = false;
           state.user = null;
           state.isAuthenticated = false;
-        }) .addCase(LogOut.fulfilled, (state, action) => {
-          state.isLoading = false;
-          state.user = null;
-          state.isAuthenticated = false;
         }) .addCase(checkAuthorization.pending, (state) => {
           state.isLoading = true;
           state.user=null;
           state.isAuthenticated=false
         }).addCase(checkAuthorization.fulfilled, (state, action) => {
           state.isLoading = false;
-          console.log("logIn user from checkAuth",action.payload);
+
+          console.log(" user from checkAuth",action.payload);
+          console.log(" user from checkAuth",state.isLoading);
+      
           state.user =  action.payload.user,
           state.isAuthenticated = action.payload.success;
         }).addCase(checkAuthorization.rejected, (state, action) => {
           state.isLoading = false;
+          state.user = null;
+          state.isAuthenticated = false;
+        }).addCase(LogOutUser.fulfilled, (state, action) => {
+          
           state.user = null;
           state.isAuthenticated = false;
         }) 
@@ -157,4 +148,16 @@ const authSlice = createSlice({
 export const { setUser } = authSlice.actions;
 export default authSlice.reducer;
 
- 
+ /**.addCase(CreateAccount.pending, (state) => {
+          state.isLoading = true;
+        })
+        .addCase(CreateAccount.fulfilled, (state, action) => {
+          state.isLoading = false;
+          state.user = null;
+          state.isAuthenticated = false;
+        })
+        .addCase(CreateAccount.rejected, (state, action) => {
+          state.isLoading = false;
+          state.user = null;
+          state.isAuthenticated = false;
+        }) */
