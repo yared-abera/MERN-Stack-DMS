@@ -4,10 +4,10 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const auth_route = require("./router/auth-router/auth-router");
+//
 
- 
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect(process.env.MONGO_URL )
   .then(() => {
     console.log("connected to database");
   })
@@ -16,7 +16,7 @@ mongoose
   });
 
 const app = express();
-////localhost:27017/DMS
+ 
 app.use(cookieParser());
 app.use(express.json());
 
