@@ -31,6 +31,12 @@ import { checkAuthorization } from "./store/auth-slice";
 import Notfound from "./components/common/notFound";
 import UnauthPage from "./components/common/unAuth-page";
 
+import ProctorHomePage from "./pages/proctor/homePage"
+import RegisterDorm from "./pages/proctor/registerDorm"
+import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
+import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
+import ProctorGenerateReport from "./pages/proctor/generateReport"
+import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
 function App() {
   const theme = useSelector((state) => state.theme.mode);
   const  { user, isAuthenticated, isLoading } = useSelector(
@@ -84,9 +90,10 @@ function App() {
         <Route
           path="/admin"
           element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <AdminLayout />
-            </CheckAuthComponent>
+            // <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+              
+            // </CheckAuthComponent>
+             <AdminLayout />
           }
         >
           <Route path="home" element={<AdminDashboard />} />
@@ -109,19 +116,17 @@ function App() {
           <Route path="GenerateReport" element={<GenerateReport />} />
         </Route>
 
-        <Route
-          path="/proctor"
-          element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+        <Route path="/proctor" 
+        element={
+          <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <ProctorLayout />
-            </CheckAuthComponent>
-          }
-        >
-          <Route path="RegisterBlock" element={<RegisterBlock />} />
-          <Route path="RegisterStudent" element={<RegisterStudent />} />
-          <Route path="ViewFeedback" element={<ViewFeedback />} />
-          <Route path="ViewMaintenance" element={<ViewMaintenance />} />
-          <Route path="GenerateReport" element={<GenerateReport />} />
+            </CheckAuthComponent>}>
+           <Route path="home" element={<ProctorHomePage/>} />
+          <Route path="dorm" element={<RegisterDorm/>} />
+          <Route path="register" element={<RegisterStudentPage/>} />
+          <Route path="info" element={<ProctorViewInfo/>} />
+          <Route path="report" element={<ProctorGenerateReport/>} />  
+          <Route path="issue" element={<MaintenanceIssuePage/>} /> 
         </Route>
 
         <Route

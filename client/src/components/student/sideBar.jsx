@@ -8,7 +8,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
   } from "../ui/sidebar";
-  import { useEffect, useState } from "react";
+ 
 import { Link, useLocation } from "react-router-dom";
  
   import { Bug, Home, LogOut, MessageSquareShare, UserCog, View } from "lucide-react";
