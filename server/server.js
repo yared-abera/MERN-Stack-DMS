@@ -7,7 +7,9 @@ const auth_route = require("./router/auth-router/auth-router");
 
  
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect(process.env.MONGO_URL, 
+    {serverSelectionTimeoutMS: 30000}
+  )
   .then(() => {
     console.log("connected to database");
   })
@@ -15,13 +17,18 @@ mongoose
     console.log(err);
   });
 
-  mongoose.connect( 'mongodb+srv://soul:dms%40433@cluster0.jm8wi.mongodb.net/dms?retryWrites=true&w=majority',
-  )
-  .then(()=>{
-      console.log("connected to database")
-  }).catch((err)=>{
-      console.log(err)
-  });
+  // mongoose.connect( 'mongodb+srv://soul:dms%40433@cluster0.jm8wi.mongodb.net/dms?retryWrites=true&w=majority',
+  //   {
+  //     useNewUrlParser: true,
+  //     useUnifiedTopology: true,
+  //     serverSelectionTimeoutMS: 30000, // Increase timeout
+  //   }
+  // )
+  // .then(()=>{
+  //     console.log("connected to database")
+  // }).catch((err)=>{
+  //     console.log(err)
+  // });
 
 const app = express();
 ////localhost:27017/DMS
