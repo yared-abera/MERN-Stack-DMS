@@ -33,9 +33,10 @@ import UnauthPage from "./components/common/unAuth-page";
 
 function App() {
   const theme = useSelector((state) => state.theme.mode);
-  const { user, isAuthenticated, isLoading } = useSelector(
+  const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
+    
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkAuthorization());

@@ -117,6 +117,7 @@ export const UserAccount = [
       { id: "studentDean", label: "Student Dean" },
       { id: "proctorManager", label: "Proctor Manager" },
       { id: "proctor", label: "proctor" },
+      { id: "admin", label: "Admin" },
       
     ],
   },
