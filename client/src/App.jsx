@@ -89,10 +89,10 @@ function App() {
         <Route
           path="/admin"
           element={
-            // <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              
-            // </CheckAuthComponent>
-             <AdminLayout />
+             <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+               <AdminLayout />
+             </CheckAuthComponent>
+            
           }
         >
           <Route path="home" element={<AdminDashboard />} />
