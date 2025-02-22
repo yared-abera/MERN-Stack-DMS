@@ -263,4 +263,22 @@ export const Comment_Report = [
   },
   
 ];
+
+export const RadioButton=[
+  {
+    value:'remadial',
+    id:'remadial',
+    label:'Remadial Student'
+  },
+  {
+    value:'freash',
+    id:'freash',
+    label:'Freshman student'
+  },
+  {
+    value:'department',
+    id:'department',
+    label:'After Having Department'
+  }
+]
  

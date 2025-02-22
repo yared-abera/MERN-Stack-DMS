@@ -39,9 +39,10 @@ import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
 function App() {
   const theme = useSelector((state) => state.theme.mode);
-  const { user, isAuthenticated, isLoading } = useSelector(
+  const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
+    
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkAuthorization());
@@ -55,12 +56,16 @@ function App() {
     }
   }, [theme]);
 
-  if (isLoading)
+  if (isLoading){
+    console.log(isLoading,"isLoading");
+    
     return (
       <div>
-        <h1 className="w-[100px] h-[20px] rounded-full">Loading...</h1>
+        <h1 className="w-[100px] h-[20px] rounded-full text-center bg-black">Loading...</h1>
       </div>
     );
+
+  } 
 
   return (
     <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
@@ -89,9 +94,9 @@ function App() {
         <Route
           path="/admin"
           element={
-             <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
                <AdminLayout />
-             </CheckAuthComponent>
+            </CheckAuthComponent>
             
           }
         >

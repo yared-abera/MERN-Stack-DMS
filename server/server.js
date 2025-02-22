@@ -4,8 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const auth_route = require("./router/auth-router/auth-router");
+//
 
- 
 mongoose
   .connect(process.env.MONGO_URL, 
     {serverSelectionTimeoutMS: 30000}
@@ -31,7 +31,7 @@ mongoose
   // });
 
 const app = express();
-////localhost:27017/DMS
+ 
 app.use(cookieParser());
 app.use(express.json());
 

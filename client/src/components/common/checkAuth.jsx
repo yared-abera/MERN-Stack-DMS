@@ -5,14 +5,14 @@ const roleRoutes = {
   studentDean: "/dean/home",
   student: "/student/home",
   proctorManager: "/proctor-manager/RegisterBlock",
-  proctor: "/proctor/RegisterBlock",
+  proctor: "/proctor/home",
 };
 
 const roleBasePaths = {
   admin: "/admin",
   studentDean: "/dean",
   student: "/student",
-  proctorManager: "/proctor-manager",
+  proctorManager:"/proctor-manager",
   proctor: "/proctor",
 };
 
@@ -31,10 +31,10 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
   // 2. Handle authenticated users
   const userRole = user?.role;
   const allowedBasePath = roleBasePaths[userRole];
-  const isAllowedPath = allowedBasePath ? currentPath.startsWith(allowedBasePath) : <Navigate to={'/unauth-page'}/>;
+ 
+  const isAllowedPath = allowedBasePath? currentPath.startsWith(allowedBasePath) : <Navigate to={'/unauth-page'}/>;
    
   
-
   // Redirect to role dashboard if trying to access unauthorized routes
   if (!isAllowedPath) {
     return <Navigate to={roleRoutes[userRole]  } replace />;
