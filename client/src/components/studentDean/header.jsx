@@ -35,7 +35,7 @@ export default function Header() {
 
   return (
     <header className="overflow-hidden fixed w-full h-20 top-0   md:p-4   border-solid shadow-md  flex gap-4  dark:bg-black bg-white ">
-      <div className="flxe text-left ">
+      <div className="flex text-left ">
         <SidebarTrigger />
       </div>
       <div className="flex-1 flex gap-3 ">

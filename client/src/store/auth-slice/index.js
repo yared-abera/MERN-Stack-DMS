@@ -82,6 +82,7 @@ export const CreateAccount=createAsyncThunk('/auth/createUser',async (formData)=
       withCredentials: true,
       
     });
+    console.log("successfully created")
     return result
     
   } catch (error) {

@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { toggleSidebar, setUpdateAllocation } from  "@/store/common/sidebarSlice";
+import { toggleSidebar } from  "@/store/common/sidebarSlice";
 import { useNavigate } from "react-router-dom";
  
 import {
@@ -24,12 +24,11 @@ const navigationItems = [
 ];
 
 export default function SideBarComponent() {
-  const isOpen = useSelector((state) => state.sidebar.isOpen);
-   const updateAllocation = useSelector((state) => state.sidebar.updateAllocation);
+  const isOpen = useSelector((state) => state.sidebar.isOpen); 
    const dispatch = useDispatch();
   const navigate = useNavigate();
 
-   
+
   return (
     <Sidebar className={cn("bg-white shadow-md transition-all", isOpen ? "w-64" : "w-16")}>
       <SidebarHeader className="flex items-center justify-between p-4">
@@ -44,7 +43,7 @@ export default function SideBarComponent() {
             key={item.id}
            onClick={() => {
             navigate(item.url)
-             {item.id === "registerStudent" && dispatch(setUpdateAllocation(updateAllocation))}
+             
            }
            } 
             className="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-100"
