@@ -2,14 +2,6 @@ const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
-  fName: { type: String, required: true },
-  mName: { type: String, required: true },
-  lName: { type: String, required: true },
-  gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
-  phoneNum: { type: String, required: true, unique: true },
-  userName: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ["Admin", "Student", "Manager"], required: true },
   batch: { type: Number, required: true },
   department: { type: String, required: true },
   address: { type: String, required: true },
@@ -21,4 +13,4 @@ const studentSchema = new mongoose.Schema({
   blockNum: { type: mongoose.Schema.Types.ObjectId, ref: "Block", required: true }, // Foreign Key Referenc 
 });
 
-module.exports = mongose.model("User",userSchema);
+module.exports = mongose.model("Student",studentSchema);
