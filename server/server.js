@@ -15,7 +15,7 @@ mongoose
     console.log(err);
   });
 
-  mongoose.connect( 'mongodb+srv://soul:dms%40433@cluster0.jm8wi.mongodb.net/dms?retryWrites=true&w=majority',
+  mongoose.connect('mongodb+srv://soul:dms%40433@cluster0.jm8wi.mongodb.net/dms?retryWrites=true&w=majority',
   )
   .then(()=>{
       console.log("connected to database")
