@@ -268,17 +268,63 @@ export const RadioButton=[
   {
     value:'remadial',
     id:'remadial',
-    label:'Remadial Student'
+    label:'Remadial student '
   },
+ 
   {
     value:'freash',
     id:'freash',
-    label:'Freshman student'
+    label:'Freshman student '
   },
   {
-    value:'department',
-    id:'department',
+    value:'seniour',
+    id:'seniour',
     label:'After Having Department'
   }
 ]
- 
+export const RadioFileFormat=[
+  {
+    value:'json',
+    id:'json',
+    label:'Json File format'
+  },
+  {
+    value:'csv',
+    id:'csv',
+    label:'Microsoft Excel'
+  },
+   
+]
+
+
+
+export const StudDataSchema = {
+  Fname: String,
+  Mname: String,
+  Lname: String,
+  email: String,
+  userName: String,
+  phoneNum: String,
+  password: String, 
+  sex: String,
+  batch: String,
+  isSpecial: String,
+  isDisable: String,
+  address: String,
+  stream:String,
+  studCategory:String,
+  department:String,
+  collage:String
+};
+export const requiredSchema={
+  Fname: String,
+  Mname: String,
+  Lname: String,
+  userName: String,
+  sex: String,
+  studCategory:String,
+  department:String,
+  stream:String
+}
+
+

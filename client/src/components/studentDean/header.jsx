@@ -51,7 +51,7 @@ export default function Header() {
           <Input
             type="text"
             placeholder="Search user by Using User Name"
-            className="hidden md:inline-flex transition-all duration-300  ease-in-out dark:text-white flex-1"
+            className="hidden md:inline-flex  dark:text-white text-base"
           />
             </div>
             <div className="flex w-1/2  gap-6">
