@@ -37,7 +37,7 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
   
   // Redirect to role dashboard if trying to access unauthorized routes
   if (!isAllowedPath) {
-    return <Navigate to={roleRoutes[userRole]   } replace />;
+    return <Navigate to={roleRoutes[userRole]  } replace />;
   }
 
   // 3. Prevent access to login page when authenticated

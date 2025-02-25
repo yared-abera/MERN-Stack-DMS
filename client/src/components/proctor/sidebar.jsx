@@ -9,36 +9,45 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
+import { setUpdateAllocation } from  "@/store/common/sidebarSlice";
 
 import { Link, useLocation } from "react-router-dom"; // React Router imports
 
+import { useSelector, useDispatch } from "react-redux";
+
 const ProSideBar = [
   {
+    id: "home",
     title: "Home",
     url: "/proctor/home",
     icon: Home,
   },
   {
+    id: "registerDorm",
     title: "Register Dorm",
     url: "/proctor/dorm",
     icon: LayoutGrid,
   },
   {
+    id: "info",
     title: "View Student Info",
     url: "/proctor/info",
     icon: View,
   },
   {
+    id: "report",
     title: "Generate Report",
     url: "/proctor/report",
     icon: UserRoundPen,
   },
   {
+    id: "registerStudent",
     title: "Register Student ",
     url: "/proctor/register",
     icon: UserRoundPen,
   },
   {
+    id: "issue",
     title: "Maintenance Issue",
     url: "/proctor/issue",
     icon: UserRoundPen,
@@ -51,8 +60,9 @@ const ProSideBar = [
 ];
 
 export default function ProctorSideBar() {
-  
+  const updateAllocation = useSelector((state) => state.sidebar.updateAllocation);
   const location = useLocation(); // Get current location
+  const dispatch = useDispatch();
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -71,7 +81,7 @@ export default function ProctorSideBar() {
                       className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
                         location.pathname === item.url ? "bg-blue-500 text-white" : ""
                       }`}
-                      
+                     onClick={() => {item.id === "registerStudent" && dispatch(setUpdateAllocation(updateAllocation))}}  
                     >
                       <item.icon />
                       <span className="text-xl ">{item.title}</span>
