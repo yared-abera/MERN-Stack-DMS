@@ -13,7 +13,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white dark:bg-gray-900 shadow-md px-8 flex justify-between items-center">
+    <header className="w-full bg-white dark:bg-gray-900 shadow-md px-4 pt-8 flex justify-between items-center">
       {/* Logo & Name */}
       <div className="flex items-center gap-3">
         <button

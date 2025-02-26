@@ -18,7 +18,7 @@ import StudentHome from "./pages/student/home";
 import ViewDorm from "./pages/student/viewDorm";
 import ReportMaintenace from "./pages/student/maintenanceIssue";
 import StudentAccount from "./pages/student/account";
-import RegisterBlock from "./pages/proctorManager/RegisterBlockPage";
+import RegisterBlockComp from "./pages/proctorManager/RegisterBlockPage";
 import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
 import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
 import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
@@ -93,10 +93,11 @@ function App() {
 
         <Route
           path="/admin"
-          element={
+          element={  
+            
             <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-               <AdminLayout />
-            </CheckAuthComponent>
+            <AdminLayout />
+             </CheckAuthComponent>
             
           }
         >
@@ -113,7 +114,7 @@ function App() {
             </CheckAuthComponent>
           }
         >
-          <Route path="RegisterBlock" element={<RegisterBlock />} />
+          <Route path="RegisterBlock" element={<RegisterBlockComp />} />
           <Route path="RegisterStudent" element={<RegisterStudent />} />
           <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />

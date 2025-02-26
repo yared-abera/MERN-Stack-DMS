@@ -45,21 +45,21 @@ export const adminSideBar = [
 export const UserAccount = [
   {
     label: "First Name",
-    name: "Fname",
+    name: "fName",
     componentType: "input",
     type: "text",
     placeholder: "Enter First Name",
   },
   {
     label: "Middle Name",
-    name: "Mname",
+    name: "mName",
     componentType: "text",
     placeholder: "Enter Middle Name",
     type: "text",
   },
   {
     label: "Last Name",
-    name: "Lname",
+    name: "lName",
     componentType: "text",
     placeholder: "Enter Last Name",
     type: "text",
@@ -83,12 +83,12 @@ export const UserAccount = [
     name: "phoneNum",
     componentType: "text",
     type: "text",
-    placeholder: "Enter Email",
+    placeholder: "Enter Phone Number",
   },
 
   {
     label: "Gender",
-    name: "sex",
+    name: "gender",
     componentType: "select",
     options: [
       { id: "male", label: "Male" },
@@ -281,4 +281,72 @@ export const RadioButton=[
     label:'After Having Department'
   }
 ]
+
+export const RegisterBlock = [
+  {
+    label: "Block Number",
+    name: "blockNum",
+    placeholder: "Enter Block Number",
+    type: "number",
+    componentType: "input",
+  },
+  {
+    label: "Capacity",
+    name: "capacity",
+    placeholder: "Enter Capacity",
+    type: "number",
+    componentType: "input",
+  },
+  {
+    label: "Found In",
+    name: "foundIn",
+    componentType: "select",
+    options: [
+      { id: "maleArea", label: "Male Area" },
+      { id: "femaleArea", label: "Female Area" },
+    ],
+  },
+  {
+    label: "Status",
+    name: "status",
+    componentType: "select",
+    options: [
+      { id: "Available", label: "Available" },
+      { id: "Occupied", label: "Occupied" },
+    ],
+  },
+  {
+    label: "Total Rooms",
+    name: "totalRoom",
+    placeholder: "Enter Total Number of Rooms",
+    type: "number",
+    componentType: "input",
+  },
+  {
+    label: "Available Rooms",
+    name: "availableRoom",
+    placeholder: "Enter Number of Available Rooms",
+    type: "number",
+    componentType: "input",
+  },
+  {
+    label: "Special Student Selection",
+    name: "isSelectedForSpecialStud",
+    componentType: "select",
+    options: [
+      { id: "true", label: "Yes" },
+      { id: "false", label: "No" },
+    ],
+  },
+  {
+    label: "Disabled Student Selection",
+    name: "isSelectedForDisableStud",
+    componentType: "select",
+    options: [
+      { id: "true", label: "Yes" },
+      { id: "false", label: "No" },
+    ],
+  },
+];
+
  

@@ -1,13 +1,16 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const RegisterBlock = () => {
+import {RegisterBlock} from "@/config/data"
+import CommonForm from "@/components/common/form"
+const RegisterBlockComp = () => {
   
 
 
     return (
-      <Card>
+      <div className="border-2 border-blue-600 h-full">
+       <div>
+      <Card >
         <CardHeader>
           <CardTitle>Register Block</CardTitle>
         </CardHeader>
@@ -18,10 +21,20 @@ const RegisterBlock = () => {
             <Input type="number" placeholder="Capacity" />
             <Button type="submit">Register Block</Button>
           </form>
+         <CommonForm
+            formControls={}
+            formData={}
+            setFormData={}
+            onSubmit={}
+            buttonText={}
+            isBtnDisabled={}
+          />
         </CardContent>
       </Card>
+      </div>
+      </div>
     );
   };
 
-  export default RegisterBlock;
+  export default RegisterBlockComp;
  
