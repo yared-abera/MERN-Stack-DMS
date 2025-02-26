@@ -1,19 +1,18 @@
 const User = require("../../model/user/user");
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const UserAccount = async (req, res) => {
   try {
     const {
-      Fname,
-      Lname,
-      Mname,
+      fName,
+      lName,
+      mName,
       phoneNum,
       email,
       password,
       role,
-      sex,
+      gender,
       userName,
     } = req.body;
 
@@ -21,14 +20,14 @@ const UserAccount = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      Fname,
-      Mname,
-      Lname,
-      email,
-      userName,
+      fName,
+      mName,
+      lName, 
+      gender,
       phoneNum,
+      userName,
+      email,
       password: hashedPassword,
-      sex,
       role,
     });
 
