@@ -7,11 +7,11 @@ import StudetDeanSideBar from "./SideBar";
 export default function StudentDeanLayout() {
    
   return (
-    <SidebarProvider  >
+    <SidebarProvider >
       <StudetDeanSideBar />
       <main className="w-full">
-        <Header   />
-        <Outlet  />
+        <Header />
+        <Outlet />
       </main>
     </SidebarProvider>
   );
