@@ -37,6 +37,7 @@ import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
 import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
 import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
+import StudentDeanBlockInfo from "./pages/studentDean/BloackInfo";
 function App() {
   const theme = useSelector((state) => state.theme.mode);
   const  { user, isAuthenticated, isLoading } = useSelector(
@@ -144,6 +145,7 @@ function App() {
           <Route path="home" element={<StudentDeanHome />} />
           <Route path="dorm" element={<DormAllocation />} />
           <Route path="info" element={<StudentInfo />} />
+          <Route path="block" element={<StudentDeanBlockInfo/>} />
           <Route path="account" element={<StudDeanAccount />} />
         </Route>
 

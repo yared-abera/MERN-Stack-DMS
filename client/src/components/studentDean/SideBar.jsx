@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "../ui/sidebar";
- 
+
 import { Link, useLocation } from "react-router-dom"; // React Router imports
 
 const StudDeanSideBar = [
@@ -28,6 +28,12 @@ const StudDeanSideBar = [
     url: "/dean/info",
     icon: View,
   },
+
+  {
+    title: "View Block Info",
+    url: "/dean/block",
+    icon: UserRoundPen,
+  },
   {
     title: "Account",
     url: "/dean/account",
@@ -45,15 +51,17 @@ export default function StudentDeanSideBar() {
           <SidebarGroupLabel className="sm:text-lg sm:font-semibold md:text-2xl font-bold mb-4">
             Student Dean
           </SidebarGroupLabel>
-          <SidebarGroupContent className='mt-4'>
+          <SidebarGroupContent className="mt-4">
             <SidebarMenu>
               {StudDeanSideBar.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <Link
                       to={item.url}
-                      className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
-                        location.pathname === item.url ? "bg-blue-500 text-white" : ""
+                      className={`text-lg font-semibold hover:bg-slate-400  dark:hover:bg-blue-400 ${
+                        location.pathname === item.url
+                          ? "bg-blue-500 text-white"
+                          : ""
                       }`}
                     >
                       <item.icon />
