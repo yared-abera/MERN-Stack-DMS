@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
- 
+
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { LogOut,  UserCog } from "lucide-react";
 import { useDispatch, useSelector } from 'react-redux';

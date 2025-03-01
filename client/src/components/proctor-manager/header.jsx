@@ -2,15 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Moon, Sun, UserCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export default function Header() {
-  const [darkMode, setDarkMode] = useState(false);
+import DarkMode from "@/components/common/darkMode";
+import AvatarComponent from "../common/avatar";
+export default function Header() {  
   const [menuOpen, setMenuOpen] = useState(false);
-  
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark");
-  };
 
   return (
     <header className="w-full bg-white dark:bg-gray-900 shadow-md px-4 pt-8 flex justify-between items-center">
@@ -23,7 +18,7 @@ export default function Header() {
           <Menu size={24} />
         </button>
         <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          Proctor Management System
+          Proctor Manager
         </h1>
       </div>
 
@@ -37,20 +32,14 @@ export default function Header() {
 
       {/* Right Section: Dark Mode & Profile */}
       <div className="flex items-center gap-4">
-        {/* Dark Mode Toggle */}
-        <button
-          className="p-2 rounded-md text-gray-700 dark:text-gray-300"
-          onClick={toggleDarkMode}
-        >
-          {darkMode ? <Sun size={24} /> : <Moon size={24} />}
-        </button>
-
+         {/* dark mode component */}
+          <DarkMode/>
+         
         {/* User Profile Dropdown */}
         <div className="relative">
           <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-            <UserCircle size={28} />
-            <span className="hidden lg:block">User</span>
-          </button>
+            <AvatarComponent/>
+             </button>
         </div>
       </div>
     </header>

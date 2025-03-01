@@ -30,14 +30,15 @@ import AdminDashboard from "./pages/Admin/dashbord";
 import { checkAuthorization } from "./store/auth-slice";
 import Notfound from "./components/common/notFound";
 import UnauthPage from "./components/common/unAuth-page";
-
 import ProctorHomePage from "./pages/proctor/homePage"
 import RegisterDorm from "./pages/proctor/registerDorm"
 import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
 import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
 import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
+
 function App() {
+  
   const theme = useSelector((state) => state.theme.mode);
   const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth

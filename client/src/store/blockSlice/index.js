@@ -7,7 +7,7 @@ const initialState={
 }
 
 
-const registerBlock=createAsyncThunk("block/register",
+export const registerBlock=createAsyncThunk("block/register",
    async(formData)=>{
     try {
         console.log("register blockASyncThunk",formData);
