@@ -2,6 +2,9 @@
 import authReducer from "./auth-slice";
 import themeSlice from "./common/ThemeSlice";
 import sidebarReducer from "./common/sidebarSlice";
+import DataSlice  from "./common/data";
+
+
 import blockReducer from "./blockSlice";
 const store = configureStore({
 
@@ -9,6 +12,7 @@ const store = configureStore({
         auth: authReducer,
         theme: themeSlice,
         sidebar: sidebarReducer,
+        Data:DataSlice,
         block:blockReducer
     }
 })

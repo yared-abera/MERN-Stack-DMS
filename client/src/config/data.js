@@ -118,7 +118,6 @@ export const UserAccount = [
       { id: "proctorManager", label: "Proctor Manager" },
       { id: "proctor", label: "proctor" },
       { id: "admin", label: "Admin" },
-      
     ],
   },
 ];
@@ -152,11 +151,11 @@ export const Maintainance_Issue = [
     type: "text",
     componentType: "input",
   },
- 
+
   {
     label: "Date",
     name: "date",
-    
+
     type: "date",
     componentType: "input",
   },
@@ -175,45 +174,46 @@ export const Maintainance_Issue = [
     componentType: "input",
   },
 ];
- 
 
 export const typeOfIssue = [
   {
-    label: 'Electricity Issue',
-    description: 'Problems related to electrical systems, such as power outages or faulty wiring.',
-    name:'electric'
+    label: "Electricity Issue",
+    description:
+      "Problems related to electrical systems, such as power outages or faulty wiring.",
+    name: "electric",
   },
   {
-    label: 'Broken Window',
-    description: 'Windows that are cracked or completely broken.',
-    name:'window'
+    label: "Broken Window",
+    description: "Windows that are cracked or completely broken.",
+    name: "window",
   },
   {
-    label: 'Broken Door',
-    description: 'Doors that do not close properly or are damaged.',
-    name:'door'
+    label: "Broken Door",
+    description: "Doors that do not close properly or are damaged.",
+    name: "door",
   },
   {
-    label: 'Missing Locker',
-    description: 'Lockers that are not available or have been removed.',
-    name:'locker'
+    label: "Missing Locker",
+    description: "Lockers that are not available or have been removed.",
+    name: "locker",
   },
   {
-    label: 'Missing Bed',
-    description: 'Beds that are not present in the dormitory.',
-    name:'bed'
+    label: "Missing Bed",
+    description: "Beds that are not present in the dormitory.",
+    name: "bed",
   },
-  
+
   {
-    label: 'Safety Concern',
-    description: 'Any issues related to safety, such as inadequate lighting or security.',
-    name:'safety'
+    label: "Safety Concern",
+    description:
+      "Any issues related to safety, such as inadequate lighting or security.",
+    name: "safety",
   },
   {
-    label: 'Pest Infestation',
-    description: 'Presence of pests like rodents or insects in the dormitory.',
-    name:'past'
-  }
+    label: "Pest Infestation",
+    description: "Presence of pests like rodents or insects in the dormitory.",
+    name: "past",
+  },
 ];
 
 export const Comment_Report = [
@@ -245,8 +245,7 @@ export const Comment_Report = [
     type: "text",
     componentType: "input",
   },
-  
- 
+
   {
     label: "Date",
     name: "date",
@@ -261,26 +260,375 @@ export const Comment_Report = [
     type: "textarea",
     componentType: "input",
   },
-  
 ];
 
-export const RadioButton=[
+export const RadioButton = [
   {
-    value:'remadial',
-    id:'remadial',
-    label:'Remadial Student'
+    value: "remedial",
+    id: "remedial",
+    label: "Remadial student ",
+  },
+
+  {
+    value: "fresh",
+    id: "fresh",
+    label: "Freshman student ",
   },
   {
-    value:'freash',
-    id:'freash',
-    label:'Freshman student'
+    value: "senior",
+    id: "senior",
+    label: "After Having Department",
   },
   {
+    value: "gust",
+    id: "gust",
+    label: "Gust",
+  },
+];
+export const RadioFileFormat = [
+  {
+    value: "json",
+    id: "json",
+    label: "Json File format",
+  },
+  {
+    value: "csv",
+    id: "csv",
+    label: "Microsoft Excel",
+  },
+];
+
+export const StudDataSchema = {
+  Fname: String,
+  Mname: String,
+  Lname: String,
+  email: String,
+  userName: String,
+  phoneNum: String,
+  password: String,
+  sex: String,
+  batch: String,
+  isSpecial: String,
+  isDisable: String,
+  address: String,
+  stream: String,
+  studCategory: String,
+  department: String,
+  collage: String,
+};
+export const requiredSchema = {
+  Fname: String,
+  Mname: String,
+  Lname: String,
+  userName: String,
+  sex: String,
+  studCategory: String,
+  department: String,
+  stream: String,
+};
+
+export const Gust = {
+  Fname: String,
+  Mname: String,
+  Lname: String,
+  userName: String,
+  block: "",
+  dorm: "",
+};
+
+ // Block Data
+export const blockData=[
+  {
+    "blockNum": 1,
+    "location": "girls_Campus",
+    "totalCapacity": 100,
+    "availableRoom": 30,
+    "isFull": false,
+    "isSelectedForImpaired": false,
+    "isSelectedForSpecial": true,
+    "description": "Block for female students.",
+    "floors": []
+  },
+  {
+    "blockNum": 2,
+    "location": "boys_Campus",
+    "totalCapacity": 150,
+    "availableRoom": 0,
+    "isFull": true,
+    "isSelectedForImpaired": true,
+    "isSelectedForSpecial": false,
+    "description": "Block for male students.",
+    "floors": []
+  },
+  {
+    "blockNum": 3,
+    "location": "Other",
+    "totalCapacity": 80,
+    "availableRoom": 20,
+    "isFull": false,
+    "isSelectedForImpaired": false,
+    "isSelectedForSpecial": false,
+    "description": "Mixed block.",
+    "floors": []
+  }
+]
+
+// Floor Data
+export const FloorData=[
+  {
+    "floorNumber": 1,
+    "floorStatus": "available",
+    "floorCapacity": 40,
+    "block": "ObjectId_of_Block_1",
+    "dorms": []
+  },
+  {
+    "floorNumber": 2,
+    "floorStatus": "occupied",
+    "floorCapacity": 30,
+    "block": "ObjectId_of_Block_1",
+    "dorms": []
+  },
+  {
+    "floorNumber": 1,
+    "floorStatus": "partial",
+    "floorCapacity": 50,
+    "block": "ObjectId_of_Block_2",
+    "dorms": []
+  },
+  {
+    "floorNumber": 1,
+    "floorStatus": "maintenance",
+    "floorCapacity": 40,
+    "block": "ObjectId_of_Block_3",
+    "dorms": []
+  }
+]
+
+// Dorm Data
+export const dormData=[
+  {
+    "dormNumber": 101,
+    "capacity": 4,
+    "dormStatus": "available",
+    "floor": "ObjectId_of_Floor_1",
+    "block": "ObjectId_of_Block_1"
+  },
+  {
+    "dormNumber": 102,
+    "capacity": 4,
+    "dormStatus": "occupied",
+    "floor": "ObjectId_of_Floor_1",
+    "block": "ObjectId_of_Block_1"
+  },
+  {
+    "dormNumber": 201,
+    "capacity": 2,
+    "dormStatus": "available",
+    "floor": "ObjectId_of_Floor_3",
+    "block": "ObjectId_of_Block_2"
+  },
+  {
+    "dormNumber": 202,
+    "capacity": 3,
+    "dormStatus": "maintenance",
+    "floor": "ObjectId_of_Floor_4",
+    "block": "ObjectId_of_Block_3"
+  }
+]
+
+
+export const BlockDemoData = [
+  {
+    blockNum: 1,
+    location: "boys_Campus",
+    totalCapacity: 300,
+    availableRoom: 50,
+    isFull: false,
+    floors: [
+      {
+        floorNumber: 1,
+        floorStatus: "Available",
+        floorCapacity: 100
+      },
+      {
+        floorNumber: 2,
+        floorStatus: "Available",
+        floorCapacity: 100
+      },
+      {
+        floorNumber: 3,
+        floorStatus: "Available",
+        floorCapacity: 100
+      }
+    ],
+    dorms: [
+      {
+        dormNumber: 101,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 102,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 103,
+        capacity: 2,
+        dormStatus: "Available"
+      },
+        {
+        dormNumber: 201,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 202,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 203,
+        capacity: 2,
+        dormStatus: "available"
+      },
+        {
+        dormNumber: 301,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 302,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 303,
+        capacity: 2,
+        dormStatus: "Available"
+      }
+    ],
+   
+    description: "Block A - for general students"
+  },
+  {
+    blockNum: 2,
+    location: "girls_Campus",
+    totalCapacity: 200,
+    availableRoom: 100,
+    isFull: false,
+    floors: [
+      {
+        floorNumber: 1,
+        floorStatus: "Available",
+        floorCapacity: 100
+      },
+      {
+        floorNumber: 2,
+        floorStatus: "Available",
+        floorCapacity: 100
+      }
+    ],
+    dorms: [
+      {
+        dormNumber: 1,
+        capacity: 2,
+        dormStatus: "available"
+      },
+      {
+        dormNumber: 2,
+        capacity: 2,
+        dormStatus: "available"
+      },
+      {
+        dormNumber: 3,
+        capacity: 4,
+        dormStatus: "Available"
+      },
+       {
+        dormNumber: 4,
+        capacity: 4,
+        dormStatus: "Available"
+      }
+    ],
+    isSelectedForImaried: false,
+    isSelectedForSpecial: true,
+    description: "Block B - for special program students"
+  },
+    {
+    blockNum: 3,
+    location: "boys_Campus",
+    totalCapacity: 150,
+    availableRoom: 10,
+    isFull: true,
+    floors: [
+      {
+        floorNumber: 1,
+        floorStatus: "Available",
+        floorCapacity: 75
+      },
+      {
+        floorNumber: 2,
+        floorStatus: "Available",
+        floorCapacity: 75
+      },
+    ],
+    dorms: [
+      {
+        dormNumber: 1,
+        capacity: 3,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 2,
+        capacity: 3,
+        dormStatus: "Available"
+      },
+      {
+        dormNumber: 3,
+        capacity: 3,
+        dormStatus: "Available"
+      }
+    ],
+    isSelectedForImaried: false,
+    isSelectedForSpecial: false,
+    description: "Block C - for female students"
+  }
+];
+
+
+ export  const AllocationTabscategories = [
+    {
+      key: "physicalDisable",
+      label: "for physical Imared",
+      options: [
+        { name: "male", label: "for Male Student" },
+        { name: "female", label: "for Female student" },
+      ],
+    },
+    {
+      key: "scholar",
+      label: "for Scholar",
+      options: [
+        { name: "male", label: "for  Male Student" },
+        { name: "female", label: "for Female Student" },
+      ],
+    },
+    {
+      key: "regular",
+      label: "for Regular Student",
+      options: [
+        { name: "male", label: " for Male Student" },
+        { name: "female", label: "for Female Student" },
+      ],
+    },
+  ];
     value:'department',
     id:'department',
     label:'After Having Department'
   }
-]
+];
 
 export const RegisterBlock = [
   {
