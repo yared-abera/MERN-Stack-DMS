@@ -598,36 +598,31 @@ export const BlockDemoData = [
 ];
 
 
- export  const AllocationTabscategories = [
-    {
-      key: "physicalDisable",
-      label: "for physical Imared",
-      options: [
-        { name: "male", label: "for Male Student" },
-        { name: "female", label: "for Female student" },
-      ],
-    },
-    {
-      key: "scholar",
-      label: "for Scholar",
-      options: [
-        { name: "male", label: "for  Male Student" },
-        { name: "female", label: "for Female Student" },
-      ],
-    },
-    {
-      key: "regular",
-      label: "for Regular Student",
-      options: [
-        { name: "male", label: " for Male Student" },
-        { name: "female", label: "for Female Student" },
-      ],
-    },
-  ];
-    value:'department',
-    id:'department',
-    label:'After Having Department'
-  }
+export  const AllocationTabscategories = [
+  {
+    key: "physicalDisable",
+    label: "physical Imared",
+    options: [
+      { name: "male", label: "Male Student" },
+      { name: "female", label: "Female student" },
+    ],
+  },
+  {
+    key: "scholar",
+    label: "Scholar Student",
+    options: [
+      { name: "male", label: "Male Student" },
+      { name: "female", label: "Female Student" },
+    ],
+  },
+  {
+    key: "regular",
+    label: "Regular Student",
+    options: [
+      { name: "male", label: "Male Student" },
+      { name: "female", label: "Female Student" },
+    ],
+  },
 ];
 
 export const RegisterBlock = [

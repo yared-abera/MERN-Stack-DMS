@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "../ui/label";
-
 import {
   AllocationTabscategories,
   blockData,
@@ -16,10 +15,13 @@ import {
 } from "../ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { SelectValue } from "@radix-ui/react-select";
+import AllocationComponent from "./AllocationComponent"; // Import the AllocationComponent
+
 const initialOption = {
   key: "",
   label: "",
 };
+
 export default function AllocationPage({ dataFormat, isNotGust }) {
   const [categorizedStudents, setCategorizedStudents] = useState({
     GenderMale: {
@@ -33,6 +35,8 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
       special: [],
     },
   });
+
+  const [showAllocationComponent, setShowAllocationComponent] = useState(false); // State to control visibility
   const Tabscategories = AllocationTabscategories;
   const [activeCategory, setActiveCategory] = useState(null);
   const timeoutRef = useRef(null);
@@ -43,12 +47,18 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
     floorValue: "",
   });
   const [storFloors, setStorFloors] = useState([]);
+
+  // Toggle the visibility of the AllocationComponent
+  const handleShowAllocationComponent = () => {
+    setShowAllocationComponent((prev) => !prev);
+  };
+
   useEffect(() => {
     if (BlockData && BlockData.length > 0) {
       const BlockLocation =
         selectedOne.label === "male" ? "boys_Campus" : "girls_Campus";
       const SelectedBlockArray = [];
-      const uniqueFloors = new Set(); // Use Set to store unique floor numbers
+      const uniqueFloors = new Set();
 
       BlockData.forEach((block) => {
         if (block.location === BlockLocation && !block.isFull) {
@@ -56,18 +66,18 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
 
           if (block.floors && block.floors.length > 0) {
             block.floors.forEach((floor) => {
-              uniqueFloors.add(floor.floorNumber); // Add floor number to the Set
+              uniqueFloors.add(floor.floorNumber);
             });
           }
         }
       });
 
-      const floors = Array.from(uniqueFloors); // Convert Set to Array
+      const floors = Array.from(uniqueFloors);
 
       if (floors.length > 0) {
-        floors.unshift("all"); // Add "all" only if there are floors
+        floors.unshift("all");
       }
-      setStorFloors(floors); // Set floors after processing all blocks
+      setStorFloors(floors);
       setSelectedBlock(SelectedBlockArray);
     }
   }, [selectedOne]);
@@ -114,7 +124,6 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
         } else if (isSpecial) {
           category.special.push(student);
         } else {
-          // Handle regular students with stream classification
           const streamKey =
             student.stream?.toUpperCase() === "NATURAL"
               ? "NaturalStream"
@@ -269,7 +278,7 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
   };
 
   return (
-    <div className="  w-full min-h-screen">
+    <div className="w-full min-h-screen">
       <div className="flex flex-col gap-2 p-3 md:p-6">
         <div className="w-1/2 m-2">
           <h1 className="text-center text-lg md:text-xl font-bold">
@@ -321,7 +330,7 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
             >
               <button
                 type="button"
-                className="px-4 py-3 bg-sky-600   rounded-md hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors"
+                className="px-4 py-3 bg-sky-600 rounded-md hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors"
                 aria-label={`Allocate ${category.key} students`}
               >
                 {category.label}
@@ -329,7 +338,7 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
 
               {activeCategory === category.key && (
                 <div
-                  className="absolute top-full dark:bg-white left-0 mt-2 w-64   shadow-lg rounded-md z-10"
+                  className="absolute top-full dark:bg-white left-0 mt-2 w-64 shadow-lg rounded-md z-10"
                   onMouseEnter={() => handleMouseEnter(category.key)}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -350,6 +359,22 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
             </div>
           ))}
         </div>
+
+        {/* Button to Show/Hide AllocationComponent */}
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={handleShowAllocationComponent}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            {showAllocationComponent ? "Hide Allocation" : "Show Allocation"}
+          </button>
+        </div>
+
+        {/* Conditionally Render AllocationComponent */}
+        {showAllocationComponent && (
+          <AllocationComponent categorizedStudents={categorizedStudents} />
+        )}
+
         <div className="mt-14">
           {selectedBlock?.length > 0 && (
             <Table>
@@ -392,4 +417,3 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
     </div>
   );
 }
- 
