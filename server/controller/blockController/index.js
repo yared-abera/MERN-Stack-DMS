@@ -7,23 +7,18 @@ const registerBlock=async (req, res) => {
     
     const {
         blockNum ,
-        capacity ,
-        foundIn ,
-        status ,
-        totalRoom ,
-        availableRoom ,
+        foundIn,
         isSelectedForSpecialStud,
-        isSelectedForDisableStud} =req.body; 
+        floors,
+        totalFloors
+         } =req.body; 
     
     const newBlock=new Block({
         blockNum ,
-        capacity ,
-        foundIn ,
-        status ,
-        totalRoom ,
-        availableRoom ,
-        isSelectedForSpecialStud,
-        isSelectedForDisableStud
+        location:foundIn ,
+        isSelectedForSpecialStud ,
+        [floors]:floors,
+        totalFloors
     })
 
     await newBlock.save();

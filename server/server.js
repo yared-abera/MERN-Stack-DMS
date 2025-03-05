@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const auth_route = require("./router/auth-router/auth-router");
-const block_route= require("/router/blockRouter/index")
+const block_route= require("./router/blockRouter/index")
 
 mongoose
   .connect(process.env.MONGO_URL, 
