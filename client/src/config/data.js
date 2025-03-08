@@ -631,14 +631,14 @@ export const RegisterBlock = [
     name: "blockNum",
     placeholder: "Enter Block Number",
     type: "number",
-    componentType: "input",
+    componentType: "input"
   },
   {
-    label: "Capacity",
-    name: "capacity",
-    placeholder: "Enter Capacity",
+    label: "floor Numbers",
+    name: "totalFloors",
+    placeholder: "Enter Number of floor",
     type: "number",
-    componentType: "input",
+    componentType: "input"
   },
   {
     label: "Found In",
@@ -650,29 +650,6 @@ export const RegisterBlock = [
     ],
   },
   {
-    label: "Status",
-    name: "status",
-    componentType: "select",
-    options: [
-      { id: "Available", label: "Available" },
-      { id: "Occupied", label: "Occupied" },
-    ],
-  },
-  {
-    label: "Total Rooms",
-    name: "totalRoom",
-    placeholder: "Enter Total Number of Rooms",
-    type: "number",
-    componentType: "input",
-  },
-  {
-    label: "Available Rooms",
-    name: "availableRoom",
-    placeholder: "Enter Number of Available Rooms",
-    type: "number",
-    componentType: "input",
-  },
-  {
     label: "Special Student Selection",
     name: "isSelectedForSpecialStud",
     componentType: "select",
@@ -681,9 +658,37 @@ export const RegisterBlock = [
       { id: "false", label: "No" },
     ],
   },
+];
+
+
+
+export const RegisterDorm = [
   {
-    label: "Disabled Student Selection",
-    name: "isSelectedForDisableStud",
+    label: "Block Number",
+    name: "blockNum",
+    placeholder: "Enter Block Number",
+    type: "number",
+    componentType: "input"
+  },
+  {
+    label: "floor Numbers",
+    name: "totalFloors",
+    placeholder: "Enter Number of floor",
+    type: "number",
+    componentType: "input"
+  },
+  {
+    label: "Found In",
+    name: "foundIn",
+    componentType: "select",
+    options: [
+      { id: "maleArea", label: "Male Area" },
+      { id: "femaleArea", label: "Female Area" },
+    ],
+  },
+  {
+    label: "Special Student Selection",
+    name: "isSelectedForSpecialStud",
     componentType: "select",
     options: [
       { id: "true", label: "Yes" },

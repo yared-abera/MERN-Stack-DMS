@@ -73,7 +73,7 @@ export const BlockDemoData = [
       }
     ],
     isSelectedForImparied: true,
-    isSelectedForSpecial: false,
+    isSelectedForSpecial: true,
     description: "Block A - for general students"
   },
   {
@@ -163,74 +163,80 @@ export const BlockDemoData = [
 
 export default function AllocationComponent({ categorizedStudents }) {
   // Function to allocate students to dorms based on gender, special status, and impairment
-  const allocateStudents = (students, blocks) => {
-    const allocations = [];
+ const allocateStudents = (students, blocks) => {
+  const allocations = [];
 
-    students.forEach((student) => {
-      let allocated = false;
+  students.forEach((student) => {
+    let allocated = false;
 
-      // Determine the student's gender and special status
-      const isFemale = student.sex?.toUpperCase() === "FEMALE";
-      const isSpecial = student.isSpecial?.toUpperCase() === "YES";
-      const isImpaired = student.isDisable?.toUpperCase() === "YES";
+    // Determine the student's gender, special status, and impairment
+    const isFemale = student.sex?.toUpperCase() === "FEMALE";
+    const isSpecial = student.isSpecial?.toUpperCase() === "YES";
+    const isImpaired = student.isDisable?.toUpperCase() === "YES";
 
-      // Filter blocks based on gender and special status
-      const eligibleBlocks = blocks.filter((block) => {
-        const isGenderMatch =
-          (isFemale && block.location === "girls_Campus") ||
-          (!isFemale && block.location === "boys_Campus");
+    // Filter blocks based on gender and special status
+    const eligibleBlocks = blocks.filter((block) => {
+      // Gender matching: male students go to boys_Campus, female students go to girls_Campus
+      const isGenderMatch =
+        (isFemale && block.location === "girls_Campus") ||
+        (!isFemale && block.location === "boys_Campus");
 
-        const isSpecialMatch = isSpecial ? block.isSelectedForSpecial : true;
+      // Special students can only be allocated to blocks marked for special students
+      const isSpecialMatch = isSpecial ? block.isSelectedForSpecial : true;
 
-        return isGenderMatch && isSpecialMatch;
-      });
+      return isGenderMatch && isSpecialMatch;
+    });
 
-      // Iterate through eligible blocks to find available dorms
-      for (const block of eligibleBlocks) {
-        if (block.isFull) continue;
+    // Iterate through eligible blocks to find available dorms
+    for (const block of eligibleBlocks) {
+      if (block.isFull) continue;
 
-        for (const floor of block.floors) {
-          // If the student is impaired, allocate to the first floor
-          if (isImpaired && floor.floorNumber !== 1) continue;
+      for (const floor of block.floors) {
+        // If the student is impaired, allocate to the first floor
+        if (isImpaired && floor.floorNumber !== 1) continue;
 
-          for (const dorm of block.dorms) {
-            if (dorm.dormStatus === "Available" && dorm.capacity > 0) {
-              // Allocate student to dorm
-              allocations.push({
-                student,
-                block: block.blockNum,
-                floor: floor.floorNumber,
-                dorm: dorm.dormNumber,
-              });
+        for (const dorm of block.dorms) {
+          // Check dorm status (case-insensitive) and capacity
+          if (
+            dorm.dormStatus.toLowerCase() === "available" &&
+            dorm.capacity > 0
+          ) {
+            // Allocate student to dorm
+            allocations.push({
+              student,
+              block: block.blockNum,
+              floor: floor.floorNumber,
+              dorm: dorm.dormNumber,
+            });
 
-              // Update dorm capacity and status
-              dorm.capacity -= 1;
-              if (dorm.capacity === 0) {
-                dorm.dormStatus = "Full";
-              }
-
-              allocated = true;
-              break;
+            // Update dorm capacity and status
+            dorm.capacity -= 1;
+            if (dorm.capacity === 0) {
+              dorm.dormStatus = "Full";
             }
+
+            allocated = true;
+            break;
           }
-          if (allocated) break;
         }
         if (allocated) break;
       }
+      if (allocated) break;
+    }
 
-      if (!allocated) {
-        // If no dorm is available, mark as unallocated
-        allocations.push({
-          student,
-          block: "Unallocated",
-          floor: "N/A",
-          dorm: "N/A",
-        });
-      }
-    });
+    if (!allocated) {
+      // If no dorm is available, mark as unallocated
+      allocations.push({
+        student,
+        block: "Unallocated",
+        floor: "N/A",
+        dorm: "N/A",
+      });
+    }
+  });
 
-    return allocations;
-  };
+  return allocations;
+};
 
   // Allocate students based on categories
   const allocatedStudents = useMemo(() => {

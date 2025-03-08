@@ -31,7 +31,7 @@ import { checkAuthorization } from "./store/auth-slice";
 import Notfound from "./components/common/notFound";
 import UnauthPage from "./components/common/unAuth-page";
 import ProctorHomePage from "./pages/proctor/homePage"
-import RegisterDorm from "./pages/proctor/registerDorm"
+import RegisterDormComp from "./pages/proctor/registerDorm"
 import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
 import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
 import ProctorGenerateReport from "./pages/proctor/generateReport"
@@ -43,6 +43,8 @@ function App() {
   const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
+
+ 
     
   const dispatch = useDispatch();
   useEffect(() => {
@@ -128,7 +130,7 @@ function App() {
               <ProctorLayout />
             </CheckAuthComponent>}>
            <Route path="home" element={<ProctorHomePage/>} />
-          <Route path="dorm" element={<RegisterDorm/>} />
+          <Route path="dorm" element={<RegisterDormComp/>} />
           <Route path="register" element={<RegisterStudentPage/>} />
           <Route path="info" element={<ProctorViewInfo/>} />
           <Route path="report" element={<ProctorGenerateReport/>} />  
