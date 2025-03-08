@@ -6,21 +6,20 @@ import {
   blockData,
   BlockDemoData,
 } from "@/config/data";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
-import { SelectValue } from "@radix-ui/react-select";
+
+import { Button } from "../ui/button";
+
+import DetailAllocation from "./DetailAllocation";
+import { useDispatch } from "react-redux";
+import { StudetnDataDirect } from "@/store/common/data";
+ 
+ 
+ 
 const initialOption = {
   key: "",
   label: "",
 };
-export default function AllocationPage({ dataFormat, isNotGust }) {
+export default function AllocationPage({ dataFormat, selectedValue }) {
   const [categorizedStudents, setCategorizedStudents] = useState({
     GenderMale: {
       RegularMale: { NaturalStream: [], SoctiaStream: [] },
@@ -35,59 +34,48 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
   });
   const Tabscategories = AllocationTabscategories;
   const [activeCategory, setActiveCategory] = useState(null);
-  const timeoutRef = useRef(null);
+  const [timeoutId, setTimeoutId] = useState(null); // State to store timeout ID
+
   const [selectedOne, setSelectedOne] = useState(initialOption);
-  const [selectedBlock, setSelectedBlock] = useState([]);
+  const [filteredBlock, setFilterdBlock] = useState([]);
   const BlockData = BlockDemoData;
-  const [floorChange, setFloorChange] = useState({
-    floorValue: "",
-  });
-  const [storFloors, setStorFloors] = useState([]);
+
   useEffect(() => {
-    if (BlockData && BlockData.length > 0) {
+    if (BlockData?.length > 0) {
       const BlockLocation =
         selectedOne.label === "male" ? "boys_Campus" : "girls_Campus";
+
       const SelectedBlockArray = [];
-      const uniqueFloors = new Set(); // Use Set to store unique floor numbers
 
       BlockData.forEach((block) => {
         if (block.location === BlockLocation && !block.isFull) {
           SelectedBlockArray.push(block);
-
-          if (block.floors && block.floors.length > 0) {
-            block.floors.forEach((floor) => {
-              uniqueFloors.add(floor.floorNumber); // Add floor number to the Set
-            });
-          }
         }
       });
 
-      const floors = Array.from(uniqueFloors); // Convert Set to Array
-
-      if (floors.length > 0) {
-        floors.unshift("all"); // Add "all" only if there are floors
-      }
-      setStorFloors(floors); // Set floors after processing all blocks
-      setSelectedBlock(SelectedBlockArray);
+      setFilterdBlock(SelectedBlockArray);
     }
-  }, [selectedOne]);
+  }, [selectedOne, BlockData]);
 
   function handleMouseEnter(input) {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+    if (timeoutId) {
+      // Check if there's an existing timeout
+      clearTimeout(timeoutId); // Clear the timeout if mouse re-enters
+      setTimeoutId(null); // Reset timeout ID state
     }
     setActiveCategory(input);
   }
 
   function handleMouseLeave() {
-    timeoutRef.current = setTimeout(() => {
+    const id = setTimeout(() => {
+      // Use setTimeout for delay
       setActiveCategory(null);
-    }, 1000);
+    }, 1000); // Delay of 1 second
+    setTimeoutId(id); // Store timeout ID to clear it later
   }
 
   useEffect(() => {
-    if (dataFormat?.length && isNotGust) {
+    if (dataFormat?.length && selectedValue!=='gust') {
       const newCategorizedStudents = {
         GenderMale: {
           RegularMale: { NaturalStream: [], SoctiaStream: [] },
@@ -129,7 +117,7 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
 
       setCategorizedStudents(newCategorizedStudents);
     }
-  }, [dataFormat, isNotGust]);
+  }, [dataFormat, selectedValue]);
 
   const {
     totalMale,
@@ -185,6 +173,22 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
       femaleSocial,
     };
   }, [categorizedStudents]);
+  const dispatch=useDispatch()
+
+useEffect(()=>{
+  const userCalculatedValue={
+    maleNatural:maleNatural,
+    maleSocial:maleSocial,
+    femaleNatural:femaleNatural,
+    femaleSocial:femaleSocial,
+    maleDisabled:maleDisabled,
+    femaleDisabled:femaleDisabled,
+    maleSpecial:maleSpecial,
+    femaleSpecial:femaleSpecial
+  }
+ dispatch(StudetnDataDirect({categorizedStudents,selectedValue,userCalculatedValue}))
+
+},[categorizedStudents,selectedValue])
 
   function handleCategorySelected(option, keys) {
     setSelectedOne({
@@ -192,81 +196,7 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
       label: option,
     });
   }
-
-  function handleFloorChange(value) {
-    setFloorChange({
-      floorValue: value,
-    });
-  }
-
-  useEffect(() => {
-    selectedBlock && selectedBlock.length > 0
-      ? selectedBlock.map((block) => {
-          console.log(block, "block Number");
-        })
-      : "";
-  });
-
-  const FloorSelect = ({ onChange, floors }) => (
-    <Select onValueChange={onChange}>
-      <SelectTrigger>
-        <SelectValue placeholder="Select floor" />
-      </SelectTrigger>
-      <SelectContent>
-        {floors?.length > 0 ? (
-          floors.map((floor) => (
-            <SelectItem key={floor} value={floor}>
-              {floor === "all" ? "All Floors" : `Floor ${floor}`}
-            </SelectItem>
-          ))
-        ) : (
-          <SelectItem value="none" disabled>
-            No floors available
-          </SelectItem>
-        )}
-      </SelectContent>
-    </Select>
-  );
-
-  const renderBlockRow = (block) => (
-    <TableRow key={block._id || block.blockNum}>
-      <TableCell>{block.blockNum}</TableCell>
-      <TableCell>{block.location}</TableCell>
-      <TableCell>{block.totalCapacity}</TableCell>
-      <TableCell>{block.availableRoom}</TableCell>
-      <TableCell>
-        <FloorSelect
-          onChange={(value) => handleFloorChange(value)}
-          floors={storFloors}
-        />
-      </TableCell>
-      <TableCell>
-        <input type="checkbox" />
-      </TableCell>
-    </TableRow>
-  );
-
-  const renderFloorRows = (block) => {
-    if (!block?.floors?.length) return [];
-
-    return block.floors.map((floor) => (
-      <TableRow key={`${block.blockNum}-${floor.floorNumber}`}>
-        <TableCell>{floor.floorNumber}</TableCell>
-        <TableCell>{floor.floorStatus}</TableCell>
-        <TableCell>{floor.floorCapacity}</TableCell>
-        <TableCell>{floor.availableRooms}</TableCell>
-        <TableCell>
-          <FloorSelect
-            onChange={(value) => handleFloorChange(value)}
-            floors={storFloors}
-          />
-        </TableCell>
-        <TableCell>
-          <input type="checkbox" />
-        </TableCell>
-      </TableRow>
-    ));
-  };
+ 
 
   return (
     <div className="  w-full min-h-screen">
@@ -306,7 +236,7 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
       </div>
       <hr />
 
-      <div className="p-4 md:p-6 max-w-2xl mx-auto">
+      <div className="p-4 md:p-6 max-w-2xl mx-auto flex flex-col gap-2     min-h-screen" >
         <h3 className="text-center py-3 text-lg font-semibold text-gray-800">
           Allocate Student By Selecting Block
         </h3>
@@ -350,46 +280,35 @@ export default function AllocationPage({ dataFormat, isNotGust }) {
             </div>
           ))}
         </div>
-        <div className="mt-14">
-          {selectedBlock?.length > 0 && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    {floorChange.floorValue === "all"
-                      ? "Block Number"
-                      : "Floor Number"}
-                  </TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>
-                    {floorChange.floorValue === "all"
-                      ? "Block Capacity"
-                      : "Floor Capacity"}
-                  </TableHead>
-                  <TableHead>
-                    {floorChange.floorValue === "all"
-                      ? "Available Block Rooms"
-                      : "Available Floor Rooms"}
-                  </TableHead>
-                  <TableHead>
-                    {floorChange.floorValue === "all"
-                      ? "Floors"
-                      : `Floor ${floorChange.floorValue}`}
-                  </TableHead>
-                  <TableHead>Select</TableHead>
-                </TableRow>
-              </TableHeader>
 
-              <TableBody>
-                {floorChange.floorValue === "all"
-                  ? selectedBlock.map(renderBlockRow)
-                  : selectedBlock.flatMap(renderFloorRows)}
-              </TableBody>
-            </Table>
-          )}
+        <div className="mt-16 text-center">
+          <h1 className="text-lg md:text-xl font-semibold">
+            {selectedOne.key === "" ? (
+              <spane>Please Choose Stud Category</spane>
+            ) : (
+              <span>
+                {" "}
+                user selected {selectedOne.label} {selectedOne.key}
+              </span>
+            )}
+          </h1>
         </div>
+
+        <div className="mt-4  h-max">
+          <DetailAllocation
+            filteredBlock={filteredBlock}
+            selectedOne={selectedOne}
+            // categoryKey={selectedOne.key}
+            // categoryOption={selectedOne.label}
+          />
+        </div>
+      </div>
+
+      <div className="text-right mr-3">
+        <Button onClick={() => setisdefaultBtnClicked(true)}>
+          Default Allocation
+        </Button>
       </div>
     </div>
   );
 }
- 

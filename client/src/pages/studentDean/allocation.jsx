@@ -24,7 +24,6 @@ import AllocationPage from "@/components/studentDean/dormAllocation";
 const data = requiredSchema;
 const AllData = StudDataSchema;
 
- 
 export default function DormAllocation() {
   const [file, setFile] = useState(null);
   const inputRef = useRef();
@@ -37,7 +36,6 @@ export default function DormAllocation() {
   const [validationTrigger, setValidationTrigger] = useState(false);
   const [showDetailError, setShowDetailError] = useState(false);
   const [navigateToAPage, setNavigateAPage] = useState(false);
-  const [isNotGust,setIsNotGust]=useState(true)
 
   function handleFileChange(event) {
     const selectedFile = event.target.files?.[0];
@@ -130,7 +128,7 @@ export default function DormAllocation() {
   }
 
   useEffect(() => {
-    if (dataFormat && dataFormat.length > 0 && isNotGust) {
+    if (dataFormat && dataFormat.length > 0 && selectedValue !== "gust") {
       const allErrors = [];
       let hasErrors = false;
 
@@ -154,7 +152,7 @@ export default function DormAllocation() {
         //
 
         const regexStream = /^(SOCIAL|NATURAL)/i;
-     
+
         const isStreamCorrrect =
           inputData.stream && regexStream.test(inputData.stream.toUpperCase());
 
@@ -223,16 +221,13 @@ export default function DormAllocation() {
       toast("Data is valid");
     }
   }, [validationTrigger]);
-  useEffect(()=>{
-    if(selectedValue==='gust'){
-      setIsNotGust(false)
-     }
-  },[selectedValue])
+
+  console.log(dataFormat, "dataFormat");
 
   return (
     <div className="  w-full overflow-hidden min-h-screen mt-20 flex flex-col ">
       {dataFormat && dataFormat.length > 0 && navigateToAPage ? (
-        <AllocationPage dataFormat={dataFormat} isNotGust={isNotGust} />
+        <AllocationPage dataFormat={dataFormat} selectedValue={selectedValue} />
       ) : (
         <div className="flex flex-col w-full">
           <Dialog open={isDataNotCorrect} onOpenChange={handleDialog}>

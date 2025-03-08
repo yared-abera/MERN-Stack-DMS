@@ -325,6 +325,7 @@ export const requiredSchema = {
   studCategory: String,
   department: String,
   stream: String,
+  batch: String,
 };
 
 export const Gust = {
@@ -336,291 +337,479 @@ export const Gust = {
   dorm: "",
 };
 
- // Block Data
-export const blockData=[
-  {
-    "blockNum": 1,
-    "location": "girls_Campus",
-    "totalCapacity": 100,
-    "availableRoom": 30,
-    "isFull": false,
-    "isSelectedForImpaired": false,
-    "isSelectedForSpecial": true,
-    "description": "Block for female students.",
-    "floors": []
-  },
-  {
-    "blockNum": 2,
-    "location": "boys_Campus",
-    "totalCapacity": 150,
-    "availableRoom": 0,
-    "isFull": true,
-    "isSelectedForImpaired": true,
-    "isSelectedForSpecial": false,
-    "description": "Block for male students.",
-    "floors": []
-  },
-  {
-    "blockNum": 3,
-    "location": "Other",
-    "totalCapacity": 80,
-    "availableRoom": 20,
-    "isFull": false,
-    "isSelectedForImpaired": false,
-    "isSelectedForSpecial": false,
-    "description": "Mixed block.",
-    "floors": []
-  }
-]
-
-// Floor Data
-export const FloorData=[
-  {
-    "floorNumber": 1,
-    "floorStatus": "available",
-    "floorCapacity": 40,
-    "block": "ObjectId_of_Block_1",
-    "dorms": []
-  },
-  {
-    "floorNumber": 2,
-    "floorStatus": "occupied",
-    "floorCapacity": 30,
-    "block": "ObjectId_of_Block_1",
-    "dorms": []
-  },
-  {
-    "floorNumber": 1,
-    "floorStatus": "partial",
-    "floorCapacity": 50,
-    "block": "ObjectId_of_Block_2",
-    "dorms": []
-  },
-  {
-    "floorNumber": 1,
-    "floorStatus": "maintenance",
-    "floorCapacity": 40,
-    "block": "ObjectId_of_Block_3",
-    "dorms": []
-  }
-]
-
-// Dorm Data
-export const dormData=[
-  {
-    "dormNumber": 101,
-    "capacity": 4,
-    "dormStatus": "available",
-    "floor": "ObjectId_of_Floor_1",
-    "block": "ObjectId_of_Block_1"
-  },
-  {
-    "dormNumber": 102,
-    "capacity": 4,
-    "dormStatus": "occupied",
-    "floor": "ObjectId_of_Floor_1",
-    "block": "ObjectId_of_Block_1"
-  },
-  {
-    "dormNumber": 201,
-    "capacity": 2,
-    "dormStatus": "available",
-    "floor": "ObjectId_of_Floor_3",
-    "block": "ObjectId_of_Block_2"
-  },
-  {
-    "dormNumber": 202,
-    "capacity": 3,
-    "dormStatus": "maintenance",
-    "floor": "ObjectId_of_Floor_4",
-    "block": "ObjectId_of_Block_3"
-  }
-]
-
-
-export const BlockDemoData = [
+// Block Data
+export const blockData = [
   {
     blockNum: 1,
-    location: "boys_Campus",
-    totalCapacity: 300,
-    availableRoom: 50,
+    location: "girls_Campus",
+    totalCapacity: 100,
+    availableRoom: 30,
     isFull: false,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 100
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 100
-      },
-      {
-        floorNumber: 3,
-        floorStatus: "Available",
-        floorCapacity: 100
-      }
-    ],
-    dorms: [
-      {
-        dormNumber: 101,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 102,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 103,
-        capacity: 2,
-        dormStatus: "Available"
-      },
-        {
-        dormNumber: 201,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 202,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 203,
-        capacity: 2,
-        dormStatus: "available"
-      },
-        {
-        dormNumber: 301,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 302,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 303,
-        capacity: 2,
-        dormStatus: "Available"
-      }
-    ],
-   
-    description: "Block A - for general students"
+    isSelectedForImpaired: false,
+    isSelectedForSpecial: true,
+    description: "Block for female students.",
+    floors: [],
   },
   {
     blockNum: 2,
-    location: "girls_Campus",
-    totalCapacity: 200,
-    availableRoom: 100,
-    isFull: false,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 100
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 100
-      }
-    ],
-    dorms: [
-      {
-        dormNumber: 1,
-        capacity: 2,
-        dormStatus: "available"
-      },
-      {
-        dormNumber: 2,
-        capacity: 2,
-        dormStatus: "available"
-      },
-      {
-        dormNumber: 3,
-        capacity: 4,
-        dormStatus: "Available"
-      },
-       {
-        dormNumber: 4,
-        capacity: 4,
-        dormStatus: "Available"
-      }
-    ],
-    isSelectedForImaried: false,
-    isSelectedForSpecial: true,
-    description: "Block B - for special program students"
-  },
-    {
-    blockNum: 3,
     location: "boys_Campus",
     totalCapacity: 150,
-    availableRoom: 10,
+    availableRoom: 0,
     isFull: true,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 75
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 75
-      },
-    ],
-    dorms: [
-      {
-        dormNumber: 1,
-        capacity: 3,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 2,
-        capacity: 3,
-        dormStatus: "Available"
-      },
-      {
-        dormNumber: 3,
-        capacity: 3,
-        dormStatus: "Available"
-      }
-    ],
-    isSelectedForImaried: false,
+    isSelectedForImpaired: true,
     isSelectedForSpecial: false,
-    description: "Block C - for female students"
-  }
+    description: "Block for male students.",
+    floors: [],
+  },
+  {
+    blockNum: 3,
+    location: "Other",
+    totalCapacity: 80,
+    availableRoom: 20,
+    isFull: false,
+    isSelectedForImpaired: false,
+    isSelectedForSpecial: false,
+    description: "Mixed block.",
+    floors: [],
+  },
 ];
 
+// Floor Data
+export const FloorData = [
+  {
+    floorNumber: 1,
+    floorStatus: "available",
+    floorCapacity: 40,
+    block: "ObjectId_of_Block_1",
+    dorms: [],
+  },
+  {
+    floorNumber: 2,
+    floorStatus: "occupied",
+    floorCapacity: 30,
+    block: "ObjectId_of_Block_1",
+    dorms: [],
+  },
+  {
+    floorNumber: 1,
+    floorStatus: "partial",
+    floorCapacity: 50,
+    block: "ObjectId_of_Block_2",
+    dorms: [],
+  },
+  {
+    floorNumber: 1,
+    floorStatus: "maintenance",
+    floorCapacity: 40,
+    block: "ObjectId_of_Block_3",
+    dorms: [],
+  },
+];
 
- export  const AllocationTabscategories = [
-    {
-      key: "physicalDisable",
-      label: "for physical Imared",
-      options: [
-        { name: "male", label: "for Male Student" },
-        { name: "female", label: "for Female student" },
-      ],
-    },
-    {
-      key: "scholar",
-      label: "for Scholar",
-      options: [
-        { name: "male", label: "for  Male Student" },
-        { name: "female", label: "for Female Student" },
-      ],
-    },
-    {
-      key: "regular",
-      label: "for Regular Student",
-      options: [
-        { name: "male", label: " for Male Student" },
-        { name: "female", label: "for Female Student" },
-      ],
-    },
+// Dorm Data
+export const dormData = [
+  {
+    dormNumber: 101,
+    capacity: 4,
+    dormStatus: "available",
+    floor: "ObjectId_of_Floor_1",
+    block: "ObjectId_of_Block_1",
+  },
+  {
+    dormNumber: 102,
+    capacity: 4,
+    dormStatus: "occupied",
+    floor: "ObjectId_of_Floor_1",
+    block: "ObjectId_of_Block_1",
+  },
+  {
+    dormNumber: 201,
+    capacity: 2,
+    dormStatus: "available",
+    floor: "ObjectId_of_Floor_3",
+    block: "ObjectId_of_Block_2",
+  },
+  {
+    dormNumber: 202,
+    capacity: 3,
+    dormStatus: "maintenance",
+    floor: "ObjectId_of_Floor_4",
+    block: "ObjectId_of_Block_3",
+  },
+];
+
+// export const BlockDemoData = [
+//   {
+//     blockNum: 1,
+//     location: "boys_Campus",
+//     totalCapacity: 8,
+//     availableRoom: 2,
+//     isFull: false,
+//     floors: [
+//       {
+//         floorNumber: 1,
+//         floorStatus: "Available",
+//         floorCapacity: 1,
+//         isSelectedFor: "",
+//       },
+//       {
+//         floorNumber: 2,
+//         floorStatus: "Available",
+//         floorCapacity: 1,
+//         isSelectedFor: "",
+//       },
+//       {
+//         floorNumber: 3,
+//         floorStatus: "Available",
+//         floorCapacity: 1,
+//         isSelectedFor: "",
+//       },
+//     ],
+//     // dorms: [
+//     //   {
+//     //     dormNumber: 101,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 102,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 103,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 201,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 202,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 203,
+//     //     capacity: 2,
+//     //     dormStatus: "available",
+//     //   },
+//     //   {
+//     //     dormNumber: 301,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 302,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     //   {
+//     //     dormNumber: 303,
+//     //     capacity: 4,
+//     //     dormStatus: "Available",
+//     //   },
+//     // ],
+//     dorms: [
+//       {
+//         dormNumber: 1,
+//         capacity: 2,
+//         dormStatus: "available",
+//       },
+//       {
+//         dormNumber: 2,
+//         capacity: 2,
+//         dormStatus: "available",
+//       },
+//       {
+//         dormNumber: 3,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//       {
+//         dormNumber: 4,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//     ],
+//     description: "Block A - for general students",
+//   },
+//   {
+//     blockNum: 2,
+//     location: "girls_Campus",
+//     totalCapacity: 200,
+//     availableRoom: 100,
+//     isFull: false,
+//     floors: [
+//       {
+//         floorNumber: 1,
+//         floorStatus: "Available",
+//         floorCapacity: 100,
+//         isSelectedFor: "",
+//       },
+//       {
+//         floorNumber: 2,
+//         floorStatus: "Available",
+//         floorCapacity: 100,
+//         isSelectedFor: "",
+//       },
+//     ],
+//     dorms: [
+//       {
+//         dormNumber: 1,
+//         capacity: 2,
+//         dormStatus: "available",
+//       },
+//       {
+//         dormNumber: 2,
+//         capacity: 2,
+//         dormStatus: "available",
+//       },
+//       {
+//         dormNumber: 3,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//       {
+//         dormNumber: 4,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//     ],
+
+//     description: "Block B - for special program students",
+//   },
+//   {
+//     blockNum: 2,
+//     location: "boys_Campus",
+//     totalCapacity: 150,
+//     availableRoom: 10,
+//     isFull: false,
+//     floors: [
+//       {
+//         floorNumber: 1,
+//         floorStatus: "Available",
+//         floorCapacity: 75,
+//         isSelectedFor: "",
+//       },
+//       {
+//         floorNumber: 2,
+//         floorStatus: "Available",
+//         floorCapacity: 75,
+//         isSelectedFor: "",
+//       },
+//     ],
+//     dorms: [
+//       {
+//         dormNumber: 1,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//       {
+//         dormNumber: 2,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//       {
+//         dormNumber: 3,
+//         capacity: 4,
+//         dormStatus: "Available",
+//       },
+//     ],
+
+//     description: "Block C - for female students",
+//   },
+// ];
+
+
+export const BlockDemoData = [
+    {
+      blockNum: 1,
+      location: "boys_Campus",
+      totalCapacity: 8,
+      availableRoom: 2,
+      isFull: false,
+      floors: [
+        {
+          floorNumber: 1,
+          floorStatus: "Available",
+          floorCapacity: 1,
+          isSelectedFor: "",
+        },
+        {
+          floorNumber: 2,
+          floorStatus: "Available",
+          floorCapacity: 1,
+          isSelectedFor: "",
+        },
+        {
+          floorNumber: 3,
+          floorStatus: "Available",
+          floorCapacity: 1,
+          isSelectedFor: "",
+        },
+      ],
+      dorms: [
+        {
+          dormNumber: 101,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 102,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 103,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 201,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 202,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 203,
+          capacity: 2,
+          dormStatus: "available",
+        },
+        {
+          dormNumber: 301,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 302,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 303,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+      ],
+  
+      description: "Block A - for general students",
+    },
+    {
+      blockNum: 2,
+      location: "girls_Campus",
+      totalCapacity: 200,
+      availableRoom: 100,
+      isFull: false,
+      floors: [
+        {
+          floorNumber: 1,
+          floorStatus: "Available",
+          floorCapacity: 100,
+          isSelectedFor: "",
+        },
+        {
+          floorNumber: 2,
+          floorStatus: "Available",
+          floorCapacity: 100,
+          isSelectedFor: "",
+        },
+      ],
+      dorms: [
+        {
+          dormNumber: 1,
+          capacity: 2,
+          dormStatus: "available",
+        },
+        {
+          dormNumber: 2,
+          capacity: 2,
+          dormStatus: "available",
+        },
+        {
+          dormNumber: 3,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 4,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+      ],
+  
+      description: "Block B - for special program students",
+    },
+    {
+      blockNum: 2,
+      location: "boys_Campus",
+      totalCapacity: 150,
+      availableRoom: 10,
+      isFull: false,
+      floors: [
+        {
+          floorNumber: 1,
+          floorStatus: "Available",
+          floorCapacity: 75,
+          isSelectedFor: "",
+        },
+        {
+          floorNumber: 2,
+          floorStatus: "Available",
+          floorCapacity: 75,
+          isSelectedFor: "",
+        },
+      ],
+      dorms: [
+        {
+          dormNumber: 1,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 2,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+        {
+          dormNumber: 3,
+          capacity: 4,
+          dormStatus: "Available",
+        },
+      ],
+  
+      description: "Block C - for female students",
+    },
   ];
+export const AllocationTabscategories = [
+  {
+    key: "physicalDisable",
+    label: "physical Imared",
+    options: [
+      { name: "male", label: "Male Student" },
+      { name: "female", label: "Female student" },
+    ],
+  },
+  {
+    key: "scholar",
+    label: "Scholar Student",
+    options: [
+      { name: "male", label: "Male Student" },
+      { name: "female", label: "Female Student" },
+    ],
+  },
+  {
+    key: "regular",
+    label: "Regular Student",
+    options: [
+      { name: "male", label: "Male Student" },
+      { name: "female", label: "Female Student" },
+    ],
+  },
+];
