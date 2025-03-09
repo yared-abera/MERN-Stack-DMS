@@ -5,13 +5,15 @@ import sidebarReducer from "./common/sidebarSlice";
 import DataSlice  from "./common/data";
 
 
+import blockReducer from "./blockSlice";
 const store = configureStore({
 
     reducer: {
         auth: authReducer,
         theme: themeSlice,
         sidebar: sidebarReducer,
-        Data:DataSlice
+        Data:DataSlice,
+        block:blockReducer
     }
 })
 

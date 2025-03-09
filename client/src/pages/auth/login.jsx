@@ -17,8 +17,8 @@ export default function LogIn() {
   };
   
   return (
-    <div className="w-auto p-10 rounded-lg shadow-lg ">
-        <div className="flex items-center justify-center">
+    <div className="w-auto p-10 rounded-lg shadow-lg  bg-transparent">
+      <div className="flex items-center justify-center">
       <CommonForm
         formControls={logInForm}
         formData={formData}

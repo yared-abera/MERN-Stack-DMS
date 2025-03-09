@@ -18,7 +18,7 @@ import StudentHome from "./pages/student/home";
 import ViewDorm from "./pages/student/viewDorm";
 import ReportMaintenace from "./pages/student/maintenanceIssue";
 import StudentAccount from "./pages/student/account";
-import RegisterBlock from "./pages/proctorManager/RegisterBlockPage";
+import RegisterBlockComp from "./pages/proctorManager/RegisterBlockPage";
 import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
 import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
 import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
@@ -30,19 +30,21 @@ import AdminDashboard from "./pages/Admin/dashbord";
 import { checkAuthorization } from "./store/auth-slice";
 import Notfound from "./components/common/notFound";
 import UnauthPage from "./components/common/unAuth-page";
-
 import ProctorHomePage from "./pages/proctor/homePage"
-import RegisterDorm from "./pages/proctor/registerDorm"
+import RegisterDormComp from "./pages/proctor/registerDorm"
 import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
 import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
 import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
 import StudentDeanBlockInfo from "./pages/studentDean/BloackInfo";
 function App() {
+  
   const theme = useSelector((state) => state.theme.mode);
   const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
+
+ 
     
   const dispatch = useDispatch();
   useEffect(() => {
@@ -94,10 +96,11 @@ function App() {
 
         <Route
           path="/admin"
-          element={
+          element={  
+            
             <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-               <AdminLayout />
-            </CheckAuthComponent>
+            <AdminLayout />
+             </CheckAuthComponent>
             
           }
         >
@@ -114,7 +117,7 @@ function App() {
             </CheckAuthComponent>
           }
         >
-          <Route path="RegisterBlock" element={<RegisterBlock />} />
+          <Route path="RegisterBlock" element={<RegisterBlockComp />} />
           <Route path="RegisterStudent" element={<RegisterStudent />} />
           <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
@@ -127,7 +130,7 @@ function App() {
               <ProctorLayout />
             </CheckAuthComponent>}>
            <Route path="home" element={<ProctorHomePage/>} />
-          <Route path="dorm" element={<RegisterDorm/>} />
+          <Route path="dorm" element={<RegisterDormComp/>} />
           <Route path="register" element={<RegisterStudentPage/>} />
           <Route path="info" element={<ProctorViewInfo/>} />
           <Route path="report" element={<ProctorGenerateReport/>} />  

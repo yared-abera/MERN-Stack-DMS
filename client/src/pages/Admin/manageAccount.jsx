@@ -28,15 +28,15 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
  
 const intialFromData = {
-  Fname: "",
-  Mname: "",
-  Lname: "",
+  fName: "",
+  mName: "",
+  lName: "",
   email: "",
   userName: "",
   phoneNum: "",
   password: "",
  // Confirm_password:'',
-  sex: "",
+  gender: "",
   role: "",
 };
 

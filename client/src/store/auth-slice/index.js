@@ -16,8 +16,8 @@ export const loginUser=createAsyncThunk('/auth/LogIn',async (formData)=>{
           "no-store, no-cache, must-revalidate, proxy-revalidate",
       },
     });
+
      
-    
     return result.data
     
   } catch (error) {
@@ -31,7 +31,6 @@ export const loginUser=createAsyncThunk('/auth/LogIn',async (formData)=>{
 export const checkAuthorization = createAsyncThunk(
   "/auth/checkauth",
   async () => {
-     
 
     try {
       const response = await axios.get(
@@ -45,8 +44,11 @@ export const checkAuthorization = createAsyncThunk(
         }
       );
 
+    
+
       return response.data;
     } catch (error) {
+       
       console.error("Error checking authorization:", error);
       throw error; // Optionally throw the error to handle it in your slice
     }
@@ -76,8 +78,7 @@ export const LogOutUser=createAsyncThunk('/auth/LogOut',async ()=>{
 
 export const CreateAccount=createAsyncThunk('/auth/createUser',async (formData)=>{
   try {
-     
-    
+    console.log("from CreateAccountSlice",formData)
     const result= await axios.post("http://localhost:5000/api/auth/account",formData, {
       withCredentials: true,
       
@@ -98,7 +99,8 @@ const authSlice = createSlice({
     reducers: {
         setUser: (state, action) => {
             // reducer logic here
-        }
+        },
+        
     },
 
     extraReducers: (builder) => {
@@ -112,7 +114,7 @@ const authSlice = createSlice({
         })
         .addCase(loginUser.fulfilled, (state, action) => {
           state.isLoading = false;
-          console.log("logIn user from sice",action.payload);
+          console.log("logIn user from slice",action.payload);
           
           state.user = action.payload.success ? action.payload.user : null;
           state.isAuthenticated = true//action.payload.success;
@@ -128,8 +130,9 @@ const authSlice = createSlice({
         }).addCase(checkAuthorization.fulfilled, (state, action) => {
           state.isLoading = false;
 
-          console.log(" user from checkAuth",action.payload);
-          console.log(" user from checkAuth",state.isLoading);
+          console.log(" user from checkAuthSlice",action.payload);
+          console.log("  isAuthenticated from checkAuthSlice",action.payload.success);
+             
       
           state.user =  action.payload.user,
           state.isAuthenticated = action.payload.success;
@@ -146,7 +149,7 @@ const authSlice = createSlice({
     },
 });
 
-export const { setUser } = authSlice.actions;
+export const { setUser  } = authSlice.actions;
 export default authSlice.reducer;
 
  /**.addCase(CreateAccount.pending, (state) => {

@@ -47,3 +47,4 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
 
   return children;
 }
+

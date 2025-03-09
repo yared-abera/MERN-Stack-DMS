@@ -1,72 +1,97 @@
- const mongoose = require('mongoose');
- 
-const DormSchema = new mongoose.Schema({
-  dormNumber: { type: Number, required: true },
+const mongoose = require("mongoose");
+
+// Dorm Schema (nested under floors)
+const dormSchema = new mongoose.Schema({
+  dormNumber: { type: String, required: true },
   capacity: { type: Number, required: true },
+  studentsAllocated: { type: Number, default: 0 },
   dormStatus: { 
     type: String, 
-    enum: ['available', 'occupied', 'maintenance','partial'],
-    default: 'available'
+    enum: ["Available", "Full"], 
+    default: "Available" 
   },
-  floor: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Floor',
-    required: true
-  },
-  block: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Block',
-    required: true
-  }
+  totalAvailable: { type: Number, default: 0 } // Persisted
 });
 
-// Separate Floor Schema
-const FloorSchema = new mongoose.Schema({
+// Auto-update totalAvailable and dormStatus
+dormSchema.pre("save", function(next) {
+  this.totalAvailable = this.capacity - this.studentsAllocated;
+  this.dormStatus = this.totalAvailable > 0 ? "Available" : "Full";
+  next();
+});
+  
+ // Floor Schema (nested under blocks)
+ const floorSchema = new mongoose.Schema({
   floorNumber: { type: Number, required: true },
   floorStatus: { 
     type: String, 
-    enum: ['available', 'occupied', 'maintenance','partial' ],
-    default: 'available'
+    enum: ["Available", "Unavailable"], 
+    default: "Available" 
   },
-  floorCapacity: { type: Number, required: true },
-  block: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Block',
-    required: true
-  },
-  dorms: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Dorm'
-  }]
+  totalAvailable: { type: Number, default: 0 }, // Persisted
+  dorms: [dormSchema]
 });
 
-// Main Block Schema
-const BlockSchema = new mongoose.Schema({
-  blockNum: { type: Number, required: true, unique: true },
-  location: { 
-    type: String, 
-    enum: ['girls_Campus', 'boys_Campus', 'Other'],
-   
-  },
-  totalCapacity: { type: Number, required: true },
-  availableRoom: { type: Number, required: true },
-  isFull: { type: Boolean, default: false },
-  floors: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Floor'
-  }],
-  isSelectedForImpaired: { type: Boolean, default: false },
-  isSelectedForSpecial: { type: Boolean, default: false },
-  description: String
-}, { timestamps: true });
+// Auto-update floor's totalAvailable and status
+floorSchema.pre("save", function(next) {
+  this.totalAvailable = this.dorms.reduce(
+    (sum, dorm) => sum + dorm.totalAvailable, 
+    0
+  );
+  this.floorStatus = this.totalAvailable > 0 ? "Available" : "Unavailable";
+  next();
+});
 
-// Indexes
-BlockSchema.index({ blockNum: 1 }, { unique: true });
-DormSchema.index({ dormNumber: 1, block: 1 }, { unique: true });
-FloorSchema.index({ floorNumber: 1, block: 1 }, { unique: true });
+// Auto-update floor's totalAvailable and status
+floorSchema.pre("save", function(next) {
+  this.totalAvailable = this.dorms.reduce(
+    (sum, dorm) => sum + dorm.totalAvailable, 
+    0
+  );
+  this.floorStatus = this.totalAvailable > 0 ? "Available" : "Full";
+  next();
+});
 
-module.exports = {
-  Block: mongoose.model('Block', BlockSchema),
-  Floor: mongoose.model('Floor', FloorSchema),
-  Dorm: mongoose.model('Dorm', DormSchema)
-};
+// Virtual: Total available beds on the floor
+floorSchema.virtual("available").get(function() {
+  return this.dorms.reduce((sum, dorm) => sum + dorm.available, 0);
+});
+
+// Auto-update floorStatus when dorms change
+floorSchema.pre("save", function(next) {
+  const totalAvailable = this.dorms.reduce((sum, dorm) => sum + dorm.available, 0);
+  this.floorStatus = totalAvailable > 0 ? "Available" : "Unavailable";
+  next();
+});
+  
+
+// Block Schema (created by proctor managers)
+  const blockSchema = new mongoose.Schema({
+    blockNum: { type: Number, required: true, unique: true },
+    location: { 
+      type: String, 
+      enum: ["maleArea", "girlArea"], 
+      required: true 
+    },
+    floors: [floorSchema],
+    isSelectedForSpecial: { type: Boolean, default: false },
+    status: { type: String, default: "Available" },
+    totalAvailable: { type: Number, default: 0 }, // Persisted
+    totalFloors: { type: String },
+    assignedProctors: [{ 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User' 
+    }],
+  });
+  
+  // Auto-update block's totalAvailable and status
+  blockSchema.pre("save", function(next) {
+    this.totalAvailable = this.floors.reduce(
+      (total, floor) => total + floor.totalAvailable, 
+      0
+    );
+    this.status = this.totalAvailable > 0 ? "Available" : "Full";
+    next();
+  });
+  
+  module.exports = mongoose.model("Block", blockSchema);

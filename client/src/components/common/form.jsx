@@ -111,10 +111,10 @@ function CommonForm({
 
   // const display=isLogIN:display:grid ,grid-d
   return (
-    <form onSubmit={onSubmit} className="w-full overflow-hidden">
-      <div className="flex flex-col gap-2">
+    <form onSubmit={onSubmit} className="w-full  ">
+      <div className="flex flex-col gap-2  p-4 ">
         {formControls.map((controlItem) => (
-          <div className="grid grid-cols-2 w-full gap-4" key={controlItem.name}>
+          <div className="grid grid-cols-2 w-full  gap-4" key={controlItem.name}>
             <Label className="mb-1 font-sans font-semibold text-sm  dark:text-white md:text-base">
               {controlItem.label}
             </Label>

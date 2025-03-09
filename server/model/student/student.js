@@ -14,4 +14,4 @@ const studentSchema = new mongoose.Schema({
   blockNum: { type: mongoose.Schema.Types.ObjectId, ref: "Block", required: true }, // Foreign Key Referenc 
 });
 
-module.exports = mongose.model("Student",studentSchema);
+module.exports = mongoose.model("Student",studentSchema);

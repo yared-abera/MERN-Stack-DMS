@@ -1,24 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "../ui/label";
+import { AllocationTabscategories, BlockDemoData } from "@/config/data";
 
-import {
-  AllocationTabscategories,
-  blockData,
-  BlockDemoData,
-} from "@/config/data";
+import AllocationComponent from "./AllocationComponent"; // Import the AllocationComponent
 
 import { Button } from "../ui/button";
 
-import DetailAllocation from "./DetailAllocation";
 import { useDispatch } from "react-redux";
 import { StudetnDataDirect } from "@/store/common/data";
- 
- 
- 
-const initialOption = {
-  key: "",
-  label: "",
-};
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+
+import DetailAllocationStart from "./detailAllocationStart";
+import DefaultAllocation from "./DefaultAllocation";
+import { Card, CardContent } from "../ui/card";
+
 export default function AllocationPage({ dataFormat, selectedValue }) {
   const [categorizedStudents, setCategorizedStudents] = useState({
     GenderMale: {
@@ -32,50 +27,16 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
       special: [],
     },
   });
-  const Tabscategories = AllocationTabscategories;
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [timeoutId, setTimeoutId] = useState(null); // State to store timeout ID
 
-  const [selectedOne, setSelectedOne] = useState(initialOption);
-  const [filteredBlock, setFilterdBlock] = useState([]);
-  const BlockData = BlockDemoData;
+  const [showAllocationComponent, setShowAllocationComponent] = useState(false); // State to control visibility
 
-  useEffect(() => {
-    if (BlockData?.length > 0) {
-      const BlockLocation =
-        selectedOne.label === "male" ? "boys_Campus" : "girls_Campus";
-
-      const SelectedBlockArray = [];
-
-      BlockData.forEach((block) => {
-        if (block.location === BlockLocation && !block.isFull) {
-          SelectedBlockArray.push(block);
-        }
-      });
-
-      setFilterdBlock(SelectedBlockArray);
-    }
-  }, [selectedOne, BlockData]);
-
-  function handleMouseEnter(input) {
-    if (timeoutId) {
-      // Check if there's an existing timeout
-      clearTimeout(timeoutId); // Clear the timeout if mouse re-enters
-      setTimeoutId(null); // Reset timeout ID state
-    }
-    setActiveCategory(input);
-  }
-
-  function handleMouseLeave() {
-    const id = setTimeout(() => {
-      // Use setTimeout for delay
-      setActiveCategory(null);
-    }, 1000); // Delay of 1 second
-    setTimeoutId(id); // Store timeout ID to clear it later
-  }
+  // Toggle the visibility of the AllocationComponent
+  const handleShowAllocationComponent = () => {
+    setShowAllocationComponent((prev) => !prev);
+  };
 
   useEffect(() => {
-    if (dataFormat?.length && selectedValue!=='gust') {
+    if (dataFormat?.length && selectedValue !== "gust") {
       const newCategorizedStudents = {
         GenderMale: {
           RegularMale: { NaturalStream: [], SoctiaStream: [] },
@@ -102,7 +63,6 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
         } else if (isSpecial) {
           category.special.push(student);
         } else {
-          // Handle regular students with stream classification
           const streamKey =
             student.stream?.toUpperCase() === "NATURAL"
               ? "NaturalStream"
@@ -173,33 +133,30 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
       femaleSocial,
     };
   }, [categorizedStudents]);
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
 
-useEffect(()=>{
-  const userCalculatedValue={
-    maleNatural:maleNatural,
-    maleSocial:maleSocial,
-    femaleNatural:femaleNatural,
-    femaleSocial:femaleSocial,
-    maleDisabled:maleDisabled,
-    femaleDisabled:femaleDisabled,
-    maleSpecial:maleSpecial,
-    femaleSpecial:femaleSpecial
-  }
- dispatch(StudetnDataDirect({categorizedStudents,selectedValue,userCalculatedValue}))
-
-},[categorizedStudents,selectedValue])
-
-  function handleCategorySelected(option, keys) {
-    setSelectedOne({
-      key: keys,
-      label: option,
-    });
-  }
- 
+  useEffect(() => {
+    const userCalculatedValue = {
+      maleNatural: maleNatural,
+      maleSocial: maleSocial,
+      femaleNatural: femaleNatural,
+      femaleSocial: femaleSocial,
+      maleDisabled: maleDisabled,
+      femaleDisabled: femaleDisabled,
+      maleSpecial: maleSpecial,
+      femaleSpecial: femaleSpecial,
+    };
+    dispatch(
+      StudetnDataDirect({
+        categorizedStudents,
+        selectedValue,
+        userCalculatedValue,
+      })
+    );
+  }, [categorizedStudents, selectedValue]);
 
   return (
-    <div className="  w-full min-h-screen">
+    <div className="w-full min-h-screen m-2 border-solid border-2 px-3 md:px-5">
       <div className="flex flex-col gap-2 p-3 md:p-6">
         <div className="w-1/2 m-2">
           <h1 className="text-center text-lg md:text-xl font-bold">
@@ -207,107 +164,69 @@ useEffect(()=>{
           </h1>
         </div>
 
-        <div className="grid grid-cols-2 gap-1 md:gap-0.5 md:grid-cols-3 px-3 md:px-6">
-          <div className="">
-            <p>Total Student : {dataFormat.length}</p>
-            <p>Total Male : {totalMale}</p>
-            <p>Total Female : {totalFemale}</p>
-            <p>Regular Male student: {maleRegular}</p>
-            <p>Regular female Student : {femaleRegular}</p>
-          </div>
+        <div className="grid grid-cols-1 gap-2 md:gap-0.5 md:grid-cols-2 px-3 md:px-6">
+          <Card className='w-auto'>
+            <CardContent>
+              <p>Total Student : {dataFormat.length}</p>
+              <p>Total Male : {totalMale}</p>
+              <p>Total Female : {totalFemale}</p>
+              <p>Regular Male student: {maleRegular}</p>
+              <p>Regular female Student : {femaleRegular}</p>
+            </CardContent>
+          </Card>
 
-          <div>
-            <p>Regular Male Natural: {maleNatural}</p>
-            <p>Regular female Natural : {femaleNatural}</p>
-            <p>Regular Male Social: {maleSocial}</p>
-            <p>Regular female Social : {femaleSocial}</p>
-            <p>Total physical disable {totalPhysicalDisable}</p>
-          </div>
+          <Card>
+            <CardContent>
+              <p>Regular Male Natural: {maleNatural}</p>
+              <p>Regular female Natural : {femaleNatural}</p>
+              <p>Regular Male Social: {maleSocial}</p>
+              <p>Regular female Social : {femaleSocial}</p>
+              <p>Total physical disable {totalPhysicalDisable}</p>
+            </CardContent>
+          </Card>
 
-          <div>
-            <p>Total Special Student {totalSpecial}</p>
-            <p>Male and Physical Disable : {maleDisabled}</p>
-            <p>Male and special : {maleSpecial}</p>
+          <Card>
+            <CardContent>
+              <p>Total Special Student {totalSpecial}</p>
+              <p>Male and Physical Disable : {maleDisabled}</p>
+              <p>Male and special : {maleSpecial}</p>
 
-            <p>Female and Physical Disable : {femaleDisabled}</p>
-            <p>Female and special : {femaleSpecial}</p>
-          </div>
+              <p>Female and Physical Disable : {femaleDisabled}</p>
+              <p>Female and special : {femaleSpecial}</p>
+            </CardContent>
+          </Card>
         </div>
       </div>
       <hr />
-
-      <div className="p-4 md:p-6 max-w-2xl mx-auto flex flex-col gap-2     min-h-screen" >
-        <h3 className="text-center py-3 text-lg font-semibold text-gray-800">
-          Allocate Student By Selecting Block
-        </h3>
-
-        <div className="flex flex-wrap gap-3 justify-center">
-          {Tabscategories.map((category) => (
-            <div
-              key={category.key}
-              className="relative group"
-              onMouseEnter={() => handleMouseEnter(category.key)}
-              onMouseLeave={handleMouseLeave}
-            >
+      <div className="w-full ">
+        <Tabs defaultValue="detail" className="  ">
+          <div className="mx-auto">
+          <TabsList className="place-content-center flex my-4 ">
+            <TabsTrigger value="default">Default Allocation</TabsTrigger>
+            <TabsTrigger value="detail">Detail Allocation</TabsTrigger>
+          </TabsList>
+          </div>
+          
+          <TabsContent value="default ">
+            <div className="mt-6 flex justify-center">
               <button
-                type="button"
-                className="px-4 py-3 bg-sky-600   rounded-md hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors"
-                aria-label={`Allocate ${category.key} students`}
+                onClick={handleShowAllocationComponent}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
               >
-                {category.label}
+                {showAllocationComponent
+                  ? "Hide Allocation"
+                  : "Show Allocation"}
               </button>
-
-              {activeCategory === category.key && (
-                <div
-                  className="absolute top-full dark:bg-white left-0 mt-2 w-64   shadow-lg rounded-md z-10"
-                  onMouseEnter={() => handleMouseEnter(category.key)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  {category.options.map((option) => (
-                    <Label
-                      key={option.name}
-                      name={option.name}
-                      onClick={() =>
-                        handleCategorySelected(option.name, category.key)
-                      }
-                      className="block p-2 dark:text-black hover:bg-sky-50 rounded-md cursor-pointer"
-                    >
-                      {option.label}
-                    </Label>
-                  ))}
-                </div>
-              )}
             </div>
-          ))}
-        </div>
 
-        <div className="mt-16 text-center">
-          <h1 className="text-lg md:text-xl font-semibold">
-            {selectedOne.key === "" ? (
-              <spane>Please Choose Stud Category</spane>
-            ) : (
-              <span>
-                {" "}
-                user selected {selectedOne.label} {selectedOne.key}
-              </span>
+            {showAllocationComponent && (
+              <AllocationComponent categorizedStudents={categorizedStudents} />
             )}
-          </h1>
-        </div>
-
-        <div className="mt-4  h-max">
-          <DetailAllocation
-            filteredBlock={filteredBlock}
-            selectedOne={selectedOne}
-            // categoryKey={selectedOne.key}
-            // categoryOption={selectedOne.label}
-          />
-        </div>
-      </div>
-
-      <div className="text-right mr-3">
-        <Button onClick={() => setisdefaultBtnClicked(true)}>
-          Default Allocation
-        </Button>
+          </TabsContent>
+          <TabsContent value="detail">
+            <DetailAllocationStart />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

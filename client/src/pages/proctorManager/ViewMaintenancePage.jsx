@@ -24,7 +24,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
             </TableHeader>
             <TableBody>
               {maintenanceData.map((maintenance) => (
-                <TableRow key={maintenance.id}>
+                  <TableRow key={maintenance.id}>
                   <TableCell>{maintenance.block}</TableCell>
                   <TableCell>{maintenance.issue}</TableCell>
                   <TableCell>{maintenance.status}</TableCell>

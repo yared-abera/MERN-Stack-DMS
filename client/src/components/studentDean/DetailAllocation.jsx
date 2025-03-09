@@ -215,7 +215,8 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
       ) ||
       selectedBlockANDFloor.CheckedBlocks.some(
         (b) =>
-          b.blockNumber === selectedFloor.blockNum && b.checkForCategory === value
+          b.blockNumber === selectedFloor.blockNum &&
+          b.checkForCategory === value
       );
     return (
       <div className="flex gap-1">
@@ -251,8 +252,6 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
     // Show button only if either condition is met
     setCheckSelected(hasBlockSelections || hasFullBlockViaFloors);
   }, [selectedBlockANDFloor, filteredBlock]);
-
-   
 
   const handleBackToBlocks = () => {
     setSelectedFloor({ blockNum: null, floorNumber: null, location: null });
@@ -345,7 +344,7 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
     );
   } else {
     return (
-      <div className="h-full">
+      <div className="h-full  ">
         <Table>
           <TableHeader>
             <TableRow>
@@ -428,11 +427,17 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
                         <Checkbox
                           checked={
                             selectedBlockANDFloor.CheckedBlocks.some(
-                              (b) => b.blockNumber === block.blockNum&&b.location===block.location
+                              (b) =>
+                                b.blockNumber === block.blockNum &&
+                                b.location === block.location
                             ) || allFloorsSelected
                           }
                           onCheckedChange={() =>
-                            handleToggleBlock(selectedOne, block.blockNum, block.location)
+                            handleToggleBlock(
+                              selectedOne,
+                              block.blockNum,
+                              block.location
+                            )
                           }
                         />
                       )}
@@ -443,24 +448,13 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
           </TableBody>
         </Table>
 
-        {checkSelected ? (
-          <div className="text-right mt-32 ">
-            <Button onClick={() => setViewSelection(true)}>
-              View Selection
-            </Button>
-          </div>
-        ) : null}
-
-        <Dialog
-          open={viewSelection}
-          onOpenChange={() => setViewSelection(false)}
-          className=""
-        >
+        <div className="mt-20 w-full h-auto ">
+          
           <AllocationDialog
             selectedBlockANDFloor={selectedBlockANDFloor}
             filteredBlock={filteredBlock}
           />
-        </Dialog>
+        </div>
       </div>
     );
   }
