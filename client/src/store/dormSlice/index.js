@@ -4,29 +4,25 @@ import axios from 'axios';
 
 export const registerDorm = createAsyncThunk(
   'dorm/registerDorm',
-   async ({ blockNum, floorNumber, dormNumber, capacity }, { rejectWithValue }) => {
+  async ( formData, { rejectWithValue }) => {
     try {
-    
-      const response = await axios.post(
-        'http://localhost:5000/api/dorm/register', // Full backend URL
+      const { blockId, floorNumber, dormNumber, capacity } = formData;
+      const response = await axios.patch(
+        `http://localhost:5000/api/dorm/${blockId}/floors/${floorNumber}/dorms`,
+        { dormNumber, capacity },
         {
-          blockNum: Number(blockNum),
-          floorNumber: Number(floorNumber),
-          dormNumber,
-          capacity: Number(capacity)
-        },
-        {
-          withCredentials:true
-      }
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
       return response.data;
     } catch (err) {
-      // Handle network errors (no server response)
       if (!err.response) {
-        return rejectWithValue({ error: "Network Error - Server unavailable" });
+        return rejectWithValue("Network Error - Server unavailable");
       }
-      // Forward server error message
-      return rejectWithValue(err.response.data);
+      return rejectWithValue(err.response.data.error);
     }
   }
 );

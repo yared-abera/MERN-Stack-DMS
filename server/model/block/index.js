@@ -77,12 +77,14 @@ floorSchema.pre("save", function(next) {
     isSelectedForSpecial: { type: Boolean, default: false },
     status: { type: String, default: "Available" },
     totalAvailable: { type: Number, default: 0 }, // Persisted
-    totalFloors: { type: String },
-    assignedProctors: [{ 
+    totalFloors: { type: Number },
+    assignedProctors: [{     
       type: mongoose.Schema.Types.ObjectId, 
       ref: 'User' 
     }],
   });
+
+ blockSchema.index({ assignedProctors: 1 });
   
   // Auto-update block's totalAvailable and status
   blockSchema.pre("save", function(next) {

@@ -107,9 +107,9 @@ useEffect(() => {
       alert("Please fill all fields");
       return;
     }
-
-    await dispatch(registerDorm(formData));
-    setFormData(initialFormData);
+      console.log("formData from The register Dorm",formData);
+     dispatch(registerDorm(formData));
+     setFormData(initialFormData);
   };
 
   return (
