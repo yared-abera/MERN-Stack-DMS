@@ -47,55 +47,55 @@ const RegisterDormComp = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialFormData);
   const [formConfig, setFormConfig] = useState(RegisterDorm);
-  const user = useSelector((state) => state.auth.user);
   const { list: blocks } = useSelector((state) => state.block);
-  const proctorId = user?.id;
-  console.log('proctorId',proctorId)
   // Fetch proctor's blocks when component mounts
   useEffect(() => {
-    if(proctorId) dispatch(fetchProctorBlocks(proctorId));
-  }, [dispatch, proctorId]);
+      dispatch(fetchProctorBlocks());
+  }, [dispatch]);
 
   console.log('blocks',blocks)
   // Update form configuration when blocks change
-  useEffect(() => {
-    const updatedConfig = formConfig.map(field => {
-      if(field.name === 'blockId') {
-        return {
-          ...field,
-          options: blocks.map(block => ({
-            id: block._id,
-            label: `Block ${block.blockNum} (${block.location})`,
-            floors: block.floors
-          }))
-        };
-      }
-      return field;
-    });
-    
-    setFormConfig(updatedConfig);
-  }, [blocks]);
+ // Update form configuration when blocks change
+useEffect(() => {
+  const updatedConfig = formConfig.map(field => {
+    if(field.name === 'blockId') {
+      return {
+        ...field,
+        options: blocks.map(block => ({
+          id: block._id,
+          label: `Block ${block.blockNum} (${block.location})`,
+          value: block._id  
+        }))
+      };
+    }
+    return field;
+  });
+  
+  setFormConfig(updatedConfig);
+}, [blocks]);
 
   // Update floor options when block is selected
-  useEffect(() => {
-    const selectedBlock = blocks.find(b => b._id === formData.blockId);
-    const totalFloors = selectedBlock?.floors?.length || 0;
+// Update floor options when block is selected
+useEffect(() => {
+  const selectedBlock = blocks.find(b => b._id === formData.blockId);
+  const floorOptions = selectedBlock?.floors?.map(floor => ({
+    id: floor.floorNumber.toString(),
+    label: `Floor ${floor.floorNumber}`,
+    
+  })) || [];
 
-    const updatedConfig = formConfig.map(field => {
-      if(field.name === 'floorNumber') {
-        return {
-          ...field,
-          options: Array.from({length: totalFloors}, (_, i) => ({
-            id: i + 1,
-            label: `Floor ${i + 1}`
-          }))
-        };
-      }
-      return field;
-    });
+  const updatedConfig = formConfig.map(field => {
+    if(field.name === 'floorNumber') {
+      return {
+        ...field,
+        options: floorOptions
+      };
+    }
+    return field;
+  });
 
-    setFormConfig(updatedConfig);
-  }, [formData.blockId]);
+  setFormConfig(updatedConfig);
+}, [formData.blockId]);
 
   const isFormValid = () => {
     return Object.values(formData).every(value => value !== "");

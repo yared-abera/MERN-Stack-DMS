@@ -13,7 +13,7 @@ const initialState={
 export const registerBlock=createAsyncThunk("block/register",
    async(formData)=>{
     try {
-        console.log("register blockASyncThunk",formData);
+        console.log("registerBlock formData from blockASyncThunk",formData);
     const result= await axios.post("http://localhost:5000/api/block/register",formData,{
         withCredentials:true
     });
@@ -29,10 +29,10 @@ export const registerBlock=createAsyncThunk("block/register",
 
 export const fetchProctorBlocks = createAsyncThunk(
   'blocks/fetchProctorBlocks',
-  async (proctorId, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      console.log("Fetching blocks for proctor:", proctorId); // Log the proctorId
-      const response = await axios.get(`http://localhost:5000/api/block/proctor/my-block?proctorId=${proctorId}`, {
+
+      const response = await axios.get(`http://localhost:5000/api/block/proctor/my-block`, {
         withCredentials: true,
       });
       console.log("Response from fetchProctorBlocks:", response.data); // Log the response

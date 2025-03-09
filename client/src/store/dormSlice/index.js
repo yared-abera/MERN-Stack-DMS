@@ -6,7 +6,7 @@ export const registerDorm = createAsyncThunk(
   'dorm/registerDorm',
    async ({ blockNum, floorNumber, dormNumber, capacity }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token'); // Get token from storage
+    
       const response = await axios.post(
         'http://localhost:5000/api/dorm/register', // Full backend URL
         {
