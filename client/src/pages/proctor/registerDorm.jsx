@@ -1,5 +1,5 @@
 // components/DormRegistrationForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState,useCallback, useEffect } from 'react';
 import { registerDorm } from '@/store/dormSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProctorBlocks } from '@/store/blockSlice/index';
@@ -100,17 +100,22 @@ useEffect(() => {
   const isFormValid = () => {
     return Object.values(formData).every(value => value !== "");
   };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if(!isFormValid()) {
-      alert("Please fill all fields");
-      return;
+ 
+ const onSubmit = useCallback(
+    
+    (e) => {
+      e.preventDefault();
+    if (isFormValid()) {
+      console.log("formData from The register Dorm", formData);
+      dispatch(registerDorm(formData));
     }
-      console.log("formData from The register Dorm",formData);
-     dispatch(registerDorm(formData));
-     setFormData(initialFormData);
-  };
+   else {
+     alert("Please fill all fields");
+      }
+    },
+    [formData, dispatch]
+  );
+
 
   return (
     <div className="border-2 border-blue-600 h-full"
