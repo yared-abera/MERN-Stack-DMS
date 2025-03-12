@@ -1,10 +1,5 @@
 import { Dialog } from "@radix-ui/react-dialog";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+ 
 import { useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -27,7 +22,6 @@ import AllocationLast from "./studentAllocation.jsx";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -57,13 +51,13 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
       female: [],
     },
   });
-
+ const [allocatedStudent,setAllocatedStudent]=useState()
   const [Errors, setErrors] = useState([]);
 
   const [studAndBlockInfo, setStudAndBlockInfo] = useState({
     studCategory: "",
-    BlockNumber: "",
-    FloorNumber: "",
+    BlockNumber: [],
+    FloorNumber: [],
   });
   const studentCategories = [
     {
@@ -289,100 +283,133 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     }
   }
 
-  function HandleAllocation({ studentKey, item }) {
-    console.log(item, "item");
+  function HandleAllocation({ studentKey, blockNumbers, floorNumbers }) {
+    console.log(blockNumbers, "blockNumbers");
+    console.log(floorNumbers, "floorNumber");
 
     setStudAndBlockInfo({
       studCategory: studentKey,
-      BlockNumber: item.blockNumber,
-      FloorNumber: item.floorNumber,
+      BlockNumber: blockNumbers,
+      FloorNumber: floorNumbers,
     });
   }
+  console.log(studAndBlockInfo, "studAndBlockInfo");
 
-  function viewAllocatedStudent(student){
-
+  function viewAllocatedStudent(student) {
+    console.log(student,'student');
+    setAllocatedStudent(student)
+    
   }
+
+  function HandleViewDialog({ studentKey, blockNumbers, allocatedStudent }) {
+    const parts = studentKey.split(" ");
+    const stateKey = parts[0]; // First part is always stateKey (e.g., "regular")
+    let option; // Second part is always option (e.g., "male")
+    let category; // Third part (if exists) is category
+    
+    if (stateKey === "regular") {
+      category = parts[1];
+      option = parts[2];
+    } else {
+      option = parts[1];
+    }
+  
+    console.log(allocatedStudent, 'allocatedStudent');
+    
+    const viewedStudents = allocatedStudent.filter(stud => {
+      return stud.sex === option && blockNumbers.includes(stud.block);
+    });
+  
+    console.log(viewedStudents, 'viewedStudents');
+    
+    //return viewedStudents;
+  }
+  
+
   const renderSelectdInfo = useCallback(
     (obj, path = []) => {
       let rows = [];
       Object.entries(obj).forEach(([key, value]) => {
         const newPath = [...path, key];
-        if (Array.isArray(value)) {
-          if (value.length > 0) {
-            const studentKey = newPath.join(" ");
-            let totalCapacity = 0;
-  
-            // First pass: Calculate total capacity for all blocks in this category
-            const itemsWithCapacity = value.map((item) => {
-              const currentFilteredBlock = AllBlock.find(
-                (block) => block.blockNum === item.blockNumber
-              );
-              let capacity = null;
-              if (currentFilteredBlock) {
-                capacity =
-                  item.floorNumber !== null
-                    ? currentFilteredBlock.floors.find(
-                        (f) => f.floorNumber === item.floorNumber
-                      )?.floorCapacity
-                    : currentFilteredBlock.totalCapacity;
-              }
-              totalCapacity += capacity || 0; // Treat null as 0 in sum
-              return { item, capacity };
-            });
-  
-            // Get student count and status based on TOTAL capacity
-            const numberOfStudents =
-              userCalculatedValue[getStudentNumber(studentKey)];
-            const status = getStudentStatus(
-              totalCapacity,
-              numberOfStudents,
-              studentKey
+        if (Array.isArray(value) && value.length > 0) {
+          const studentKey = newPath.join(" ");
+          let totalCapacity = 0;
+          const blockNumbers = [];
+          const floorNumbers = []; // Changed to array
+
+          // Loop through each selected item and aggregate info
+          value.forEach((item) => {
+            const currentFilteredBlock = AllBlock.find(
+              (block) => block.blockNum === item.blockNumber
             );
-  
-            // Second pass: Generate table rows with individual capacities but shared status
-            itemsWithCapacity.forEach(({ item, capacity }) => {
-              rows.push(
-                <Card key={`${studentKey}-${item.blockNumber}-${item.floorNumber}`} className='w-auto px-2'>
-                  <CardHeader>
-                    <CardTitle>Selected Info</CardTitle>
-                    
-                  </CardHeader>
-                  <CardContent>
-                    <p>Student Category: {studentKey}</p>
-                    <p>Selected Block: {item.blockNumber}</p>
-                    <p>
-                      Selected Floor:{" "}
-                      {item.floorNumber !== null ? item.floorNumber : "whole Block"}
-                    </p>
-                    <p>Number of Student: {numberOfStudents}</p>
-                    <p>
-                      Capacity:{" "}
-                      {item.floorNumber !== null
-                        ? `floor capacity ${capacity}`
-                        : `block capacity ${capacity}`}
-                    </p>
-                    <p>
-                      Status: <ErrorAndWarnningHover status={status} />
-                    </p>
+            let capacity = 0;
+            if (currentFilteredBlock) {
+              if (item.floorNumber !== null) {
+                const floorData = currentFilteredBlock.floors.find(
+                  (f) => f.floorNumber === item.floorNumber
+                );
+                capacity = floorData ? floorData.floorCapacity : 0;
+                floorNumbers.push({
+                  // Changed to push object
+                  floor: item.floorNumber,
+                  block: item.blockNumber,
+                });
+              } else {
+                capacity = currentFilteredBlock.totalCapacity;
+              }
+              blockNumbers.push(item.blockNumber);
+            }
+            totalCapacity += capacity;
+          });
 
-                   
-                  </CardContent>
-                  <CardFooter className='flex justify-between'>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={status === "Error"}
-                      onClick={() => HandleAllocation({ studentKey, item })}
-                    >
-                      Allocate
-                    </Button>
+          // Get student count and status based on total capacity
+          const numberOfStudents =
+            userCalculatedValue[getStudentNumber(studentKey)];
+          const status = getStudentStatus(
+            totalCapacity,
+            numberOfStudents,
+            studentKey
+          );
 
-                    <Button className='hidden'>View</Button>
-                  </CardFooter>
-                </Card>
-              );
-            });
-          }
+          rows.push(
+            <Card key={studentKey} className="w-auto px-2">
+              <CardHeader>
+                <CardTitle>Selected Info</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>Student Category: {studentKey}</p>
+                <p>Selected Block: {Array.from(blockNumbers).join(", ")}</p>
+                <p>
+                  Selected Floor:{" "}
+                  {floorNumbers.length > 0 // Changed to check array length
+                    ? floorNumbers
+                        .map(
+                          (fb, index) => `Floor ${fb.floor}, Block ${fb.block}` // Modified to display floor and block
+                        )
+                        .join(", ")
+                    : "Whole Block"}
+                </p>
+                <p>Number of Student: {numberOfStudents}</p>
+                <p>Capacity: {totalCapacity}</p>
+                <p>
+                  Status: <ErrorAndWarnningHover status={status} />
+                </p>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={status === "Error"}
+                  onClick={() =>
+                    HandleAllocation({ studentKey, blockNumbers, floorNumbers })
+                  }
+                >
+                  Allocate
+                </Button>
+                <Button className="" onClick={()=>HandleViewDialog({studentKey,blockNumbers})}>View</Button>
+              </CardFooter>
+            </Card>
+          );
         } else if (typeof value === "object" && value !== null) {
           rows = rows.concat(renderSelectdInfo(value, newPath));
         }
@@ -391,14 +418,16 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     },
     [AllBlock, userCalculatedValue, getStudentNumber, getStudentStatus]
   );
-  
+
   const filteredState = filterCategoriesWithValues(isStudentGetBlockState);
-  
+
   return (
     <div>
-          <div className="text-center">
-          <h1 className="text-xl md:text-2xl font-bold">Selectd block Information</h1>
-         </div>   
+      <div className="text-center">
+        <h1 className="text-xl md:text-2xl font-bold">
+          Selectd block Information
+        </h1>
+      </div>
       {Errors.length > 0 ? (
         <div className="flex flex-col gap-3 text-center">
           <p className="text-red-600">
@@ -409,7 +438,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
               View Detail
             </Button>
           </div>
-  
+
           {viewDetailError
             ? Errors.map((error, idx) => (
                 <div key={idx} className="mt-3">
@@ -421,20 +450,23 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
       ) : (
         <div className="flex flex-col gap-1   ">
           <div className=" flex flex-wrap gap-3 m-4">
-    {/* Call the helper function directly with the filteredState */}
-    {renderSelectdInfo(filteredState)}
+            {/* Call the helper function directly with the filteredState */}
+            {renderSelectdInfo(filteredState)}
           </div>
-      
-  
+
           <div className="flex mt-3">
             {studAndBlockInfo &&
-            Object.values(studAndBlockInfo).every((item) => item !== "") ? (
-              <AllocationLast studAndBlockInfo={studAndBlockInfo} viewAllocatedStudent={viewAllocatedStudent} />
-            ) : null}
+              (studAndBlockInfo.BlockNumber?.length > 0 ||
+              studAndBlockInfo.FloorNumber?.length > 0 ? (
+                <AllocationLast
+                  studAndBlockInfo={studAndBlockInfo}
+                  viewAllocatedStudent={viewAllocatedStudent}
+                />
+              ) : null)}
           </div>
         </div>
       )}
     </div>
   );
-  
 }
+//      Object.values(studAndBlockInfo).every((item) => item !== "") ?

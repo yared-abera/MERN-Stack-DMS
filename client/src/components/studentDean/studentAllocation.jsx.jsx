@@ -12,6 +12,9 @@ export default function AllocationLast({
     (state) => state.Data
   );
 
+  console.log(studAndBlockInfo.BlockNumber,'Block');
+  console.log(studAndBlockInfo.FloorNumber,'Fllor');
+
   // State for block data and allocated students
   const [updatedBlockData, setUpdatedBlockData] = useState(BlockDemoData);
   const [allocatedStudents, setAllocatedStudents] = useState([]);
@@ -73,96 +76,9 @@ export default function AllocationLast({
     return groups;
   }
 
-  function AllocateSeniorStudent(
-    stud,
-    SelectedGender,
-    studAndBlockInfo,
-    currentBlockData
-  ) {
-    const blockLocation =
-      SelectedGender === "GenderMale" ? "boys_Campus" : "girls_Campus";
-    const { BlockNumber, FloorNumber } = studAndBlockInfo;
+  
+ 
 
-    // Find block index
-    const blockIndex = currentBlockData.findIndex(
-      (block) =>
-        block.blockNum === BlockNumber && block.location === blockLocation
-    );
-    if (blockIndex === -1) {
-      console.warn(`Block ${BlockNumber} not found in ${blockLocation}`);
-      return null;
-    }
-
-    const block = currentBlockData[blockIndex];
-    // Determine if we have a matching floor; if not, search all floors
-    const searchAllFloors = !block.floors.some(
-      (f) => f.floorNumber === FloorNumber
-    );
-
-    // Flatten dorms from all floors
-    const allDorms = block.floors.flatMap((floor, floorIdx) =>
-      floor.dorms.map((dorm, dormIdx) => ({
-        ...dorm,
-        floorIndex: floorIdx,
-        originalDormIndex: dormIdx,
-        floorNumber: floor.floorNumber,
-      }))
-    );
-
-    // Filter dorms by floor if available; otherwise, search in all floors
-    const filteredDorms = searchAllFloors
-      ? allDorms
-      : allDorms.filter((d) => d.floorNumber === FloorNumber);
-
-    // Find the first available dorm
-    const availableDorm = filteredDorms.find(
-      (d) => d.numberOfStudents < d.capacity
-    );
-    if (!availableDorm) {
-      console.warn(`No available dorms in block ${BlockNumber}`);
-      return null;
-    }
-
-    const { floorIndex, originalDormIndex, dormNumber } = availableDorm;
-
-    // Create the updated student allocation
-    const updatedStudent = {
-      ...stud,
-      block: BlockNumber,
-      dorm: dormNumber,
-    };
-
-    // Immutably update the block data structure
-    const newBlockData = currentBlockData.map((blockItem, idx) => {
-      if (idx === blockIndex) {
-        return {
-          ...blockItem,
-          floors: blockItem.floors.map((floor, fIdx) => {
-            if (fIdx === floorIndex) {
-              return {
-                ...floor,
-                dorms: floor.dorms.map((dorm, dIdx) => {
-                  if (dIdx === originalDormIndex) {
-                    return {
-                      ...dorm,
-                      numberOfStudents: dorm.numberOfStudents + 1,
-                    };
-                  }
-                  return dorm;
-                }),
-              };
-            }
-            return floor;
-          }),
-        };
-      }
-      return blockItem;
-    });
-
-    return { updatedStudent, newBlockData };
-  }
-
-  // Process allocation for senior students
   async function seniorStudentAllocation() {
     const { SelectedGender, StudCategory, Stream } = IdentifyStudent({
       studAndBlockInfo,
@@ -175,22 +91,33 @@ export default function AllocationLast({
       selectedStudentGroup =
         catagorizedStudentData[SelectedGender][StudCategory];
     }
-
+  
     if (!selectedStudentGroup || selectedStudentGroup.length === 0) {
       console.warn("No students available for allocation");
       return;
     }
-
-    if (checkBlockAndDormExist(selectedStudentGroup)) {
+  
+    // Filter out already allocated students
+    const unallocatedStudents = selectedStudentGroup.filter(
+      (stud) => !allocatedStudents.some((a) => a.username === stud.username)
+    );
+  
+    if (unallocatedStudents.length === 0) {
+      toast.error("All students in this group are already allocated.");
       return;
     }
-
-    const groups = groupStudentsByBatchAndDepartment(selectedStudentGroup);
+  
+    const groups = groupStudentsByBatchAndDepartment(unallocatedStudents);
     let currentBlockDataState = [...updatedBlockData];
     const newAllocatedStudents = [];
-
+  
     for (const group of groups) {
       for (const stud of group) {
+        // Additional check to prevent race conditions
+        if (allocatedStudents.some((a) => a.username === stud.username)) {
+          console.warn(`Student ${stud.id} already allocated, skipping.`);
+          continue;
+        }
         const allocationResult = AllocateSeniorStudent(
           stud,
           SelectedGender,
@@ -208,83 +135,99 @@ export default function AllocationLast({
         }
       }
     }
-    // Update state once after processing all students
+  
+    // Update state after processing all students
     setUpdatedBlockData(currentBlockDataState);
-    //setAllocatedStudents(newAllocatedStudents);
     setAllocatedStudents((prev) => [...prev, ...newAllocatedStudents]);
-
-    if(newAllocatedStudents&&newAllocatedStudents.length>0){
-      return toast.success(`Student ${studAndBlockInfo.studCategory} allocated successfully`)
+  
+    if (newAllocatedStudents.length > 0) {
+      return toast.success(
+        `Student ${studAndBlockInfo.studCategory} allocated successfully`
+      );
     }
   }
-
-  function OrderFreashStudent(selectedStudentGroup) {
-    return [...selectedStudentGroup].sort((a, b) =>
-      (a.Fname || "").toUpperCase().localeCompare((b.Fname || "").toUpperCase())
-    );
-  }
-  function AllocateFreashStudent(
-    student,
+  
+  function AllocateSeniorStudent(
+    stud,
     SelectedGender,
     studAndBlockInfo,
     currentBlockData
   ) {
-    const { BlockNumber, FloorNumber } = studAndBlockInfo;
+    // Determine the campus location based on gender
     const blockLocation =
       SelectedGender === "GenderMale" ? "boys_Campus" : "girls_Campus";
-
-    // Find the matching block by block number and location
-    const blockIndex = currentBlockData.findIndex(
-      (block) =>
-        block.blockNum === BlockNumber && block.location === blockLocation
-    );
-    if (blockIndex === -1) {
-      console.warn(`Block ${BlockNumber} not found in ${blockLocation}`);
+    // Destructure the updated studAndBlockInfo
+    // BlockNumber is now an array and FloorNumber is an array of objects: { floor, block }
+    const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
+  
+    let allocationResult = null;
+  
+    // Iterate over the selected blocks in order
+    for (const blockNum of blockNumbers) {
+      // Find the block index in the currentBlockData matching blockNum and location
+      const blockIndex = currentBlockData.findIndex(
+        (block) => block.blockNum === blockNum && block.location === blockLocation
+      );
+      if (blockIndex === -1) {
+        console.warn(`Block ${blockNum} not found in ${blockLocation}`);
+        continue; // Try next block if not found
+      }
+  
+      const block = currentBlockData[blockIndex];
+  
+      // Look for a floor selection for this specific block
+      const floorSelectionForBlock = floorSelections.find(
+        (fs) => fs.block === blockNum
+      );
+  
+      // Build a list of dorms in the block along with their floor info
+      const allDorms = block.floors.flatMap((floor, floorIdx) =>
+        floor.dorms.map((dorm, dormIdx) => ({
+          ...dorm,
+          floorIndex: floorIdx,
+          originalDormIndex: dormIdx,
+          floorNumber: floor.floorNumber,
+        }))
+      );
+  
+      // If a floor was selected for this block, filter to dorms on that floor only;
+      // otherwise, consider all dorms in the block.
+      const filteredDorms = floorSelectionForBlock
+        ? allDorms.filter((d) => d.floorNumber === floorSelectionForBlock.floor)
+        : allDorms;
+  
+      // Find the first available dorm (not full)
+      const availableDorm = filteredDorms.find(
+        (d) => d.numberOfStudents < d.capacity
+      );
+  
+      if (availableDorm) {
+        // We found a dorm in this block – save the allocation result and break out.
+        allocationResult = {
+          blockIndex,
+          blockNum,
+          ...availableDorm,
+        };
+        break;
+      }
+      // If no available dorm in this block, continue to the next block in the list.
+    }
+  
+    if (!allocationResult) {
+      console.warn("No available dorms in the selected blocks");
       return null;
     }
-
-    const block = currentBlockData[blockIndex];
-
-    // Determine whether the specified floor exists in this block.
-    const hasMatchingFloor = block.floors.some(
-      (floor) => floor.floorNumber === FloorNumber
-    );
-    // If not, search in all floors; otherwise, filter to the given floor.
-    const searchAllFloors = !hasMatchingFloor;
-
-    // Flatten dorms with additional metadata
-    const allDorms = block.floors.flatMap((floor, floorIndex) =>
-      floor.dorms.map((dorm, dormIndex) => ({
-        ...dorm,
-        floorIndex,
-        originalDormIndex: dormIndex,
-        floorNumber: floor.floorNumber,
-      }))
-    );
-
-    const filteredDorms = searchAllFloors
-      ? allDorms
-      : allDorms.filter((dorm) => dorm.floorNumber === FloorNumber);
-
-    // Find the first dorm that has available capacity
-    const availableDorm = filteredDorms.find(
-      (dorm) => dorm.numberOfStudents < dorm.capacity
-    );
-    if (!availableDorm) {
-      console.warn(`No available dorms in block ${BlockNumber}`);
-      return null;
-    }
-
-    const { floorIndex, originalDormIndex, dormNumber } = availableDorm;
-
-    // Create the updated student allocation record.
+  
+    const { blockIndex, floorIndex, originalDormIndex, dormNumber, blockNum } = allocationResult;
+  
+    // Create the updated student allocation record
     const updatedStudent = {
-      ...student,
-      block: BlockNumber,
+      ...stud,
+      block: blockNum,
       dorm: dormNumber,
     };
-
-    // Immutably update the block data: increase numberOfStudents in the chosen dorm.
+  
+    // Immutably update the block data structure:
     const newBlockData = currentBlockData.map((blockItem, idx) => {
       if (idx === blockIndex) {
         return {
@@ -310,16 +253,13 @@ export default function AllocationLast({
       }
       return blockItem;
     });
-
+  
     return { updatedStudent, newBlockData };
   }
-
-
-
-
+  
   function checkBlockAndDormExist(selectedStudentGroup) {
-    const hasDormAndBlock = selectedStudentGroup.every(
-      (stud) => stud.block !== null && stud.dorm !== null
+    const hasDormAndBlock = selectedStudentGroup.some(
+      (stud) => stud.block !== '' && stud.dorm !== ''
     );
     if (hasDormAndBlock) {
       toast.error("Student has already allocated");
@@ -327,6 +267,121 @@ export default function AllocationLast({
     }
     return false;
   }
+
+  function OrderFreashStudent(selectedStudentGroup) {
+    return [...selectedStudentGroup].sort((a, b) =>
+      (a.Fname || "").toUpperCase().localeCompare((b.Fname || "").toUpperCase())
+    );
+  }
+
+ 
+  function AllocateFreashStudent(
+    student,
+    SelectedGender,
+    studAndBlockInfo,
+    currentBlockData
+  ) {
+    // Destructure the new studAndBlockInfo where:
+    // BlockNumber is an array of selected block numbers (e.g. [1, 3, 5])
+    // FloorNumber is an array of objects, e.g. [ { floor: 1, block: 1 }, { floor: 2, block: 3 } ]
+    const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
+    const blockLocation =
+      SelectedGender === "GenderMale" ? "boys_Campus" : "girls_Campus";
+  
+    let allocationResult = null;
+  
+    // Iterate over each selected block in order
+    for (const blockNum of blockNumbers) {
+      // Find the block by blockNum and location
+      const blockIndex = currentBlockData.findIndex(
+        (block) => block.blockNum === blockNum && block.location === blockLocation
+      );
+      if (blockIndex === -1) {
+        console.warn(`Block ${blockNum} not found in ${blockLocation}`);
+        continue;
+      }
+      const block = currentBlockData[blockIndex];
+  
+      // Look for a floor selection specific to this block (if any)
+      const floorSelectionForBlock = floorSelections.find(
+        (fs) => fs.block === blockNum
+      );
+  
+      // Flatten dorms from all floors in this block (keeping track of floor info)
+      const allDorms = block.floors.flatMap((floor, floorIndex) =>
+        floor.dorms.map((dorm, dormIndex) => ({
+          ...dorm,
+          floorIndex,
+          originalDormIndex: dormIndex,
+          floorNumber: floor.floorNumber,
+        }))
+      );
+  
+      // If a floor selection exists for this block, filter to that floor; otherwise, use all dorms.
+      const filteredDorms = floorSelectionForBlock
+        ? allDorms.filter((d) => d.floorNumber === floorSelectionForBlock.floor)
+        : allDorms;
+  
+      // Find the first dorm with available capacity
+      const availableDorm = filteredDorms.find(
+        (d) => d.numberOfStudents < d.capacity
+      );
+      if (availableDorm) {
+        allocationResult = {
+          blockIndex,
+          blockNum,
+          ...availableDorm,
+        };
+        break; // Exit loop once a dorm is found
+      }
+    }
+  
+    if (!allocationResult) {
+      console.warn("No available dorms in the selected blocks");
+      return null;
+    }
+  
+    const { blockIndex, floorIndex, originalDormIndex, dormNumber, blockNum } = allocationResult;
+  
+    // Create the updated student record
+    const updatedStudent = {
+      ...student,
+      block: blockNum,
+      dorm: dormNumber,
+    };
+  
+    // Immutably update the currentBlockData: increment numberOfStudents in the chosen dorm
+    const newBlockData = currentBlockData.map((blockItem, idx) => {
+      if (idx === blockIndex) {
+        return {
+          ...blockItem,
+          floors: blockItem.floors.map((floor, fIdx) => {
+            if (fIdx === floorIndex) {
+              return {
+                ...floor,
+                dorms: floor.dorms.map((dorm, dIdx) => {
+                  if (dIdx === originalDormIndex) {
+                    return {
+                      ...dorm,
+                      numberOfStudents: dorm.numberOfStudents + 1,
+                    };
+                  }
+                  return dorm;
+                }),
+              };
+            }
+            return floor;
+          }),
+        };
+      }
+      return blockItem;
+    });
+  
+    return { updatedStudent, newBlockData };
+  }
+  
+  // Fresh student allocation processing
+  
   
   function freshStudentAllocation() {
     const { SelectedGender, StudCategory, Stream } = IdentifyStudent({
@@ -346,8 +401,13 @@ export default function AllocationLast({
       return;
     }
   
-    // Abort allocation if all students have already been allocated
-    if (checkBlockAndDormExist(selectedStudentGroup)) {
+    // Filter out already allocated students
+    const unallocatedStudents = selectedStudentGroup.filter(
+      (stud) => !allocatedFreashStudents.some((a) => a.username === stud.username)
+    );
+  
+    if (unallocatedStudents.length === 0) {
+      toast.error("All students in this group are already allocated.");
       return;
     }
   
@@ -357,6 +417,11 @@ export default function AllocationLast({
     const newAllocatedStudents = [];
   
     for (const student of ArrangedStudent) {
+      if (allocatedFreashStudents.some((a) => a.username === stud.username)) {
+        console.warn(`Student ${stud.id} already allocated, skipping.`);
+        continue;
+      }
+
       const allocatedFreash = AllocateFreashStudent(
         student,
         SelectedGender,
@@ -383,76 +448,19 @@ export default function AllocationLast({
   }
  
   }
-  
-//   function chechBlockAndDormExist(selectedStudentGroup){
-// const hasDormAndBlock = selectedStudentGroup.every(
-//       (stud) => stud.block !== "" && stud.dorm !== ""
-//     );
-//     if (hasDormAndBlock) {
-//       toast.error("Student has already allocated");
-//     }
+ 
 
-//     return
-
-//   }
-//   function freshStudentAllocation() {
-//     const { SelectedGender, StudCategory, Stream } = IdentifyStudent({
-//       studAndBlockInfo,
-//     });
-//     let selectedStudentGroup;
-//     if (StudCategory === "RegularMale" || StudCategory === "RegularFemale") {
-//       selectedStudentGroup =
-//         catagorizedStudentData[SelectedGender][StudCategory][Stream];
-//     } else {
-//       selectedStudentGroup =
-//         catagorizedStudentData[SelectedGender][StudCategory];
-//     }
-
-//     if (!selectedStudentGroup || selectedStudentGroup.length === 0) {
-//       console.warn("No students available for allocation");
-//       return;
-//     }
-   
-
-//     chechBlockAndDormExist(selectedStudentGroup)
-    
-
-//     const ArrangedStudent = OrderFreashStudent(selectedStudentGroup);
-//     console.log(ArrangedStudent, "ArrangedStudent");
-//     let currentBlockDataState = [...updatedBlockData];
-//     const newAllocatedStudents = [];
-
-//     for (const student of ArrangedStudent) {
-//       const allocatedFreash = AllocateFreashStudent(
-//         student,
-//         SelectedGender,
-//         studAndBlockInfo,
-//         currentBlockDataState
-//       );
-//       if (allocatedFreash) {
-//         const { updatedStudent, newBlockData } = allocatedFreash;
-//         newAllocatedStudents.push(updatedStudent);
-//         currentBlockDataState = newBlockData;
-//       } else {
-//         console.warn(
-//           `Allocation failed for student: ${student.Fname} ${student.Lname}`
-//         );
-//       }
-//     }
-
-//     // Update state once after processing all students
-//     setUpdatedBlockData(currentBlockDataState);
-//     //setAllocatedStudents(newAllocatedStudents);
-//     setAllocatedFreashStudents((prev) => [...prev, ...newAllocatedStudents]);
-//   }
-
-  // Run allocation only when selectOption is "senior"
+  //Run allocation only when selectOption is "senior"
   useEffect(() => {
     if (selectOption === "senior") {
       seniorStudentAllocation();
+      viewAllocatedStudent(allocatedStudents)
+
     } else if (selectOption === "fresh" || selectOption === "remedial") {
       freshStudentAllocation();
+      viewAllocatedStudent(allocatedFreashStudents)
     }
+   
   }, [selectOption, studAndBlockInfo]);
 
   return (
@@ -491,5 +499,6 @@ export default function AllocationLast({
         </div>
       )}
     </div>
+    
   );
 }

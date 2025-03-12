@@ -447,7 +447,7 @@ export const BlockDemoData = [
     location: "boys_Campus",
     totalCapacity: 120,
     availableRoom: 2,
-    isFull: true,
+    isFull: false,
     floors: [
       {
         floorNumber: 1,
