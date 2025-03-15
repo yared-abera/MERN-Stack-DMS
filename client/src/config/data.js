@@ -316,7 +316,8 @@ export const StudDataSchema = {
   department: String,
   collage: String,
   dorm:Number,
-  block:Number
+  block:Number,
+  role:String
 };
 export const requiredSchema = {
   Fname: String,

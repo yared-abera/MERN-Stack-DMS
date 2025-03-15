@@ -1,8 +1,9 @@
 import { BlockDemoData } from "@/config/data";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { InsertAllocatedStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function AllocationLast({
   studAndBlockInfo,
@@ -11,15 +12,15 @@ export default function AllocationLast({
   const { catagorizedStudentData, selectOption } = useSelector(
     (state) => state.Data
   );
-
-  console.log(studAndBlockInfo.BlockNumber,'Block');
-  console.log(studAndBlockInfo.FloorNumber,'Fllor');
-
+  const { AvailebleBlocks } = useSelector((state) => state.block);
+  
+ 
   // State for block data and allocated students
-  const [updatedBlockData, setUpdatedBlockData] = useState(BlockDemoData);
+  const [updatedBlockData, setUpdatedBlockData] = useState(AvailebleBlocks.data);
   const [allocatedStudents, setAllocatedStudents] = useState([]);
-  const [allocatedFreashStudents, setAllocatedFreashStudents] = useState([]);
-
+  const [AllallocatedStudents, setAllAllocatedStudents] = useState([]);
+  const dispatch=useDispatch()
+ 
   // Updated IdentifyStudent function for proper parsing
   function IdentifyStudent({ studAndBlockInfo }) {
     const studentKey = studAndBlockInfo.studCategory;
@@ -46,6 +47,8 @@ export default function AllocationLast({
 
   function getSameBatchAndDepartment({ student, selectedStudentGroup }) {
     const { batch, department } = student;
+    console.log(selectedStudentGroup,'selectedStudentGroup');
+    
     return selectedStudentGroup.filter(
       (stud) => stud.batch === batch && stud.department === department
     );
@@ -72,6 +75,8 @@ export default function AllocationLast({
           processed.add(key);
         }
       }
+      console.log(groups,'groups');
+      
     });
     return groups;
   }
@@ -98,26 +103,27 @@ export default function AllocationLast({
     }
   
     // Filter out already allocated students
-    const unallocatedStudents = selectedStudentGroup.filter(
-      (stud) => !allocatedStudents.some((a) => a.username === stud.username)
-    );
+    // const unallocatedStudents = selectedStudentGroup.filter(
+    //   (stud) => !allocatedStudents.some((a) => a.username === stud.username)
+    // );
+    
+    // if (unallocatedStudents.length === 0) {
+    //   toast.error("All students in this group are already allocated.");
+    //   return;
+    // }
   
-    if (unallocatedStudents.length === 0) {
-      toast.error("All students in this group are already allocated.");
-      return;
-    }
-  
-    const groups = groupStudentsByBatchAndDepartment(unallocatedStudents);
+    const groups = groupStudentsByBatchAndDepartment(selectedStudentGroup);
     let currentBlockDataState = [...updatedBlockData];
     const newAllocatedStudents = [];
-  
+    console.log(groups,'groups');
+    
     for (const group of groups) {
       for (const stud of group) {
         // Additional check to prevent race conditions
-        if (allocatedStudents.some((a) => a.username === stud.username)) {
-          console.warn(`Student ${stud.id} already allocated, skipping.`);
-          continue;
-        }
+        // if (allocatedStudents.some((a) => a.username === stud.username)) {
+        //   console.warn(`Student ${stud.id} already allocated, skipping.`);
+        //   continue;
+        // }
         const allocationResult = AllocateSeniorStudent(
           stud,
           SelectedGender,
@@ -138,8 +144,9 @@ export default function AllocationLast({
   
     // Update state after processing all students
     setUpdatedBlockData(currentBlockDataState);
-    setAllocatedStudents((prev) => [...prev, ...newAllocatedStudents]);
-  
+
+   // setAllocatedStudents((prev) => [...prev, ...newAllocatedStudents]);
+  setAllocatedStudents(newAllocatedStudents)
     if (newAllocatedStudents.length > 0) {
       return toast.success(
         `Student ${studAndBlockInfo.studCategory} allocated successfully`
@@ -155,7 +162,7 @@ export default function AllocationLast({
   ) {
     // Determine the campus location based on gender
     const blockLocation =
-      SelectedGender === "GenderMale" ? "boys_Campus" : "girls_Campus";
+      SelectedGender === "GenderMale" ? "maleArea" : "femaleArea";
     // Destructure the updated studAndBlockInfo
     // BlockNumber is now an array and FloorNumber is an array of objects: { floor, block }
     const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
@@ -168,11 +175,15 @@ export default function AllocationLast({
       const blockIndex = currentBlockData.findIndex(
         (block) => block.blockNum === blockNum && block.location === blockLocation
       );
+      console.log(blockNumbers,'blockNumbers');
+      
+      console.log(blockIndex,'blockIndex');
       if (blockIndex === -1) {
         console.warn(`Block ${blockNum} not found in ${blockLocation}`);
         continue; // Try next block if not found
       }
-  
+     
+      
       const block = currentBlockData[blockIndex];
   
       // Look for a floor selection for this specific block
@@ -198,7 +209,7 @@ export default function AllocationLast({
   
       // Find the first available dorm (not full)
       const availableDorm = filteredDorms.find(
-        (d) => d.numberOfStudents < d.capacity
+        (d) => d.studentsAllocated < d.capacity
       );
   
       if (availableDorm) {
@@ -240,7 +251,7 @@ export default function AllocationLast({
                   if (dIdx === originalDormIndex) {
                     return {
                       ...dorm,
-                      numberOfStudents: dorm.numberOfStudents + 1,
+                      studentsAllocated: dorm.studentsAllocated + 1,
                     };
                   }
                   return dorm;
@@ -257,16 +268,7 @@ export default function AllocationLast({
     return { updatedStudent, newBlockData };
   }
   
-  function checkBlockAndDormExist(selectedStudentGroup) {
-    const hasDormAndBlock = selectedStudentGroup.some(
-      (stud) => stud.block !== '' && stud.dorm !== ''
-    );
-    if (hasDormAndBlock) {
-      toast.error("Student has already allocated");
-      return true;
-    }
-    return false;
-  }
+  
 
   function OrderFreashStudent(selectedStudentGroup) {
     return [...selectedStudentGroup].sort((a, b) =>
@@ -280,13 +282,10 @@ export default function AllocationLast({
     SelectedGender,
     studAndBlockInfo,
     currentBlockData
-  ) {
-    // Destructure the new studAndBlockInfo where:
-    // BlockNumber is an array of selected block numbers (e.g. [1, 3, 5])
-    // FloorNumber is an array of objects, e.g. [ { floor: 1, block: 1 }, { floor: 2, block: 3 } ]
+  ) { 
     const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
     const blockLocation =
-      SelectedGender === "GenderMale" ? "boys_Campus" : "girls_Campus";
+      SelectedGender === "GenderMale" ? "maleArea" : "femaleArea";
   
     let allocationResult = null;
   
@@ -301,7 +300,7 @@ export default function AllocationLast({
         continue;
       }
       const block = currentBlockData[blockIndex];
-  
+       
       // Look for a floor selection specific to this block (if any)
       const floorSelectionForBlock = floorSelections.find(
         (fs) => fs.block === blockNum
@@ -324,7 +323,7 @@ export default function AllocationLast({
   
       // Find the first dorm with available capacity
       const availableDorm = filteredDorms.find(
-        (d) => d.numberOfStudents < d.capacity
+        (d) => d.studentsAllocated < d.capacity
       );
       if (availableDorm) {
         allocationResult = {
@@ -363,7 +362,7 @@ export default function AllocationLast({
                   if (dIdx === originalDormIndex) {
                     return {
                       ...dorm,
-                      numberOfStudents: dorm.numberOfStudents + 1,
+                      studentsAllocated: dorm.studentsAllocated + 1,
                     };
                   }
                   return dorm;
@@ -403,7 +402,7 @@ export default function AllocationLast({
   
     // Filter out already allocated students
     const unallocatedStudents = selectedStudentGroup.filter(
-      (stud) => !allocatedFreashStudents.some((a) => a.username === stud.username)
+      (stud) => !allocatedStudents.some((a) => a.username === stud.username)
     );
   
     if (unallocatedStudents.length === 0) {
@@ -417,7 +416,7 @@ export default function AllocationLast({
     const newAllocatedStudents = [];
   
     for (const student of ArrangedStudent) {
-      if (allocatedFreashStudents.some((a) => a.username === stud.username)) {
+      if (allocatedStudents.some((a) => a.username === stud.username)) {
         console.warn(`Student ${stud.id} already allocated, skipping.`);
         continue;
       }
@@ -442,7 +441,8 @@ export default function AllocationLast({
 
        // Update state once after processing all students
        setUpdatedBlockData(currentBlockDataState);
-       setAllocatedFreashStudents((prev) => [...prev, ...newAllocatedStudents]);
+       allocatedStudents(newAllocatedStudents)
+       //allocatedStudents((prev) => [...prev, ...newAllocatedStudents]);
   if(newAllocatedStudents&&newAllocatedStudents.length>0){
     return toast.success(`Student ${studAndBlockInfo.studCategory} allocated successfully`)
   }
@@ -453,16 +453,22 @@ export default function AllocationLast({
   //Run allocation only when selectOption is "senior"
   useEffect(() => {
     if (selectOption === "senior") {
+       
       seniorStudentAllocation();
-      viewAllocatedStudent(allocatedStudents)
+   
+      // viewAllocatedStudent(allocatedStudents)
 
     } else if (selectOption === "fresh" || selectOption === "remedial") {
       freshStudentAllocation();
-      viewAllocatedStudent(allocatedFreashStudents)
+      // viewAllocatedStudent(allocatedFreashStudents)
     }
    
   }, [selectOption, studAndBlockInfo]);
 
+  useEffect(()=>{
+dispatch(InsertAllocatedStudent)
+
+  },[allocatedStudents,selectOption ,studAndBlockInfo])
   return (
     <div>
       {selectOption === "senior" ? (
@@ -474,7 +480,7 @@ export default function AllocationLast({
               {allocatedStudents.map((stud, idx) => (
                 <li key={idx}>
                   {stud.Fname} {stud.Lname} - Block: {stud.block}, Dorm:{" "}
-                  {stud.dorm}
+                  {stud.dorm} {stud.department} {stud.Stream}
                 </li>
               ))}
               
@@ -487,7 +493,7 @@ export default function AllocationLast({
           <div>
             <h4>Allocated Students:</h4>
             <ul>
-              {allocatedFreashStudents.map((stud, idx) => (
+              {allocatedStudents.map((stud, idx) => (
                 <li key={idx}>
                   {stud.Fname} {stud.Lname} - Block: {stud.block}, Dorm:{" "}
                   {stud.dorm}
