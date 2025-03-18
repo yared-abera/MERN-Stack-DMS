@@ -37,7 +37,7 @@ export const GetAvaiableBlocks = createAsyncThunk(
       const response = await axios.get(`http://localhost:5000/api/block/getAvailabeBlock`, {
         withCredentials: true,
       });
-      console.log("Response from fetchProctorBlocks:", response.data); // Log the response
+ 
       return response.data;
     } catch (err) {
       console.error("Error in fetchProctorBlocks:", err); // Log the error
@@ -76,7 +76,20 @@ export const fetchAvailableProctors = createAsyncThunk(
     }
   }
 );
+
+export const UpdateBlock=createAsyncThunk('block/update',async( {updatedBlock})=>{
+  try {
+    const respons=await axios.put('http://localhost:5000/api/block/update',updatedBlock ,{
+      withCredentials:true
+    })
+ 
+
+    return respons.data
+  } catch (error) {
+    return rejectWithValue(err.response.data);
     
+  }
+})
 
 const blockSlice =createSlice({
     name:"block",

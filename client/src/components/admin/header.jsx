@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "../ui/sidebar";
+import AvatarComponent from "../common/avatar";
 
 export default function Header() {
   const NowDate = new Date();
@@ -85,7 +86,7 @@ export default function Header() {
       </span>
     </div>
     <div className="md:mr-20 sm:ml-2 flex-1">
-      <DropdownMenu>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="bg-black cursor-pointer dark:bg-white">
             <AvatarFallback className="bg-black dark:bg-white dark:text-black text-white font-extrabold">
@@ -106,7 +107,9 @@ export default function Header() {
             LogOut
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
+<AvatarComponent/>
+      
     </div>
   </div>
 </div>

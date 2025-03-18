@@ -7,6 +7,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+     
   } from "../ui/sidebar";
  
 import { Link, useLocation } from "react-router-dom";
@@ -38,7 +39,8 @@ import { Link, useLocation } from "react-router-dom";
 export default function StudentSideBar(){
   const location =useLocation()
 
-    return(<Sidebar>
+    return( 
+      <Sidebar>
         <SidebarContent>
                    <SidebarGroup>
                      <SidebarGroupLabel className="sm:text-lg sm:font-semibold md:text-2xl font-bold mb-4">
@@ -66,5 +68,7 @@ export default function StudentSideBar(){
                      </SidebarGroupContent>
                    </SidebarGroup>
         </SidebarContent>
-    </Sidebar>)
+    </Sidebar>
+     
+    )
 }
