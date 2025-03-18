@@ -6,7 +6,7 @@ export default function AccountPage() {
       <div className="flex flex-col gap-2 p-4   ">
         <div className="flex flex-col items-center border-solid shadow-md mt-8">
           <h1>My profile</h1>
-
+           
           <div className="m-4 flex items-center justify-around w-full">
             <div className="grid grid-cols-1 gap-4">
               <div className="rounded-full bg-black w-24 h-24 dark:bg-white "></div>
