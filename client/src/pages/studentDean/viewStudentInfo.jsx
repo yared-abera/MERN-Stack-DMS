@@ -44,22 +44,22 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
 
   // Fetch Incidents
   useEffect(() => {
-    const getIncidents = async () => {
+    const getStudents = async () => {
       setLoading(true);
       try {
          const response = null;// await axiosInstance.get("/incidents/allIncidents");
         if (response.data) {
-          dispatch(getAllStudents(response.data.incidents));
-          setStudents(response.data.incidents);
-          setFilteredStudents(response.data.incidents);
+          dispatch(getAllStudents(response.data.Students));
+          setStudents(response.data.students);
+          setFilteredStudents(response.data.students);
         }
       } catch (error) {
-        console.error("Error fetching incidents:", error);
+        console.error("Error fetching studentss:", error);
       } finally {
         setLoading(false);
       }
     };
-    getIncidents();
+    getStudents();
   }, [dispatch]);
 
   // Filter incidents by search query
