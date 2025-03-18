@@ -53,12 +53,12 @@ export default function StudentHeader() {
 
   return (
     <>
-      <div className="fixed top-0   z-10 h-auto py-3 shadow-lg border-solid     ">
+      <div className="fixed top-0   z-10 h-auto py-3 shadow-lg border-solid w-[100vw]     ">
         <div className="md:inline-flex  ">
-        <div className="flex text-left ">
+        {/* <div className="flex text-left ">
         < SidebarTrigger/>
-       </div>
-          <div className="w-[65%] flex items-center justify-evenly h-full gap-1">
+       </div> */}
+          <div className="w-full flex items-center justify-between h-full gap-6">
             {headerComponent.map((item, index) => (
               <Link
                 key={index}
@@ -76,7 +76,7 @@ export default function StudentHeader() {
             ))}
           </div>
 
-          <div className=" flex items-center justify-around">
+          <div className=" flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">{time}</h1>
             </div>

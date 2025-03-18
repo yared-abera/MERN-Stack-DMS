@@ -417,7 +417,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     },
     [AllBlock, userCalculatedValue, getStudentNumber, getStudentStatus]
   );
-
+  
   const filteredState = filterCategoriesWithValues(isStudentGetBlockState);
 
   return (
