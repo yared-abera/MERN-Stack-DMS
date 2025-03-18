@@ -29,7 +29,8 @@ import {
 
 export default function AllocationDialog({ selectedBlockANDFloor }) {
   const { userCalculatedValue } = useSelector((state) => state.Data);
-  const AllBlock = BlockDemoData;
+  const { AvailebleBlocks } = useSelector((state) => state.block);
+  const AllBlock = AvailebleBlocks.data;
 
   const [isStudentGetBlockState, setIsStudentGetBlockState] = useState({
     regular: {
@@ -284,8 +285,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
   }
 
   function HandleAllocation({ studentKey, blockNumbers, floorNumbers }) {
-    console.log(blockNumbers, "blockNumbers");
-    console.log(floorNumbers, "floorNumber");
+     
 
     setStudAndBlockInfo({
       studCategory: studentKey,
@@ -293,8 +293,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
       FloorNumber: floorNumbers,
     });
   }
-  console.log(studAndBlockInfo, "studAndBlockInfo");
-
+  
   function viewAllocatedStudent(student) {
     console.log(student,'student');
     setAllocatedStudent(student)
@@ -348,14 +347,14 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
                 const floorData = currentFilteredBlock.floors.find(
                   (f) => f.floorNumber === item.floorNumber
                 );
-                capacity = floorData ? floorData.floorCapacity : 0;
+                capacity = floorData ? floorData.totalAvailable : 0;
                 floorNumbers.push({
                   // Changed to push object
                   floor: item.floorNumber,
                   block: item.blockNumber,
                 });
               } else {
-                capacity = currentFilteredBlock.totalCapacity;
+                capacity = currentFilteredBlock.totalAvailable;
               }
               blockNumbers.push(item.blockNumber);
             }
@@ -424,7 +423,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
   return (
     <div>
       <div className="text-center">
-        <h1 className="text-xl md:text-2xl font-bold">
+        <h1 className="text-lg md:text-xl font-bold">
           Selectd block Information
         </h1>
       </div>
@@ -469,4 +468,5 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     </div>
   );
 }
-//      Object.values(studAndBlockInfo).every((item) => item !== "") ?
+//  npx shadcn@latest add hover-card
+

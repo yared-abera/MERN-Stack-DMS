@@ -37,19 +37,23 @@ import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
 import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
 import StudentDeanBlockInfo from "./pages/studentDean/BloackInfo";
+import { GetAvaiableBlocks } from "./store/blockSlice";
 function App() {
   
   const theme = useSelector((state) => state.theme.mode);
   const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
-
+ 
  
     
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkAuthorization());
+    dispatch(GetAvaiableBlocks())
   }, [dispatch]);
+
+
 
   useEffect(() => {
     if (theme === "dark") {

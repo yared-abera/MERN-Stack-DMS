@@ -165,6 +165,7 @@ export default function DormAllocation() {
           inputData.studCategory = "fresh";
         } else if (selectedValue === "senior") {
           inputData.studCategory = "senior";
+          
         } else {
           inputData.department = "Not_yet";
           inputData.studCategory = "remedial";
@@ -174,7 +175,7 @@ export default function DormAllocation() {
         Object.entries(inputData).forEach(([key, value]) => {
           if (key in data) {
             const expectedType = data[key];
-            if (value === null || value === undefined) {
+            if (value === null || value === undefined||'') {
               errors.push(`Missing value for ${key}`);
             }
             const actualType = value.constructor;

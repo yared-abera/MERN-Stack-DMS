@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
 
 export default function AccountPage() {
+  const {user}=useSelector(state=>state.auth)
+  console.log(user,'user');
+  
   return (
     <div className="w-full min-h-screen  mt-20 overflow-hidden">
       <div className="flex flex-col gap-2 p-4   ">
@@ -39,6 +43,10 @@ export default function AccountPage() {
           </div>
            
           </div>
+        </div>
+
+        <div>
+
         </div>
 
         <div className="w-full  border-solid shadow-md mt-8 px-7">
