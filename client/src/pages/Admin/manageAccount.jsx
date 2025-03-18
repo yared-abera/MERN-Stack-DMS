@@ -26,6 +26,7 @@ import { UserAccount } from "@/config/data";
 import { CreateAccount } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast } from "sonner";
  
 const intialFromData = {
   fName: "",
@@ -85,7 +86,17 @@ export default function ManageAccount() {
   
   const onSubmit = (event) => {
     event.preventDefault();
-    dispatch(CreateAccount(formData))
+    dispatch(CreateAccount(formData)).then(data=>{
+
+      if(data?.success){
+        toast.success(' ✅ User Created Successfully ')
+      }
+      else{
+        toast.error('Error Occured ')
+      }
+ 
+      
+    })
    
 
   };

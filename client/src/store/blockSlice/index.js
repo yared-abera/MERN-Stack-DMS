@@ -6,7 +6,9 @@ const initialState={
     isLoading: true,
     error: null,
     list: [],
-    availableProctors: []
+    availableProctors: [],
+    AvailebleBlocks:[]
+
 }
 
 
@@ -27,6 +29,23 @@ export const registerBlock=createAsyncThunk("block/register",
    }
 );
 
+export const GetAvaiableBlocks = createAsyncThunk(
+  'blocks/GetAvaiableBlocks',
+  async () => {
+    try {
+
+      const response = await axios.get(`http://localhost:5000/api/block/getAvailabeBlock`, {
+        withCredentials: true,
+      });
+ 
+      return response.data;
+    } catch (err) {
+      console.error("Error in fetchProctorBlocks:", err); // Log the error
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
+
 export const fetchProctorBlocks = createAsyncThunk(
   'blocks/fetchProctorBlocks',
   async (_, { rejectWithValue }) => {
@@ -35,7 +54,7 @@ export const fetchProctorBlocks = createAsyncThunk(
       const response = await axios.get(`http://localhost:5000/api/block/proctor/my-block`, {
         withCredentials: true,
       });
-      console.log("Response from fetchProctorBlocks:", response.data); // Log the response
+        // Log the response
       return response.data;
     } catch (err) {
       console.error("Error in fetchProctorBlocks:", err); // Log the error
@@ -57,7 +76,20 @@ export const fetchAvailableProctors = createAsyncThunk(
     }
   }
 );
+
+export const UpdateBlock=createAsyncThunk('block/update',async( {updatedBlock})=>{
+  try {
+    const respons=await axios.put('http://localhost:5000/api/block/update',updatedBlock ,{
+      withCredentials:true
+    })
+ 
+
+    return respons.data
+  } catch (error) {
+    return rejectWithValue(err.response.data);
     
+  }
+})
 
 const blockSlice =createSlice({
     name:"block",
@@ -71,7 +103,8 @@ const blockSlice =createSlice({
     extraReducers: (builder)=>{
         builder.addCase(registerBlock.pending, (state) => {
                   state.isLoading = true;   
-                }).addCase(registerBlock.fulfilled,(state,action)=>{
+                })
+            .addCase(registerBlock.fulfilled,(state,action)=>{
              state.isLoading =false;
             console.log("from register Block slice",action.payload);
            
@@ -94,6 +127,20 @@ const blockSlice =createSlice({
             state.availableProctors = action.payload;
           })
           .addCase(fetchAvailableProctors.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload?.message || 'Failed to fetch proctors';
+          })
+
+
+          .addCase(GetAvaiableBlocks.pending, (state) => {
+            state.isLoading = true;
+            state.error = null;
+          })
+          .addCase(GetAvaiableBlocks.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.AvailebleBlocks = action.payload;
+          })
+          .addCase(GetAvaiableBlocks.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload?.message || 'Failed to fetch proctors';
           });

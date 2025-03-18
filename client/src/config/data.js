@@ -118,6 +118,7 @@ export const UserAccount = [
       { id: "proctorManager", label: "Proctor Manager" },
       { id: "proctor", label: "proctor" },
       { id: "admin", label: "Admin" },
+      { id: "student", label: "student" },
     ],
   },
 ];
@@ -316,7 +317,8 @@ export const StudDataSchema = {
   department: String,
   collage: String,
   dorm:Number,
-  block:Number
+  block:Number,
+  role:String
 };
 export const requiredSchema = {
   Fname: String,

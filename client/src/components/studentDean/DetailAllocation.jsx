@@ -283,7 +283,7 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
           <TableHeader>
             <TableRow>
               <TableHead>Floor Number</TableHead>
-              <TableHead>Capacity</TableHead>
+              <TableHead>Available Space</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Selected For</TableHead>
               <TableHead>Select</TableHead>
@@ -293,7 +293,7 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
             {floorData && (
               <TableRow>
                 <TableCell>{selectedFloor.floorNumber}</TableCell>
-                <TableCell>{floorData.floorCapacity}</TableCell>
+                <TableCell>{floorData.totalAvailable}</TableCell>
                 <TableCell>{floorData.floorStatus}</TableCell>
                 <TableCell>{floorData.isSelectedFor || "None"}</TableCell>
                 <TableCell>
@@ -350,8 +350,8 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
             <TableRow>
               <TableHead>Block Number</TableHead>
               <TableHead>Location</TableHead>
-              <TableHead>Block Capacity</TableHead>
-              <TableHead>Available Rooms</TableHead>
+            
+              <TableHead>Available Space</TableHead>
               <TableHead>Floors</TableHead>
               <TableHead>Select Whole Block</TableHead>
             </TableRow>
@@ -373,8 +373,7 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
                   <TableRow key={block.blockNum}>
                     <TableCell>{block.blockNum}</TableCell>
                     <TableCell>{block.location}</TableCell>
-                    <TableCell>{block.totalCapacity}</TableCell>
-                    <TableCell>{block.availableRoom}</TableCell>
+                     <TableCell>{block.totalAvailable}</TableCell>
                     <TableCell>
                       <Select
                         onValueChange={(value) =>
