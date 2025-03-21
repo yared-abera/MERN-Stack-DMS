@@ -30,21 +30,17 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
         const respons=await axios.get('http://localhost:5000/api/student/get', {
             withCredentials:true
         })
-    
-  
-        return respons.data
+        console.log(respons.data,"all sudent ");
+        
+     return respons.data
+
     } catch (error) {
         return rejectWithValue(error.response.data);
     }
 
 })
 
-
-
-
-
-
-
+ 
 
  const AllocateSlice=createSlice({
     name:'Allocation',
@@ -54,7 +50,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     },
     extraReducers:(builder)=>{
         builder.addCase(getAllocatedStudent.fulfilled,(state,action)=>{
-            //state.AllocatedStudent=action.payload
+            state.AllocatedStudent=action.payload
             console.log(action.payload,"action payload");
             
 

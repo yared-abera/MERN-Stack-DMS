@@ -1,70 +1,96 @@
+import { useDispatch } from "react-redux";
 import img from "../../assets/img/gibi.jpg";
 import logo from "../../assets/img/University_logo.png";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { getAllBlock } from "@/store/blockSlice";
+import StudentInfoChart from "@/components/studentDean/indexGraph";
+import { getAllocatedStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function StudentDeanHome() {
-  return (
-    <div
-      className="w-full min-h-screen mt-20 bg-cover bg-center flex flex-col    "
-      style={{
-        backgroundImage: `url(${img})`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-      }}
-    >
-      <div className="sm:p-2 md:p-4 flex-1">
-        <div className="flex  items-center  place-content-center w-full mt-3 ">
-          <img src={logo} alt="campus img" />
-        </div>
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(getAllBlock());
+    dispatch(getAllocatedStudent());
+  }, [dispatch]);
 
-        <div className="flex flex-col gap-2 ">
-          <div className="my-4 text-center sm:w-full md:w-1/2">
-            <h1 className="text-neutral-950 sm:text-md md:text-3xl font-bold ">
+  return (
+    <div className="w-full min-h-screen flex flex-col mt-20">
+      
+      {/* Header with background image covering 30% of viewport height */}
+      <div 
+        className="w-full h-[50vh] flex justify-center mt-3"
+        style={{
+          backgroundImage: `url(${img})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        <div >
+        <img src={logo} alt="University Logo" className="max-h-full z-20" />
+        </div>
+        
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-4">
+        <div className="flex flex-col gap-4">
+          <div className="bg-white p-4 rounded shadow">
+            <div className="text-center">
+          <h1 className="text-lg md:text-xl font-bold ">Student Information </h1>
+            </div>
+            <StudentInfoChart />
+          </div>
+
+          <div className="text-center w-full md:w-1/2 mx-auto">
+            <h1 className="text-neutral-950 text-xl md:text-3xl font-bold">
               Recently Searched Student Info
             </h1>
           </div>
 
-          <div className="  grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 flex-1     ">
-            <div className="  flex flex-col justify-around dark:bg-gradient-to-tr  from-orange-500 to-blue-700 bg-white  p-4 text-white shadow-2xl shadow-slate-950 w-auto h-56 border-red-100">
-              <p className="dark:text-white  text-black">First Name :</p>
-              <p className="dark:text-white text-black">Last Name :</p>
-              <p className="dark:text-white text-black">User Name :</p>
-              <p className="dark:text-white text-black">Email:</p>
-              <p className="dark:text-white text-black">Role :</p>
-              <div className="flex items-center justify-between mt-7 gap-4 ">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {/* Example Card */}
+            <div className="flex flex-col justify-around bg-white dark:bg-gradient-to-tr from-orange-500 to-blue-700 p-4 text-black shadow-2xl rounded h-56">
+              <p>First Name :</p>
+              <p>Last Name :</p>
+              <p>User Name :</p>
+              <p>Email:</p>
+              <p>Role :</p>
+              <div className="flex items-center justify-between mt-4 gap-4">
                 <Button className="w-full">Remove</Button>
                 <Button className="w-full">View Detail</Button>
               </div>
             </div>
 
-            <div className="  flex flex-col justify-around dark:bg-gradient-to-tr  from-green-500 to-blue-700   p-4 text-white shadow-2xl shadow-slate-950 w-52 h-56 border-red-100">
-              <p className="dark:text-white  text-black">First Name :</p>
-              <p className="dark:text-white text-black">Last Name :</p>
-              <p className="dark:text-white text-black">User Name :</p>
-              <p className="dark:text-white text-black">Email:</p>
-              <p className="dark:text-white text-black">Role :</p>
-              <div className="flex items-end justify-center mt-7  ">
+            {/* Duplicate cards */}
+            <div className="flex flex-col justify-around bg-white dark:bg-gradient-to-tr from-green-500 to-blue-700 p-4 text-black shadow-2xl rounded h-56">
+              <p>First Name :</p>
+              <p>Last Name :</p>
+              <p>User Name :</p>
+              <p>Email:</p>
+              <p>Role :</p>
+              <div className="flex items-end justify-center mt-4">
                 <Button className="w-full">Remove</Button>
               </div>
             </div>
-            <div className="  flex flex-col justify-around dark:bg-gradient-to-tr  from-green-500 to-blue-700   p-4 text-white shadow-2xl shadow-slate-950 w-52 h-56 border-red-100">
-              <p className="dark:text-white  text-black">First Name :</p>
-              <p className="dark:text-white text-black">Last Name :</p>
-              <p className="dark:text-white text-black">User Name :</p>
-              <p className="dark:text-white text-black">Email:</p>
-              <p className="dark:text-white text-black">Role :</p>
-              <div className="flex items-end justify-center mt-7  ">
+            <div className="flex flex-col justify-around bg-white dark:bg-gradient-to-tr from-green-500 to-blue-700 p-4 text-black shadow-2xl rounded h-56">
+              <p>First Name :</p>
+              <p>Last Name :</p>
+              <p>User Name :</p>
+              <p>Email:</p>
+              <p>Role :</p>
+              <div className="flex items-end justify-center mt-4">
                 <Button className="w-full">Remove</Button>
               </div>
             </div>
-
-            <div className="  flex flex-col justify-around dark:bg-gradient-to-tr  from-green-500 to-blue-700   p-4 text-white shadow-2xl shadow-slate-950 w-52 h-56 border-red-100">
-              <p className="dark:text-white  text-black">First Name :</p>
-              <p className="dark:text-white text-black">Last Name :</p>
-              <p className="dark:text-white text-black">User Name :</p>
-              <p className="dark:text-white text-black">Email:</p>
-              <p className="dark:text-white text-black">Role :</p>
-              <div className="flex items-end justify-center mt-7  ">
+            <div className="flex flex-col justify-around bg-white dark:bg-gradient-to-tr from-green-500 to-blue-700 p-4 text-black shadow-2xl rounded h-56">
+              <p>First Name :</p>
+              <p>Last Name :</p>
+              <p>User Name :</p>
+              <p>Email:</p>
+              <p>Role :</p>
+              <div className="flex items-end justify-center mt-4">
                 <Button className="w-full">Remove</Button>
               </div>
             </div>
@@ -72,7 +98,10 @@ export default function StudentDeanHome() {
         </div>
       </div>
 
-      <div className="  w-full bg-orange-500  ">Foolter</div>
+      {/* Footer */}
+      <div className="w-full bg-orange-500 text-center p-4">
+        Footer
+      </div>
     </div>
   );
 }

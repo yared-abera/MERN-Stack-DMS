@@ -7,8 +7,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAllBlock } from "@/store/blockSlice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function StudentDeanBlockInfo() {
+const dispatch=useDispatch()
+  useEffect(()=>{
+  dispatch(getAllBlock())
+  },[dispatch])
+  const {AllBlock}=useSelector(state=>state.block)
+
+  console.log(AllBlock);
+  
+
+function getProctor(){
+
+}
+  
   return (
     <div className="mt-20 w-full min-h-screen   flex flex-col gap-2">
       <div className="flex flex-col h-auto p-3 md:py-5">
@@ -20,32 +36,38 @@ export default function StudentDeanBlockInfo() {
           <TableHeader>
             <TableRow>
               <TableHead>Block Number</TableHead>
-              <TableHead>Capacity</TableHead>
+              <TableHead>Total capacity</TableHead>
+              <TableHead>Available Room</TableHead>
               <TableHead>Found In</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Total Room</TableHead>
-              <TableHead>Available Room</TableHead>
-              <TableHead>Is Selected for Spetial student</TableHead>
-              <TableHead>Is Selected for disable student</TableHead>
+              <TableHead>Number Of Floor</TableHead>
+             
+              
               <TableHead >Actions</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            <TableRow>
-              <TableCell>220</TableCell>
-              <TableCell>200</TableCell>
-              <TableCell>Male campus</TableCell>
-              <TableCell>occupied</TableCell>
-              <TableCell>50</TableCell>
-              <TableCell>0</TableCell>
 
-              <TableCell>No</TableCell>
-              <TableCell>Yes</TableCell>
+            {
+              AllBlock.data.map((block)=><TableRow key={block._id}>
+
+              <TableCell>{block.blockNum}</TableCell>
+              
+              <TableCell>{block.totalCapacity}</TableCell>
+              <TableCell>{block.totalAvailable}</TableCell>
+              <TableCell>{block.location}</TableCell>
+              <TableCell> {block.status}</TableCell>
+              <TableCell> {block.floors.length}</TableCell>
+
+              
               <TableCell>
               <Button variant="outline">View Detail</Button>
               </TableCell>
-            </TableRow>
+
+              </TableRow>)
+            }
+          
           </TableBody>
         </Table>
       </div>

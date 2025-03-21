@@ -7,7 +7,8 @@ const initialState={
     error: null,
     list: [],
     availableProctors: [],
-    AvailebleBlocks:[]
+    AvailebleBlocks:[],
+    AllBlock:[]
 
 }
 
@@ -35,6 +36,23 @@ export const GetAvaiableBlocks = createAsyncThunk(
     try {
 
       const response = await axios.get(`http://localhost:5000/api/block/getAvailabeBlock`, {
+        withCredentials: true,
+      });
+ 
+      return response.data;
+    } catch (err) {
+      console.error("Error in fetchProctorBlocks:", err); // Log the error
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
+
+export const getAllBlock = createAsyncThunk(
+  'blocks/getAllBlock',
+  async () => {
+    try {
+
+      const response = await axios.get(`http://localhost:5000/api/block/getAll`, {
         withCredentials: true,
       });
  
@@ -143,6 +161,10 @@ const blockSlice =createSlice({
           .addCase(GetAvaiableBlocks.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload?.message || 'Failed to fetch proctors';
+          })
+          .addCase(getAllBlock.fulfilled, (state, action) => {
+            state.isLoading = false; 
+            state.AllBlock = action.payload;
           });
     }
 

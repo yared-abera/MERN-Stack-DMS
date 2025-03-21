@@ -174,7 +174,7 @@ export default function DormAllocation() {
           inputData.studCategory = "remedial";
         }
 
-        const password=inputData.Fname+inputData.Mname[0]+'@123'
+        const password=inputData.Fname+inputData.Lname[0]+'@123'
         inputData.password=password
 
         // Validate field types

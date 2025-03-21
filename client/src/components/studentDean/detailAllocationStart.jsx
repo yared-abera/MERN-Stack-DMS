@@ -15,7 +15,7 @@ const initialOption = {
   label: "",
 };
 export default function DetailAllocationStart() {
-  const [activeCategory, setActiveCategory] = useState(null);
+   
 
   const [filteredBlock, setFilterdBlock] = useState([]);
 
@@ -23,6 +23,7 @@ export default function DetailAllocationStart() {
   
   
   const BlockData = AvailebleBlocks.data;
+console.log(BlockData,'BlockData');
 
 
   const [selectedOne, setSelectedOne] = useState(initialOption);
