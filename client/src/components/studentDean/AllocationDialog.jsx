@@ -29,6 +29,7 @@ import {
 
 export default function AllocationDialog({ selectedBlockANDFloor }) {
   const { userCalculatedValue } = useSelector((state) => state.Data);
+  
   const { AvailebleBlocks } = useSelector((state) => state.block);
   const AllBlock = AvailebleBlocks.data;
 
@@ -300,7 +301,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     
   }
 
-  function HandleViewDialog({ studentKey, blockNumbers, allocatedStudent }) {
+  function HandleViewDialog({studentKey,blockNumbers}) {
     const parts = studentKey.split(" ");
     const stateKey = parts[0]; // First part is always stateKey (e.g., "regular")
     let option; // Second part is always option (e.g., "male")
@@ -313,15 +314,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
       option = parts[1];
     }
   
-    console.log(allocatedStudent, 'allocatedStudent');
-    
-    const viewedStudents = allocatedStudent.filter(stud => {
-      return stud.sex === option && blockNumbers.includes(stud.block);
-    });
-  
-    console.log(viewedStudents, 'viewedStudents');
-    
-    //return viewedStudents;
+     
   }
   
 

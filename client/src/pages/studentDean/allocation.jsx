@@ -164,12 +164,18 @@ export default function DormAllocation() {
           inputData.department = "Not_yet";
           inputData.studCategory = "fresh";
         } else if (selectedValue === "senior") {
+          if(inputData.department===''){
+            errors.push(`department not found for ${inputData.userName}`)
+          }
           inputData.studCategory = "senior";
           
         } else {
           inputData.department = "Not_yet";
           inputData.studCategory = "remedial";
         }
+
+        const password=inputData.Fname+inputData.Mname[0]+'@123'
+        inputData.password=password
 
         // Validate field types
         Object.entries(inputData).forEach(([key, value]) => {
