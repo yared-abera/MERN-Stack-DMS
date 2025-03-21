@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import { useDispatch, useSelector } from "react-redux";
  
-// import { setIncident } from "../../redux/incidentSlice";
+import { getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
 import { FaArrowLeft, FaSearch } from "react-icons/fa"; 
 
 const customStyles = {
@@ -47,12 +47,12 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
     const getStudents = async () => {
       setLoading(true);
       try {
-         const response = null;// await axiosInstance.get("/incidents/allIncidents");
-        if (response.data) {
-          dispatch(getAllStudents(response.data.Students));
-          setStudents(response.data.students);
-          setFilteredStudents(response.data.students);
-        }
+
+       const response =dispatch(getAllocatedStudent());
+           console.log("response",response);
+          //setStudents(response.data.students);
+          //setFilteredStudents(response.data.students);
+
       } catch (error) {
         console.error("Error fetching studentss:", error);
       } finally {

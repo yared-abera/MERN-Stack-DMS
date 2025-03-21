@@ -27,12 +27,10 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     
     
     try {
-        const respons=await axios.get('http://localhost:5000/api/student/get', {
+        const response=await axios.get('http://localhost:5000/api/student/get', {
             withCredentials:true
-        })
-    
-  
-        return respons.data
+        });
+        return response.data
     } catch (error) {
         return rejectWithValue(error.response.data);
     }
