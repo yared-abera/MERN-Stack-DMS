@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
-import { useDispatch, useSelector } from "react-redux";
- 
-import { getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
+import { useDispatch, useSelector} from "react-redux";
+import {  getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
 import { FaArrowLeft, FaSearch } from "react-icons/fa"; 
 
 const customStyles = {
@@ -27,15 +26,11 @@ const customStyles = {
   },
 };
 
-// Uncomment these when AddModal and Add components are available
-// import AddModal from "../Modals/AddModal";
-// import Add from "./Add";
+ 
 
 const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for clarity
   const dispatch = useDispatch();
-  const isCollapsed = useSelector((state) => state.sidebar.isCollapsed);
   const navigate = useNavigate();
-  
   const [Students, setStudents] = useState([]);
   const [filteredIncidents, setFilteredStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,18 +42,21 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
     const getStudents = async () => {
       setLoading(true);
       try {
-
-       const response =dispatch(getAllocatedStudent());
-           console.log("response",response);
-          //setStudents(response.data.students);
-          //setFilteredStudents(response.data.students);
-
+        // Await the dispatch to resolve the promise
+        const { payload } = await dispatch(getAllocatedStudent());
+         console.log(payload, "payload");
+        // Access the payload (assuming your Redux action returns data here)
+        if (payload?.data) {
+          setStudents(payload.data);
+          setFilteredStudents(payload.data); // Initialize filteredStudents with all students
+        }
       } catch (error) {
-        console.error("Error fetching studentss:", error);
+        console.error("Error fetching students:", error);
       } finally {
         setLoading(false);
       }
     };
+    
     getStudents();
   }, [dispatch]);
 
@@ -92,14 +90,14 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
   // Define Table Columns using useMemo for performance optimization
   const columns = useMemo(
     () => [
-      { name: "Student ID", selector: (row) => row.incidentId, sortable: true },
-      { name: "Reporter", selector: (row) => row.reporter, sortable: true },
-      { name: "Type", selector: (row) => row.incidentType, sortable: true },
-      { name: "Inmate", selector: (row) => row.inmate, sortable: true },
-      { name: "Status", selector: (row) => row.status, sortable: true },
+      { name: "Student ID", selector: (row) => row.userName, sortable: true },
+      { name: "First Name", selector: (row) => row.Fname, sortable: true },
+      { name: "Last Name", selector: (row) => row.Lname, sortable: true },
+      { name: "Student Type", selector: (row) => row.studCategory, sortable: true },
+      { name: "Block Number", selector: (row) => row.blockNum, sortable: true },
       {
-        name: "Reported Date",
-        selector: (row) => new Date(row.incidentDate).toLocaleDateString(),
+        name: "Dorm Number",
+        selector: (row) => row.dormId,
         sortable: true,
       },
       {
@@ -107,13 +105,13 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
         cell: (row) => (
           <>
             <Link
-              to={`/policeOfficer-dashboard/incident-details/${row._id}`} // Fixed template literal
+            
               className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 mr-2"
             >
               View
             </Link>
             <Link
-              to={`/policeOfficer-dashboard/edit-incident/${row._id}`} // Fixed template literal
+                
               className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
             >
               Edit
@@ -133,7 +131,8 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
       <div className="flex-1 relative min-h-screen mt-32">
       <div
         className={` p-4 pt-0  md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 ${
-          isCollapsed ? "left-16 w-[calc(100%-5rem)]" : "left-64 w-[calc(100%-17rem)]"
+          // isCollapsed ? "left-16 w-[calc(100%-5rem)]" : 
+          "left-64 w-[calc(100%-17rem)]"
         }`}
       >
         {/* Back Button */}
@@ -158,17 +157,14 @@ const  StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cl
           />
         </div>
         
-        {/* Add New Incident Button (Modal Trigger) */}
-        <button
+        
+       <button
           onClick={() => setOpen(true)}
-          className="h-10 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md flex items-center justify-center min-w-[150px] md:w-auto"
+          className=" hidden h-10 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md   items-center justify-center min-w-[150px] md:w-auto"
         >
-          Add New  
-        </button>
-        {/* Uncomment when AddModal is available */}
-        {/* <AddModal open={open} setOpen={setOpen}>
-          <Add setOpen={setOpen} />
-        </AddModal> */}
+           
+        </button> 
+         
       </div>
       
         <div className="p-6">
