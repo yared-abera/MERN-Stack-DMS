@@ -24,10 +24,7 @@ const InsertStudent = async (req, res) => {
        dorm,
       role,
     } = req.body;
-    const allstud=req.body;
-    console.log(allstud,'allstud');
     
-
 
     // Check if username or email already exists
     const existingStudentByUsername = await Student.findOne({ userName });
@@ -41,7 +38,6 @@ const InsertStudent = async (req, res) => {
   
   const salt = await bcryptjs.genSalt(10);
     const hashedPassword=await bcryptjs.hash(password,salt)
-    console.log(`${password + 'for'+ Fname}`)
     
 
     const newStudent = new Student({
@@ -51,7 +47,7 @@ const InsertStudent = async (req, res) => {
       email,
       userName,
       phoneNum,
-      password:hashedPassword,
+      password:hashedPassword ,
       sex,
       batch,
       isSpecial,
@@ -65,7 +61,7 @@ const InsertStudent = async (req, res) => {
       dormId:dorm,
       role,
     });
-
+    
     await newStudent.save();
     res.status(201).json({ // Use 201 for successful resource creation
       success: true,
@@ -83,23 +79,21 @@ const InsertStudent = async (req, res) => {
   }
 };
 
- const fetchAllStudent=async(req,res)=>{
+const fetchAllStudent = async (req, res) => {
   try {
-
-    const allStudent=await Student.find()
-
-    res.status(201).json({
-      success:true,
-      data:allStudent
-    })
-    
+    const allStudents = await Student.find();
+    res.status(200).json({
+      success: true,
+      data: allStudents,
+    });
   } catch (error) {
-    console.error("Error fetching student:", error);
+    console.error("Error fetching students:", error);
     res.status(500).json({
       success: false,
-      message: "Server error, please try again later on fetching student.",
+      message: "Server error, please try again later.",
       error: error.message,
-    });   
+    });
   }
- }
+};
+
 module.exports = { InsertStudent,fetchAllStudent };

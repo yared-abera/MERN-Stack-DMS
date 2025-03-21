@@ -187,10 +187,28 @@ const UpdateBlock = async (req, res) => {
   }
 };
 
+const getALLBlocks=async(req,res)=>{
+  try {
+    const AllBlock=await Block.find()
+    res.status(200).json({
+      success: true,
+      data: AllBlock,
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "get All block failed",
+      error: error.message,
+    });
+  }
+}
+
 module.exports = {
   registerBlock,
   getProctorBlocks,
   getAvailableProctors,
   getAvailableBlocks,
   UpdateBlock,
+  getALLBlocks
 };
