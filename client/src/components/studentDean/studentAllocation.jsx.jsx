@@ -1,7 +1,6 @@
-import { BlockDemoData } from "@/config/data";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../ui/button";
+
 import { toast } from "sonner";
 import {
   getAllocatedStudent,
@@ -82,84 +81,6 @@ export default function AllocationLast({ studAndBlockInfo }) {
     return groups;
   }
 
-  // async function seniorStudentAllocation({
-  //   selectedStudentGroup,
-  //   SelectedGender,
-  // }) {
-  //   const groups = groupStudentsByBatchAndDepartment(selectedStudentGroup);
-  //   let currentBlockDataState = [...updatedBlockData];
-  //   const newAllocatedStudents = [];
-
-  //   // Determine the campus location based on gender
-  //   const blockLocation =
-  //     SelectedGender === "GenderMale" ? "maleArea" : "femaleArea";
-
-  //   const { BlockNumber: blockNumbers, FloorNumber: floorSelections } =
-  //     studAndBlockInfo;
-  //     let isAllocationCorrect=false
-
-  //   for (const group of groups) {
-  //     for (const stud of group) {
-  //       let allocated = false;
-  //       // Try each block one by one for the current student
-  //       for (const blockNum of blockNumbers) {
-  //         const allocationResult = AllocateSeniorStudent(
-  //           stud,
-  //           blockLocation,
-  //           floorSelections,
-  //           blockNum,
-  //           currentBlockDataState
-  //         );
-
-  //         if (allocationResult) {
-  //           const { updatedStudent, updatedBlock, blockIndex } =
-  //             allocationResult;
-  //           dispatch(InsertAllocatedStudent({ updatedStudent })).then(
-  //             (data) => {
-  //               if (data?.payload?.success) {
-  //                 isAllocationCorrect=true
-  //                 dispatch(getAllocatedStudent());
-                  
-  //               } else {
-  //                 isAllocationCorrect=false
-  //                 return toast.error(` ${updatedStudent.Fname + ' ' + updatedStudent.userName} ${data?.payload?.message} `);
-
-  //             }
-  //             }
-  //           );
-  //           // Update the specific block in state instead of all blocks
-  //           currentBlockDataState[blockIndex] = updatedBlock;
-  //           dispatch(UpdateBlock({ updatedBlock })).then((data) => {
-  //             if (data?.payload?.success) {
-  //               dispatch(GetAvaiableBlocks());
-  //             }
-  //           });
-
-            
-  //           allocated = true;
-  //           break; // Allocation successful – move to the next student
-  //         }
-  //       }
-  //       if (!allocated) {
-  //         console.warn(
-  //           `Allocation failed for student: ${stud.Fname} ${stud.Lname}`
-  //         );
-  //       }
-
-  //       if(isAllocationCorrect){
-  //         toast.success(
-  //           `Student ${studAndBlockInfo.studCategory} allocated successfully`
-  //         );
-  //       }
-  //     }
-  //   }
-
-  //   // Update state after processing all students
-  //   setUpdatedBlockData(currentBlockDataState);
-  //   console.log(newAllocatedStudents, "newAllocatedStudents");
-  //   setAllocatedStudents(newAllocatedStudents);
-  // }
-
   function AllocateSeniorStudent(
     stud,
     blockLocation,
@@ -238,25 +159,28 @@ export default function AllocationLast({ studAndBlockInfo }) {
     return { updatedStudent, updatedBlock, blockIndex };
   }
 
+ 
 
-
-  async function seniorStudentAllocation({ selectedStudentGroup, SelectedGender }) {
+  async function seniorStudentAllocation({
+    selectedStudentGroup,
+    SelectedGender,
+  }) {
     const groups = groupStudentsByBatchAndDepartment(selectedStudentGroup);
     let currentBlockDataState = [...updatedBlockData];
     const newAllocatedStudents = [];
   
-    // Determine the campus location based on gender
     const blockLocation = SelectedGender === "GenderMale" ? "maleArea" : "femaleArea";
-  
     const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
   
     let allAllocationsSuccessful = true;
   
+    // Process groups sequentially
     for (const group of groups) {
+      // Process students sequentially within group
       for (const stud of group) {
         let allocated = false;
   
-        // Try each block one by one for the current student
+        // Try blocks in order until successful
         for (const blockNum of blockNumbers) {
           const allocationResult = AllocateSeniorStudent(
             stud,
@@ -266,56 +190,72 @@ export default function AllocationLast({ studAndBlockInfo }) {
             currentBlockDataState
           );
   
-          if (allocationResult) {
-            const { updatedStudent, updatedBlock, blockIndex } = allocationResult;
+          if (!allocationResult) continue;
   
-            try {
-              const data = await dispatch(InsertAllocatedStudent({ updatedStudent }));
-              if (data?.payload?.success) {
-                newAllocatedStudents.push(updatedStudent);
-                currentBlockDataState[blockIndex] = updatedBlock;
-                await dispatch(UpdateBlock({ updatedBlock }));
-                await dispatch(GetAvaiableBlocks());
-                allocated = true;
-                break; // Exit block loop on successful allocation
-              } else {
-                allAllocationsSuccessful = false;
-                toast.error(`${updatedStudent.Fname} ${updatedStudent.userName} ${data?.payload?.message}`);
-                break; // Exit block loop on failure
-              }
-            } catch (error) {
+          const { updatedStudent, updatedBlock, blockIndex } = allocationResult;
+          
+          try {
+            // Wait for insertion to complete
+            const insertResult = await dispatch(InsertAllocatedStudent({ updatedStudent }));
+            
+            if (!insertResult.payload?.success) {
               allAllocationsSuccessful = false;
-              toast.error(`Error allocating ${updatedStudent.Fname} ${updatedStudent.userName}: ${error.message}`);
-              break; // Exit block loop on error
+              toast.error(`${updatedStudent.Fname} ${updatedStudent.userName} ${insertResult.payload?.message}`);
+              continue; // Try next block
             }
+  
+            // Wait for block update to complete
+            const updateResult = await dispatch(UpdateBlock({ updatedBlock }));
+            
+            if (!updateResult.payload?.success) { // Fixed typo: 'sucess' -> 'success'
+              allAllocationsSuccessful = false;
+              toast.error(`Block update failed for ${updatedStudent.Fname}`);
+              continue; // Try next block
+            }
+  
+            // Update local state only after successful backend updates
+            currentBlockDataState[blockIndex] = updatedBlock;
+            newAllocatedStudents.push(updatedStudent);
+            dispatch(getAllocatedStudent());
+            dispatch(GetAvaiableBlocks()); // Fixed typo: 'GetAvaiableBlocks'
+  
+            allocated = true;
+            break; // Exit block loop on success
+          } catch (error) {
+            allAllocationsSuccessful = false;
+            toast.error(`Error allocating ${updatedStudent.Fname}: ${error.message}`);
           }
         }
   
         if (!allocated) {
           allAllocationsSuccessful = false;
-          console.warn(`Allocation failed for student: ${stud.Fname} ${stud.Lname}`);
+          console.warn(`Allocation failed for: ${stud.Fname} ${stud.Lname}`);
         }
       }
     }
   
-    // Update state after processing all students
+    // Update state after all allocations
     setUpdatedBlockData(currentBlockDataState);
-    setAllocatedStudents(newAllocatedStudents);
+    setAllocatedStudents([...allocatedStudents, ...newAllocatedStudents]);
   
-    // Display success toast if all allocations were successful
     if (allAllocationsSuccessful) {
       toast.success(`All students in ${studAndBlockInfo.studCategory} allocated successfully`);
     }
   }
-  
 
   function orderFreshStudent(selectedStudentGroup) {
     return [...selectedStudentGroup].sort((a, b) =>
       (a.Fname || "").toUpperCase().localeCompare((b.Fname || "").toUpperCase())
     );
   }
-  
-  function allocateFreshStudent(student, blockLocation, floorSelections, blockNum, currentBlockDataState) {
+
+  function allocateFreshStudent(
+    student,
+    blockLocation,
+    floorSelections,
+    blockNum,
+    currentBlockDataState
+  ) {
     // Find the block by blockNum and location
     const blockIndex = currentBlockDataState.findIndex(
       (block) => block.blockNum === blockNum && block.location === blockLocation
@@ -325,12 +265,12 @@ export default function AllocationLast({ studAndBlockInfo }) {
       return null;
     }
     const block = currentBlockDataState[blockIndex];
-  
+
     // Look for a floor selection specific to this block (if any)
     const floorSelectionForBlock = floorSelections.find(
       (fs) => fs.block === blockNum
     );
-  
+
     // Flatten dorms from all floors in this block (keeping track of floor info)
     const allDorms = block.floors.flatMap((floor, floorIndex) =>
       floor.dorms.map((dorm, dormIndex) => ({
@@ -340,12 +280,12 @@ export default function AllocationLast({ studAndBlockInfo }) {
         floorNumber: floor.floorNumber,
       }))
     );
-  
+
     // If a floor selection exists for this block, filter to that floor; otherwise, use all dorms.
     const filteredDorms = floorSelectionForBlock
       ? allDorms.filter((d) => d.floorNumber === floorSelectionForBlock.floor)
       : allDorms;
-  
+
     // Find the first dorm with available capacity
     const availableDorm = filteredDorms.find(
       (d) => d.studentsAllocated < d.capacity
@@ -354,21 +294,21 @@ export default function AllocationLast({ studAndBlockInfo }) {
       console.warn("No available dorms in the selected block");
       return null;
     }
-  
+
     // Prepare the allocation result including block index
     const allocationResult = {
       blockIndex,
       blockNum,
       ...availableDorm,
     };
-  
+
     // Create the updated student record
     const updatedStudent = {
       ...student,
       block: blockNum,
       dorm: availableDorm.dormNumber,
     };
-  
+
     // Immutably update the current block data: increment studentsAllocated in the chosen dorm
     const updatedBlock = {
       ...block,
@@ -390,139 +330,91 @@ export default function AllocationLast({ studAndBlockInfo }) {
         return floor;
       }),
     };
-  
+
     return { updatedStudent, updatedBlock, blockIndex };
   }
-  async function freshStudentAllocation({ selectedStudentGroup, SelectedGender }) {
-    // Filter out students who have already been allocated
-   
-    // Arrange only the unallocated students
-    console.log(selectedStudentGroup,"selected group");
-    
+  async function freshStudentAllocation({
+    selectedStudentGroup,
+    SelectedGender,
+  }) {
     const arrangedStudents = orderFreshStudent(selectedStudentGroup);
     let currentBlockDataState = [...updatedBlockData];
     const newAllocatedStudents = [];
-    const allocationPromises = []; // Array to hold allocation promises
-  
+    
     const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
     const blockLocation = SelectedGender === "GenderMale" ? "maleArea" : "femaleArea";
+    let allAllocationsSuccessful = true;
   
-    // Process allocation for each student
-    for (const student of arrangedStudents) {
-      let allocated = false;
-      for (const blockNum of blockNumbers) {
-        const allocation = allocateFreshStudent(
-          student,
-          blockLocation,
-          floorSelections,
-          blockNum,
-          currentBlockDataState
-        );
-        if (allocation) {
+    try {
+      // Process students sequentially
+      for (const student of arrangedStudents) {
+        let allocated = false;
+        
+        // Try blocks in order until successful
+        for (const blockNum of blockNumbers) {
+          const allocation = allocateFreshStudent(
+            student,
+            blockLocation,
+            floorSelections,
+            blockNum,
+            currentBlockDataState
+          );
+  
+          if (!allocation) continue;
+  
           const { updatedStudent, updatedBlock, blockIndex } = allocation;
+          
+          try {
+            // Wait for insertion to complete
+            const insertResult = await dispatch(InsertAllocatedStudent({ updatedStudent }));
+            
+            if (!insertResult.payload?.success) {
+              allAllocationsSuccessful = false;
+              toast.error(`${updatedStudent.Fname} ${updatedStudent.userName} ${insertResult.payload?.message}`);
+              continue; // Try next block
+            }
   
-          // Push the allocation promise to the array
-          const allocationPromise = dispatch(InsertAllocatedStudent(updatedStudent))
-            .then((data) => {
-              if (data?.payload?.success) {
-                // Update the block data state for the changed block
-                currentBlockDataState[blockIndex] = updatedBlock;
-                dispatch(UpdateBlock({ updatedBlock })).then((data) => {
-                  if (data?.payload?.success) {
-                    dispatch(GetAvaiableBlocks());
-                  }
-                });
-                newAllocatedStudents.push(updatedStudent);
-              } else {
-                throw new Error(`Allocation failed for student: ${updatedStudent.Fname} ${updatedStudent.Lname}`);
-              }
-            })
-            .catch((error) => {
-              console.warn(error.message);
-            });
+            // Wait for block update to complete
+            const updateResult = await dispatch(UpdateBlock({ updatedBlock }));
+            
+            if (!updateResult.payload?.success) {
+              allAllocationsSuccessful = false;
+              toast.error(`Block update failed for ${updatedStudent.Fname}`);
+              continue; // Try next block
+            }
   
-          allocationPromises.push(allocationPromise);
-          allocated = true;
-          break; // Allocation successful – move to the next student
+            // Update local state only after successful backend operations
+            currentBlockDataState[blockIndex] = updatedBlock;
+            newAllocatedStudents.push(updatedStudent);
+            dispatch(getAllocatedStudent());
+            dispatch(GetAvaiableBlocks()); // Fixed typo
+  
+            allocated = true;
+            break; // Exit block loop on success
+          } catch (error) {
+            allAllocationsSuccessful = false;
+            toast.error(`Error allocating ${student.Fname}: ${error.message}`);
+          }
+        }
+  
+        if (!allocated) {
+          allAllocationsSuccessful = false;
+          console.warn(`Allocation failed for: ${student.Fname} ${student.Lname}`);
         }
       }
-      if (!allocated) {
-        console.warn(`Allocation failed for student: ${student.Fname} ${student.Lname}`);
-      }
+    } finally {
+      // Update state after all operations
+      setUpdatedBlockData(currentBlockDataState);
+      setAllocatedStudents(newAllocatedStudents);
     }
   
-    // Wait for all allocation promises to resolve
-    await Promise.all(allocationPromises);
-  
-    // Check if all allocations were successful
-    if (newAllocatedStudents.length === arrangedStudents.length) {
-      toast.success(`All students in the selected group have been allocated successfully.`);
-    } else {
-      toast.error(`Some students in the selected group could not be allocated.`);
-    }
-  
-    // Update state after processing all students
-    setUpdatedBlockData(currentBlockDataState);
-    setAllocatedStudents(newAllocatedStudents);
+    if (allAllocationsSuccessful) {
+      toast.success(`All students allocated successfully`);
+    }  
   }
-  
-  // function freshStudentAllocation({ selectedStudentGroup, SelectedGender }) {
-  //   // Filter out students who have already been allocated (assuming allocatedStudents is defined in scope)
-  //   const unallocatedStudents = selectedStudentGroup.filter(
-  //     (stud) => !allocatedStudents.some((a) => a.username === stud.username)
-  //   );
-  
-  //   if (unallocatedStudents.length === 0) {
-  //     toast.error("All students in this group are already allocated.");
-  //     return;
-  //   }
-  
-  //   // Arrange only the unallocated students
-  //   const arrangedStudents = orderFreshStudent(unallocatedStudents);
-  //   let currentBlockDataState = [...updatedBlockData]; // assuming updatedBlockData is defined in scope
-  //   const newAllocatedStudents = [];
-  
-  //   const { BlockNumber: blockNumbers, FloorNumber: floorSelections } = studAndBlockInfo;
-  //   const blockLocation = SelectedGender === "GenderMale" ? "maleArea" : "femaleArea";
-  
-  //   // Process allocation for each student
-  //   for (const student of arrangedStudents) {
-  //     let allocated = false;
-  //     for (const blockNum of blockNumbers) {
-  //       const allocation = allocateFreshStudent(
-  //         student,
-  //         blockLocation,
-  //         floorSelections,
-  //         blockNum,
-  //         currentBlockDataState
-  //       );
-  //       if (allocation) {
-  //         const { updatedStudent, updatedBlock, blockIndex } = allocation;
-  //         dispatch(InsertAllocatedStudent(updatedStudent));
-  
-  //         // Update the block data state for the changed block
-  //         currentBlockDataState[blockIndex] = updatedBlock;
-  //         dispatch(UpdateBlock({ updatedBlock })).then((data) => {
-  //           if (data?.payload?.success) {
-  //             dispatch(GetAvaiableBlocks());
-  //           }
-  //         });
-  
-  //         newAllocatedStudents.push(updatedStudent);
-  //         allocated = true;
-  //         break; // Allocation successful – move to the next student
-  //       }
-  //     }
-  //     if (!allocated) {
-  //       console.warn(
-  //         `Allocation failed for student: ${student.Fname} ${student.Lname}`
-  //       );
-  //     }
-  //   }
-  // }
+
   
 
-  //Run allocation only when selectOption is "senior"
   useEffect(() => {
     const { SelectedGender, StudCategory, Stream } = IdentifyStudent({
       studAndBlockInfo,
@@ -542,14 +434,10 @@ export default function AllocationLast({ studAndBlockInfo }) {
     }
     if (selectOption === "senior") {
       seniorStudentAllocation({ selectedStudentGroup, SelectedGender });
-
-      // viewAllocatedStudent(allocatedStudents)
+ 
     } else if (selectOption === "fresh" || selectOption === "remedial") {
       freshStudentAllocation({ selectedStudentGroup, SelectedGender });
-      // viewAllocatedStudent(allocatedFreashStudents)
+       
     }
   }, [selectOption, studAndBlockInfo]);
-
-  
 }
- 

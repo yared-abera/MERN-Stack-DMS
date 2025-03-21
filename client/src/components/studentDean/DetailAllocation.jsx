@@ -32,7 +32,7 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
     CheckedBlocks: [],
   });
 
-  const [viewSelection, setViewSelection] = useState(false);
+   
   const [checkSelected, setCheckSelected] = useState(false);
 
   // Helper: Clear radio selection for a given block (both block-level and floor-level selections)
@@ -252,6 +252,9 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
     // Show button only if either condition is met
     setCheckSelected(hasBlockSelections || hasFullBlockViaFloors);
   }, [selectedBlockANDFloor, filteredBlock]);
+
+console.log(selectedBlockANDFloor,"selected thing");
+
 
   const handleBackToBlocks = () => {
     setSelectedFloor({ blockNum: null, floorNumber: null, location: null });

@@ -38,12 +38,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
 
 })
 
-
-
-
-
-
-
+ 
 
  const AllocateSlice=createSlice({
     name:'Allocation',
@@ -53,7 +48,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     },
     extraReducers:(builder)=>{
         builder.addCase(getAllocatedStudent.fulfilled,(state,action)=>{
-            //state.AllocatedStudent=action.payload
+            state.AllocatedStudent=action.payload
             console.log(action.payload,"action payload");
             state.AllocatedStudent=action.payload.data
             
