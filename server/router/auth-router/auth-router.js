@@ -2,8 +2,7 @@ const express=require('express')
 const {UserAccount,logInUser,LogOut,authMiddleware} =require('../../controller/auth-controller/index')
 const route=express.Router()
 
-console.log('routes');
-
+ 
 
 route.post('/logIn',logInUser);
 route.post('/account',UserAccount)

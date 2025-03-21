@@ -53,7 +53,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     extraReducers:(builder)=>{
         builder.addCase(getAllocatedStudent.fulfilled,(state,action)=>{
             //state.AllocatedStudent=action.payload
-            console.log(action.payload);
+            console.log(action.payload,"action payload");
             
 
         })

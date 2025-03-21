@@ -1,6 +1,81 @@
 const User = require("../../model/user/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const Student=require('../../model/student/student')
+
+
+
+const logInUser = async (req, res) => {
+  try {
+    const { userName, password } = req.body;
+    const userModels = [User, Student]; 
+
+    let foundUser = null;
+    
+    for (const model of userModels) {
+      const findUser = await model.findOne({ userName });
+      if (findUser) {
+        foundUser = findUser;
+        break;
+      }
+    }
+
+    console.log(foundUser,"found user")
+
+    //const foundUser = await User.findOne({ userName });
+
+    // Check if user exists
+    if (!foundUser) {
+      return res.json({
+        success: false,
+        message: "User doesn't exist, please first register",
+      });
+    }
+
+    // Check password match
+    const checkPasswordMatch = await bcrypt.compare(
+      password,
+      foundUser.password
+    );
+    if (!checkPasswordMatch) {
+      return res.json({
+        success: false,
+        message: "Incorrect password! Please try again",
+      });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      {
+        id: foundUser._id,
+        role: foundUser.role,
+        email: foundUser.email,
+        username: foundUser.userName,
+      },
+      process.env.CLIENT_SECRET_KEY,
+      { expiresIn: "30m" }
+    );
+
+    // Set cookie and send response
+    res.cookie("token", token, { httpOnly: true, secure: false }).json({
+      success: true,
+      message: "Logged in Successfully",
+      user: {
+        email: foundUser.email,
+        id: foundUser._id,
+        role: foundUser.role,
+        userName: foundUser.userName,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Something Went Wrong",
+    });
+  }
+};
+
 
 const UserAccount = async (req, res) => {
   try {
@@ -18,7 +93,8 @@ const UserAccount = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
+   
+  
     const newUser = new User({
       fName,
       mName,
@@ -45,66 +121,6 @@ const UserAccount = async (req, res) => {
     });
   }
 };
-
-const logInUser = async (req, res) => {
-  try {
-    const { userName, password } = req.body;
-    console.log("The password ", userName, password);
-
-    const checkUser = await User.findOne({ userName });
-
-    // Check if user exists
-    if (!checkUser) {
-      return res.json({
-        success: false,
-        message: "User doesn't exist, please first register",
-      });
-    }
-
-    // Check password match
-    const checkPasswordMatch = await bcrypt.compare(
-      password,
-      checkUser.password
-    );
-    if (!checkPasswordMatch) {
-      return res.json({
-        success: false,
-        message: "Incorrect password! Please try again",
-      });
-    }
-
-    // Generate token
-    const token = jwt.sign(
-      {
-        id: checkUser._id,
-        role: checkUser.role,
-        email: checkUser.email,
-        username: checkUser.userName,
-      },
-      process.env.CLIENT_SECRET_KEY,
-      { expiresIn: "30m" }
-    );
-
-    // Set cookie and send response
-    res.cookie("token", token, { httpOnly: true, secure: false }).json({
-      success: true,
-      message: "Logged in Successfully",
-      user: {
-        email: checkUser.email,
-        id: checkUser._id,
-        role: checkUser.role,
-        userName: checkUser.userName,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Something Went Wrong",
-    });
-  }
-};
-
 const LogOut = async (req, res) => {
   res.clearCookie("token").json({
     success: true,
