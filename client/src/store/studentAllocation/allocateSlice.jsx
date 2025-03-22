@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const initialState={
-    AllocatedStudent:[]
+    AllocatedStudent:[],
+    isLoading:true
 }
 
 
@@ -27,13 +28,11 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     
     
     try {
-        const respons=await axios.get('http://localhost:5000/api/student/get', {
+        const response=await axios.get('http://localhost:5000/api/student/get', {
             withCredentials:true
-        })
-        console.log(respons.data,"all sudent ");
-        
-     return respons.data
-
+        });
+        console.log(response.data,"response of student get from slice");
+        return response.data
     } catch (error) {
         return rejectWithValue(error.response.data);
     }
@@ -49,12 +48,16 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
 
     },
     extraReducers:(builder)=>{
-        builder.addCase(getAllocatedStudent.fulfilled,(state,action)=>{
-            state.AllocatedStudent=action.payload
-            console.log(action.payload,"action payload");
-            
-
-        })
+        builder.addCase(getAllocatedStudent.pending,(state,action)=>{
+          state.AllocatedStudent=[]
+          state.isLoading=true
+         }).addCase(getAllocatedStudent.fulfilled,(state,action)=>{
+        state.AllocatedStudent=action.payload.data
+        state.isLoading=false
+            }).addCase(getAllocatedStudent.rejected,(state,action)=>{
+                state.AllocatedStudent=[]
+                state.isLoading=false
+                    })
     }
 })
 

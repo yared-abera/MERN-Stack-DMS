@@ -54,7 +54,7 @@ export default function StudentDeanHome() {
       >
         <button
           onClick={handlePrev}
-          className="absolute bg-black left-4 top-1/2 -translate-y-1/2 bg-white/75 p-2 rounded-full hover:bg-white/50"
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/75 p-2 rounded-full hover:bg-white/50"
         >
           <ChevronLeft className="w-5 h-5 md:w-8 md:h-8" />
         </button>
@@ -73,12 +73,16 @@ export default function StudentDeanHome() {
       {/* Main Content */}
       <div className="flex-1 p-4">
         <div className="flex flex-col gap-4">
+          
           <div className="bg-white p-4 rounded shadow">
             <div className="text-center">
               <h1 className="text-lg md:text-xl font-bold ">
                 Student Information{" "}
               </h1>
             </div>
+
+
+
             <StudentInfoChart />
           </div>
 

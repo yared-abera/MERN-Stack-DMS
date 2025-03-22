@@ -11,7 +11,6 @@ import { StudetnDataDirect } from "@/store/common/data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 import DetailAllocationStart from "./detailAllocationStart";
-import DefaultAllocation from "./DefaultAllocation";
 import { Card, CardContent } from "../ui/card";
 
 export default function AllocationPage({ dataFormat, selectedValue }) {

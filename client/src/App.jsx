@@ -38,6 +38,7 @@ import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
 import StudentDeanBlockInfo from "./pages/studentDean/BloackInfo";
 import { GetAvaiableBlocks } from "./store/blockSlice";
+import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 function App() {
   
   const theme = useSelector((state) => state.theme.mode);
@@ -51,6 +52,7 @@ function App() {
   useEffect(() => {
     dispatch(checkAuthorization());
     dispatch(GetAvaiableBlocks())
+    dispatch(getAllocatedStudent())
   }, [dispatch]);
 
 
