@@ -14,6 +14,9 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
 
 import StudentSideBar from "./sideBar";
+import AvatarComponent from "../common/avatar";
+import DarkMode from "../common/darkMode";
+ 
 const headerComponent = [
   {
     label: "home",
@@ -40,8 +43,8 @@ const headerComponent = [
 export default function StudentHeader() {
   const [time, setTime] = useState();
   const location = useLocation();
-  const navigate=useNavigate()
 
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -54,11 +57,9 @@ export default function StudentHeader() {
   return (
     <>
       <div className="fixed top-0   z-10 h-auto py-3 shadow-lg border-solid w-[100vw]     ">
-        <div className="md:inline-flex  ">
-        {/* <div className="flex text-left ">
-        < SidebarTrigger/>
-       </div> */}
-          <div className="w-full flex items-center justify-between h-full gap-6">
+        <div className=" hidden md:flex   ">
+     
+          <div className="w-[60%] flex items-center justify-evenly ml-4 h-full gap-6">
             {headerComponent.map((item, index) => (
               <Link
                 key={index}
@@ -76,45 +77,23 @@ export default function StudentHeader() {
             ))}
           </div>
 
-          <div className=" flex items-center justify-between">
+          <div className=" flex items-center justify-around  w-[40%]">
             <div>
               <h1 className="text-xl font-bold">{time}</h1>
             </div>
 
             <div>
-              <Button>DarkMode</Button>
+             <DarkMode/>
             </div>
+           
+
             <div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="bg-black cursor-pointer dark:bg-white">
-                    <AvatarFallback className="bg-black dark:bg-white dark:text-black text-white font-extrabold">
-                      xu
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="right" className="w-56">
-                  <DropdownMenuLabel>Logged in as</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <UserCog
-                      className="m-2 w-4 h-4"
-                      onClick={() => navigate("/student/account")}
-                    />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="w-4 h-4 m-2" />
-                    LogOut
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <AvatarComponent/>
             </div>
           </div>
         </div>
 
-        <div className="sm:inline-flex md:hidden">
+        <div className="sm:flex md:hidden">
           <SidebarProvider className="sm:inline-flex md:hidden">
             <StudentSideBar />
             <main className="w-full">

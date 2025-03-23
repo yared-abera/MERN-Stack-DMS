@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const initialState={
-    AllocatedStudent:[]
+    AllocatedStudent:[],
+    isLoading:true
 }
 
 
@@ -60,13 +61,16 @@ export const updateStudent=createAsyncThunk('student/update',async({studentId,up
 
     },
     extraReducers:(builder)=>{
-        builder.addCase(getAllocatedStudent.fulfilled,(state,action)=>{
-            state.AllocatedStudent=action.payload
-            console.log(action.payload,"action payload");
-            state.AllocatedStudent=action.payload.data
-            
-
-        })
+        builder.addCase(getAllocatedStudent.pending,(state,action)=>{
+          state.AllocatedStudent=[]
+          state.isLoading=true
+         }).addCase(getAllocatedStudent.fulfilled,(state,action)=>{
+        state.AllocatedStudent=action.payload.data
+        state.isLoading=false
+            }).addCase(getAllocatedStudent.rejected,(state,action)=>{
+                state.AllocatedStudent=[]
+                state.isLoading=false
+                    })
     }
 })
 
