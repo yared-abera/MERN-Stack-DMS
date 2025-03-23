@@ -20,8 +20,7 @@ const logInUser = async (req, res) => {
       }
     }
 
-    console.log(foundUser,"found user")
-
+   
     //const foundUser = await User.findOne({ userName });
 
     // Check if user exists
@@ -50,7 +49,7 @@ const logInUser = async (req, res) => {
         id: foundUser._id,
         role: foundUser.role,
         email: foundUser.email,
-        username: foundUser.userName,
+        userName: foundUser.userName,
       },
       process.env.CLIENT_SECRET_KEY,
       { expiresIn: "30m" }
