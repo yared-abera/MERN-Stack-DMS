@@ -7,6 +7,7 @@ const auth_route = require("./router/auth-router/auth-router");
 const block_route= require("./router/blockRouter/index")
 const dorm_route= require("./router/dormRouter/index")
 const student_Route=require('./router/student/studentRoute')
+
 mongoose
   .connect(process.env.MONGO_URL, 
     {serverSelectionTimeoutMS: 30000}
