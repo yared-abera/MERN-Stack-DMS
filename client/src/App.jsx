@@ -36,7 +36,7 @@ import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
 import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
 import ProctorGenerateReport from "./pages/proctor/generateReport"
 import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
-import StudentDeanBlockInfo from "./pages/studentDean/BloackInfo";
+import BlockInfo from "./pages/studentDean/BlockInfo";
 import { GetAvaiableBlocks } from "./store/blockSlice";
 function App() {
   
@@ -152,7 +152,7 @@ function App() {
           <Route path="home" element={<StudentDeanHome />} />
           <Route path="dorm" element={<DormAllocation />} />
           <Route path="info" element={<StudentInfo />} />
-          <Route path="block" element={<StudentDeanBlockInfo/>} />
+          <Route path="block" element={<BlockInfo/>} />
           <Route path="account" element={<StudDeanAccount />} />
         </Route>
 
