@@ -53,7 +53,7 @@ const RegisterStudentPage = () => {
       setError("Please enter a student ID");
       return;
     }
-
+    
     setLoading(true);
     setError("");
 
@@ -77,6 +77,7 @@ const RegisterStudentPage = () => {
           arrivalDate: new Date().toISOString().split('T')[0],
           roomNumber: student.dormId || ""
         });
+        console.log("Student data:", response.data);
       } else {
         setError("Student not found in your blocks");
         setSelectedStudent(null);

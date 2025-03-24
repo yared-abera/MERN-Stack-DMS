@@ -146,9 +146,9 @@ export const Maintainance_Issue = [
     componentType: "input",
   },
   {
-    label: "Student Id",
+    label: "user_name",
     name: "id",
-    placeholder: "Enter user id",
+    placeholder: "Enter user_name",
     type: "text",
     componentType: "input",
   },

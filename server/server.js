@@ -8,6 +8,7 @@ const block_route= require("./router/blockRouter/index")
 const dorm_route= require("./router/dormRouter/index")
 const student_Route=require('./router/student/studentRoute')
 const user_Route=require('./router/user/user_Router')
+const maintenance_Route=require('./router/maintenanceRouter/index')
 
 mongoose
   .connect(process.env.MONGO_URL, 
@@ -16,22 +17,9 @@ mongoose
   .then(() => {
     console.log("connected to database");
   })
-  .catch((err) => {
+.catch((err) => {
     console.log(err);
-  });
-
-  // mongoose.connect( 'mongodb+srv://soul:dms%40433@cluster0.jm8wi.mongodb.net/dms?retryWrites=true&w=majority',
-  //   {
-  //     useNewUrlParser: true,
-  //     useUnifiedTopology: true,
-  //     serverSelectionTimeoutMS: 30000, // Increase timeout
-  //   }
-  // )
-  // .then(()=>{
-  //     console.log("connected to database")
-  // }).catch((err)=>{
-  //     console.log(err)
-  // });
+});
 
 const app = express();
 
@@ -40,9 +28,8 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-app.use(
-  cors({
-    origin: process.env.Client_URL|| "http://localhost:5173",
+app.use(cors({
+    origin: process.env.Client_URL || "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: [
         "content-type",
@@ -52,17 +39,15 @@ app.use(
         "Pragma",
     ],
     credentials: true,
-  })
-);
+}));
 
- 
- 
-app.use("/api/auth/",auth_route);
-app.use("/api/block/",block_route);
-app.use("/api/dorm/",dorm_route);
-app.use('/api/student/',student_Route)
-app.use('/api/user',user_Route)
+// Routes
+app.use("/api/auth/", auth_route);
+app.use("/api/block/", block_route);
+app.use("/api/dorm/", dorm_route);
+app.use('/api/student/', student_Route);
+app.use('/api/maintainanceIssue/', maintenance_Route); // Add this lineapp.use('/api/user',user_Route)
 
 app.listen(PORT, () => {
-  console.log(`server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

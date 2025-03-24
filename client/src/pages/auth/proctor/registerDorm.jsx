@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProctorBlocks } from '@/store/blockSlice/index';
 import RegisterCard from "@/components/common/RegisterCard";
 import img from "@/assets/unique/building.jpeg";
-import { toast } from 'sonner';
 
 // Configuration for Dorm Registration form
 export const RegisterDorm = [
@@ -103,29 +102,15 @@ useEffect(() => {
   };
  
  const onSubmit = useCallback(
-    async (e) => {
+    
+    (e) => {
       e.preventDefault();
-      
-      if (!isFormValid()) {
-        toast.error("Please fill all fields");
-        return;
-      }
-
-      try {
-        // Show promise toast
-        toast.promise(
-          dispatch(registerDorm(formData)).unwrap(),
-          {
-            loading: 'Registering dorm...',
-            success: () => {
-              setFormData(initialFormData);
-              return 'Dorm registered successfully!';
-            },
-            error: (err) => err.message || 'Failed to register dorm'
-          }
-        );
-      } catch (error) {
-        toast.error(error.message || 'Failed to register dorm');
+    if (isFormValid()) {
+      console.log("formData from The register Dorm", formData);
+      dispatch(registerDorm(formData));
+    }
+   else {
+     alert("Please fill all fields");
       }
     },
     [formData, dispatch]
