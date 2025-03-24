@@ -8,6 +8,7 @@ const block_route= require("./router/blockRouter/index")
 const dorm_route= require("./router/dormRouter/index")
 const student_Route=require('./router/student/studentRoute')
 const user_Route=require('./router/user/user_Router')
+const maintenance_Route=require('./router/maintenanceRouter/index')
 
 mongoose
   .connect(process.env.MONGO_URL, 
@@ -16,18 +17,6 @@ mongoose
   .then(() => {
     console.log("connected to database");
   })
-  .catch((err) => {
-const block_route = require("./router/blockRouter/index");
-const dorm_route = require("./router/dormRouter/index");
-const student_Route = require('./router/student/studentRoute');
-const maintenance_Route = require('./router/maintenanceRouter/index'); // Add this line
-
-mongoose.connect(process.env.MONGO_URL, { 
-    serverSelectionTimeoutMS: 30000 
-})
-.then(() => {
-    console.log("Connected to database");
-})
 .catch((err) => {
     console.log(err);
 });

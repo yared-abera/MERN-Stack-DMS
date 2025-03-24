@@ -2,17 +2,26 @@ const User = require("../../model/user/user");
 const bcrypt = require("bcryptjs");
 const fetchAllUser = async (req, res) => {
   try {
-    const allUser = await User.find();
+    const { page = 1, limit = 20, sortBy, role } = req.query;
+    const query = role ? { role } : {};
+
+    const users = await User.find(query)
+      .select("-password")
+      .sort(sortBy || "-createdAt")
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
     res.status(200).json({
       success: true,
-      data: allUser,
+      count: users.length,
+      data: users,
     });
   } catch (error) {
-    console.error("Error fetching user:", error);
+    console.error("Error fetching users:", error);
     res.status(500).json({
       success: false,
-      message: "Server error, please try again later.",
-      error: error.message,
+      message: "Server error. Please try again later.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };

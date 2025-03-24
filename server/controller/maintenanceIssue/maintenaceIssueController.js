@@ -70,4 +70,31 @@ const fetchAllMaintenanceIssue=async(req,res)=>{
      }
 }
 
-module.exports = { SubmitMaintenanceIssue ,fetchAllMaintenanceIssue};
+
+
+const fetchMaintenanceIssueForUser = async (req, res) => {
+    try {
+      const { userName } = req.params;
+      console.log(userName);
+  
+      // Corrected query with proper quotes around the nested field
+      const userMaintenanceIssue = await MaintenanceIssue.find({
+        "userInfo.userName": userName,
+      });
+      
+      res.status(200).json({
+        success: true,
+        data: userMaintenanceIssue,
+      });
+    } catch (error) {
+      console.error("Error fetching MaintenanceIssue:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error, please try again later.",
+        error: error.message,
+      });
+    }
+  };
+  
+
+module.exports = { SubmitMaintenanceIssue ,fetchAllMaintenanceIssue,fetchMaintenanceIssueForUser};
