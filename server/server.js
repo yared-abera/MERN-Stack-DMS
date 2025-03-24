@@ -4,32 +4,20 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const auth_route = require("./router/auth-router/auth-router");
-const block_route= require("./router/blockRouter/index")
-const dorm_route= require("./router/dormRouter/index")
-const student_Route=require('./router/student/studentRoute')
-mongoose
-  .connect(process.env.MONGO_URL, 
-    {serverSelectionTimeoutMS: 30000}
-  )
-  .then(() => {
-    console.log("connected to database");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+const block_route = require("./router/blockRouter/index");
+const dorm_route = require("./router/dormRouter/index");
+const student_Route = require('./router/student/studentRoute');
+const maintenance_Route = require('./router/maintenanceRouter/index'); // Add this line
 
-  // mongoose.connect( 'mongodb+srv://soul:dms%40433@cluster0.jm8wi.mongodb.net/dms?retryWrites=true&w=majority',
-  //   {
-  //     useNewUrlParser: true,
-  //     useUnifiedTopology: true,
-  //     serverSelectionTimeoutMS: 30000, // Increase timeout
-  //   }
-  // )
-  // .then(()=>{
-  //     console.log("connected to database")
-  // }).catch((err)=>{
-  //     console.log(err)
-  // });
+mongoose.connect(process.env.MONGO_URL, { 
+    serverSelectionTimeoutMS: 30000 
+})
+.then(() => {
+    console.log("Connected to database");
+})
+.catch((err) => {
+    console.log(err);
+});
 
 const app = express();
 
@@ -38,9 +26,8 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-app.use(
-  cors({
-    origin: process.env.Client_URL|| "http://localhost:5173",
+app.use(cors({
+    origin: process.env.Client_URL || "http://localhost:5173",
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: [
         "content-type",
@@ -50,17 +37,15 @@ app.use(
         "Pragma",
     ],
     credentials: true,
-  })
-);
+}));
 
- 
- 
-app.use("/api/auth/",auth_route);
-app.use("/api/block/",block_route);
-app.use("/api/dorm/",dorm_route);
-app.use('/api/student/',student_Route)
-
+// Routes
+app.use("/api/auth/", auth_route);
+app.use("/api/block/", block_route);
+app.use("/api/dorm/", dorm_route);
+app.use('/api/student/', student_Route);
+app.use('/api/maintainanceIssue/', maintenance_Route); // Add this line
 
 app.listen(PORT, () => {
-  console.log(`server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
