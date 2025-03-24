@@ -50,7 +50,7 @@ function handleDialog(){
     
                   <TableBody>
                     {openDialog.students.map((student) => (
-                      <TableRow>
+                      <TableRow key={student._id}>
                         <TableCell>{student.Fname}</TableCell>
     
                         <TableCell>{student.Lname}</TableCell>

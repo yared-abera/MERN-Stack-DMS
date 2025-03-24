@@ -107,20 +107,31 @@ const registerBlock = async (req, res) => {
 };
 const getAvailableBlocks = async (req, res) => {
   try {
+    // Find blocks where block status is "Available"
     const allAvailableBlocks = await Block.find({ status: "Available" });
- 
+    
+    // For each block, filter its floors to include only those with floorStatus "Available"
+    const updatedBlocks = allAvailableBlocks.map((block) => {
+      const availableFloors = block.floors.filter(
+        (floor) => floor.floorStatus === "Available"
+      );
+      // Return a new block object with filtered floors.
+      return { ...block.toObject(), floors: availableFloors };
+    });
+    
     res.status(200).json({
       success: true,
-      data: allAvailableBlocks,
+      data: updatedBlocks,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "get Available block failed",
+      message: "Get available block failed",
       error: error.message,
     });
   }
 };
+
 
 const UpdateBlock = async (req, res) => {
   try {

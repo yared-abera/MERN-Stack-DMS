@@ -118,7 +118,7 @@ export const UserAccount = [
       { id: "proctorManager", label: "Proctor Manager" },
       { id: "proctor", label: "proctor" },
       { id: "admin", label: "Admin" },
-      { id: "student", label: "student" },
+      // { id: "student", label: "student" },
     ],
   },
 ];

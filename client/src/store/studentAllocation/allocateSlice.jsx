@@ -39,6 +39,19 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
 
 })
 
+export const updateStudent=createAsyncThunk('student/update',async({studentId,updatedData})=>{
+    try {
+        const response=await axios.put(`http://localhost:5000/api/student/update/${studentId}`,updatedData,{
+            withCredentials:true
+        })  
+        console.log(response.data,"response of student update");
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+})
+
+
  
 
  const AllocateSlice=createSlice({

@@ -34,7 +34,8 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
 
   const { AvailebleBlocks } = useSelector((state) => state.block);
   const AllBlock = AvailebleBlocks.data;
-console.log(AllBlock,'AllBlock');
+ 
+
 
   const [isStudentGetBlockState, setIsStudentGetBlockState] = useState({
     regular: {
@@ -309,7 +310,7 @@ console.log(AllBlock,'AllBlock');
       option = parts[1];
     }
     
-    const students = AllocatedStudent.data.filter((stud) =>
+    const students = AllocatedStudent.filter((stud) =>
       blockNumbers.some((block) => block === stud.blockNum&&stud.sex.toUpperCase()===option.toUpperCase())
     );
 
