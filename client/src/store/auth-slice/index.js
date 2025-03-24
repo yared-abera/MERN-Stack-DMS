@@ -84,7 +84,7 @@ export const CreateAccount=createAsyncThunk('/auth/createUser',async (formData)=
       
     });
     console.log("successfully created")
-    return result
+    return result.data
     
   } catch (error) {
     console.log(error,'from create Account');
@@ -92,6 +92,10 @@ export const CreateAccount=createAsyncThunk('/auth/createUser',async (formData)=
   }
   
 })
+
+
+
+
 
 const authSlice = createSlice({
     name: "auth",
@@ -152,16 +156,4 @@ const authSlice = createSlice({
 export const { setUser  } = authSlice.actions;
 export default authSlice.reducer;
 
- /**.addCase(CreateAccount.pending, (state) => {
-          state.isLoading = true;
-        })
-        .addCase(CreateAccount.fulfilled, (state, action) => {
-          state.isLoading = false;
-          state.user = null;
-          state.isAuthenticated = false;
-        })
-        .addCase(CreateAccount.rejected, (state, action) => {
-          state.isLoading = false;
-          state.user = null;
-          state.isAuthenticated = false;
-        }) */
+ 

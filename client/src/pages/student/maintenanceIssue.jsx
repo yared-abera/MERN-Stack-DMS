@@ -8,7 +8,7 @@ import { Maintainance_Issue, typeOfIssue } from "@/config/data";
 import { useState } from "react";
 
 export default function ReportMaintenace() {
-  const [IssueTrigered, setIssueTriggered] = useState(false);
+  const [IssueTrigered, setIssueTriggered] = useState(true);
   const [formData, setFormData] = useState({
     userInfo: Object.fromEntries(
       Maintainance_Issue.map((item) => [item.name, ""])

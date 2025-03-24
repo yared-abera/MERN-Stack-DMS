@@ -25,9 +25,9 @@ import {
 import { UserAccount } from "@/config/data";
 import { CreateAccount } from "@/store/auth-slice";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
- 
+
 const intialFromData = {
   fName: "",
   mName: "",
@@ -36,13 +36,17 @@ const intialFromData = {
   userName: "",
   phoneNum: "",
   password: "",
- // Confirm_password:'',
+  // Confirm_password:'',
   gender: "",
   role: "",
 };
 
 export default function ManageAccount() {
   const [formData, setFormData] = useState(intialFromData);
+  const { isLoading, AllUser } = useSelector((state) => state.allUser);
+
+  console.log(AllUser,'AllUser');
+  
   const data = [
     {
       firstName: "John",
@@ -81,24 +85,18 @@ export default function ManageAccount() {
       role: "User",
     },
   ];
-  const dispatch=useDispatch()
-   
-  
+  const dispatch = useDispatch();
+
   const onSubmit = (event) => {
     event.preventDefault();
-    dispatch(CreateAccount(formData)).then(data=>{
-
-      if(data?.success){
-        toast.success(' ✅ User Created Successfully ')
+    dispatch(CreateAccount(formData)).then((data) => {
+      if (data?.payload?.success) {
+        toast.success(" ✅ User Created Successfully ");
+      } else {
+        toast.error("Error Occured ");
       }
-      else{
-        toast.error('Error Occured ')
-      }
- 
-      
-    })
-   
-
+      setFormData("");
+    });
   };
 
   function iSFormValid() {
@@ -209,6 +207,7 @@ export default function ManageAccount() {
             <TableHeader>
               <TableRow>
                 <TableHead>First Name</TableHead>
+                <TableHead>Middle Name</TableHead>
                 <TableHead>Last Name</TableHead>
                 <TableHead>Username</TableHead>
                 <TableHead>Role</TableHead>
@@ -216,11 +215,13 @@ export default function ManageAccount() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((user, index) => (
+              {AllUser&&AllUser.success&&AllUser.data.length>0?
+              AllUser.data.map((user, index) => (
                 <TableRow key={index}>
-                  <TableCell>{user.firstName}</TableCell>
-                  <TableCell>{user.lastName}</TableCell>
-                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.fName}</TableCell>
+                  <TableCell>{user.mName}</TableCell>
+                  <TableCell>{user.lName}</TableCell>
+                  <TableCell>{user.userName}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>
                     {/* Desktop buttons */}
@@ -274,7 +275,7 @@ export default function ManageAccount() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )):null   }
             </TableBody>
           </Table>
         </div>

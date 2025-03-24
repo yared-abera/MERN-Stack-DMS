@@ -29,7 +29,7 @@ const studentSchema = new mongoose.Schema({
      
   },
   // floorNumber: { type: Number, } 
-});
+},{ timestamps: true });
 
  
 
