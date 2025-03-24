@@ -142,68 +142,7 @@ export default function ManageAccount() {
             List of all user{" "}
           </h1>
         </div>
-
-        {/* <div className="sm:overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>First Name</TableHead>
-                <TableHead>Last Name</TableHead>
-                <TableHead>user Name</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead></TableHead>
-                <TableHead></TableHead>
-                <TableHead></TableHead>
-                <TableHead></TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Zulkif </TableCell>
-                <TableCell>Azher</TableCell>
-                <TableCell>Xulkif</TableCell>
-                <TableCell>Admin</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>View Detail</Button>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>Update</Button>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>Delete</Button>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>Checkbox</Button>
-                </TableCell>
-                <TableCell className="block md:hidden">
-                  <Button>Buttons</Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Zulkif </TableCell>
-                <TableCell>Azher</TableCell>
-                <TableCell>Xulkif</TableCell>
-                <TableCell>Admin</TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>View Detail</Button>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>Update</Button>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>Delete</Button>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <Button>Checkbox</Button>
-                </TableCell>
-                <TableCell className="block md:hidden">
-                  <Button>Buttons</Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div> */}
+ 
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>

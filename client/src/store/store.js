@@ -4,7 +4,7 @@ import themeSlice from "./common/ThemeSlice";
 import sidebarReducer from "./common/sidebarSlice";
 import DataSlice  from "./common/data";
 import AllocateSlice from './studentAllocation/allocateSlice'
-
+import MaintainanceIssueSlice from './maintenanceIssue/maintenanceIssue'
 
 import blockReducer from "./blockSlice";
 const store = configureStore({
@@ -15,7 +15,8 @@ const store = configureStore({
         sidebar: sidebarReducer,
         Data:DataSlice,
         block:blockReducer,
-        student:AllocateSlice
+        student:AllocateSlice,
+        issue:MaintainanceIssueSlice
     }
 })
 
