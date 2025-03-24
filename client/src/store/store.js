@@ -17,7 +17,7 @@ const store = configureStore({
         Data:DataSlice,
         block:blockReducer,
         student:AllocateSlice,
-        allUser:UserSlice
+        allUser:UserSlice,
         issue:MaintainanceIssueSlice
     }
 })
