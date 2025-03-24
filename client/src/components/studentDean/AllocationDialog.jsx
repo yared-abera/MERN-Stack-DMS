@@ -24,18 +24,17 @@ import HelperDialog from "./herlperDialog";
 import { getAllocatedStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function AllocationDialog({ selectedBlockANDFloor }) {
-
-  const dispatch=useDispatch()
-  useEffect(()=>{
-    dispatch(getAllocatedStudent())
-  },[dispatch])
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllocatedStudent());
+  }, [dispatch]);
   const { userCalculatedValue } = useSelector((state) => state.Data);
   const { AllocatedStudent } = useSelector((state) => state.student);
+  const { selectedStudent } = useSelector((state) => state.Data);
+  console.log(selectedStudent, "selectedstudent");
 
   const { AvailebleBlocks } = useSelector((state) => state.block);
   const AllBlock = AvailebleBlocks.data;
- 
-
 
   const [isStudentGetBlockState, setIsStudentGetBlockState] = useState({
     regular: {
@@ -58,7 +57,7 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     },
   });
   const [Errors, setErrors] = useState([]);
-  const [openDialog,setOPenDialog]=useState()
+  const [openDialog, setOPenDialog] = useState([]);
 
   const [studAndBlockInfo, setStudAndBlockInfo] = useState({
     studCategory: "",
@@ -297,32 +296,14 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
     });
   }
 
-  function HandleViewDialog({ studentKey, blockNumbers }) {
-    const parts = studentKey.split(" ");
-    const stateKey = parts[0];  
-    let option; 
-    let category;  
+  function HandleViewDialog() {
+   
 
-    if (stateKey === "regular") {
-      category = parts[1];
-      option = parts[2];
-    } else {
-      option = parts[1];
-    }
-    
     const students = AllocatedStudent.filter((stud) =>
-      blockNumbers.some((block) => block === stud.blockNum&&stud.sex.toUpperCase()===option.toUpperCase())
+      selectedStudent.some((student) => student.userName === stud.userName)
     );
 
-    setOPenDialog({
-      studentKey:studentKey,
-      students:students,
-      blockNumber:blockNumbers
-    })
-    
-    
-   
-    
+    setOPenDialog(students);
   }
 
   const renderSelectdInfo = useCallback(
@@ -396,7 +377,6 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button
-                  
                   size="sm"
                   disabled={status === "Error"}
                   onClick={() =>
@@ -404,10 +384,9 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
                   }
                 >
                   Allocate
-                </Button>
-                <Button
-                  
-                  onClick={() => HandleViewDialog({ studentKey, blockNumbers })}
+                </Button>{/**disabled={!(openDialog.length>0)} */}
+                <Button 
+                  onClick={() => HandleViewDialog()}
                 >
                   View
                 </Button>
@@ -467,11 +446,12 @@ export default function AllocationDialog({ selectedBlockANDFloor }) {
           </div>
 
           <div>
-            {
-              openDialog&&openDialog.students.length>0?
-              <HelperDialog openDialog={openDialog} setOPenDialog={setOPenDialog}/>
-              :null
-            }
+            {openDialog && openDialog.length > 0 ? (
+              <HelperDialog
+                openDialog={openDialog}
+                setOPenDialog={setOPenDialog}
+              />
+            ) : null}
           </div>
         </div>
       )}

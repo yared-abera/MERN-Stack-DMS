@@ -7,6 +7,7 @@ import {
   InsertAllocatedStudent,
 } from "@/store/studentAllocation/allocateSlice";
 import { GetAvaiableBlocks, UpdateBlock } from "@/store/blockSlice";
+import { SelectedStudentData } from "@/store/common/data";
 
 export default function AllocationLast({ studAndBlockInfo }) {
   const { catagorizedStudentData, selectOption } = useSelector(
@@ -19,7 +20,7 @@ export default function AllocationLast({ studAndBlockInfo }) {
     AvailebleBlocks.data
   );
   const [allocatedStudents, setAllocatedStudents] = useState([]);
-
+ 
   const dispatch = useDispatch();
 
   // Updated IdentifyStudent function for proper parsing
@@ -189,20 +190,15 @@ export default function AllocationLast({ studAndBlockInfo }) {
             blockNum,
             currentBlockDataState
           );
-  
+        
           if (!allocationResult) continue;
-  
-          const { updatedStudent, updatedBlock, blockIndex } = allocationResult;
           
-          try {
-            // Wait for insertion to complete
-            const insertResult = await dispatch(InsertAllocatedStudent({ updatedStudent }));
             
-            if (!insertResult.payload?.success) {
-              allAllocationsSuccessful = false;
-              toast.error(`${updatedStudent.Fname} ${updatedStudent.userName} ${insertResult.payload?.message}`);
-              continue; // Try next block
-            }
+            const { updatedStudent, updatedBlock, blockIndex } = allocationResult;
+         
+         
+          try {
+          
   
             // Wait for block update to complete
             const updateResult = await dispatch(UpdateBlock({ updatedBlock }));
@@ -212,7 +208,22 @@ export default function AllocationLast({ studAndBlockInfo }) {
               toast.error(`Block update failed for ${updatedStudent.Fname}`);
               continue; // Try next block
             }
-  
+            else{
+
+                 // Wait for insertion to complete
+                 const insertResult = await dispatch(InsertAllocatedStudent({ updatedStudent }));
+            
+                 if (!insertResult.payload?.success) {
+                   allAllocationsSuccessful = false;
+                   toast.error(`${updatedStudent.Fname} ${updatedStudent.userName} ${insertResult.payload?.message}`);
+                   continue; // Try next block
+                 }
+     
+
+            }
+
+
+           
             // Update local state only after successful backend updates
             currentBlockDataState[blockIndex] = updatedBlock;
             newAllocatedStudents.push(updatedStudent);
@@ -221,7 +232,7 @@ export default function AllocationLast({ studAndBlockInfo }) {
   
             allocated = true;
             break; // Exit block loop on success
-          } catch (error) {
+          } catch (error) { 
             allAllocationsSuccessful = false;
             toast.error(`Error allocating ${updatedStudent.Fname}: ${error.message}`);
           }
@@ -236,7 +247,7 @@ export default function AllocationLast({ studAndBlockInfo }) {
   
     // Update state after all allocations
     setUpdatedBlockData(currentBlockDataState);
-    setAllocatedStudents([...allocatedStudents, ...newAllocatedStudents]);
+    setAllocatedStudents(newAllocatedStudents);
   
     if (allAllocationsSuccessful) {
       toast.success(`All students in ${studAndBlockInfo.studCategory} allocated successfully`);
@@ -413,8 +424,7 @@ export default function AllocationLast({ studAndBlockInfo }) {
     }  
   }
 
-  
-
+ 
   useEffect(() => {
     const { SelectedGender, StudCategory, Stream } = IdentifyStudent({
       studAndBlockInfo,
@@ -439,5 +449,9 @@ export default function AllocationLast({ studAndBlockInfo }) {
       freshStudentAllocation({ selectedStudentGroup, SelectedGender });
        
     }
+
+    dispatch(SelectedStudentData(selectedStudentGroup))
+ 
+    
   }, [selectOption, studAndBlockInfo]);
 }

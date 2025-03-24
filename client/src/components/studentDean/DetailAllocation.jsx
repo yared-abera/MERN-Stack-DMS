@@ -253,8 +253,7 @@ export default function DetailAllocation({ filteredBlock, selectedOne }) {
     setCheckSelected(hasBlockSelections || hasFullBlockViaFloors);
   }, [selectedBlockANDFloor, filteredBlock]);
 
-console.log(selectedBlockANDFloor,"selected thing");
-
+ 
 
   const handleBackToBlocks = () => {
     setSelectedFloor({ blockNum: null, floorNumber: null, location: null });

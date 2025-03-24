@@ -127,12 +127,124 @@ export default function DormAllocation() {
     setFile("");
   }
 
+  // useEffect(() => {
+  //   if (dataFormat && dataFormat.length > 0 && selectedValue !== "gust") {
+  //     const allErrors = [];
+  //     let hasErrors = false;
+
+  //     dataFormat.forEach((inputData) => {
+  //       const errors = [];
+
+  //       // Check for missing required fields
+  //       Object.keys(AllData).forEach((key) => {
+  //         if (!(key in inputData)) {
+  //           errors.push(`Missing required attribute: ${key}`);
+  //         }
+  //       });
+
+  //       // Validate user ID format
+  //       const regex = /^(NSR|SSR)\/\d{4}\/\d{2}$/i;
+  //       const isUserNameValid =
+  //         inputData.userName && regex.test(inputData.userName.toUpperCase());
+  //       if (!isUserNameValid) {
+  //         errors.push(`Invalid ID: ${inputData.userName}`);
+  //       }
+  //       //
+
+  //       const regexStream = /^(SOCIAL|NATURAL)/i;
+
+  //       const isStreamCorrrect =
+  //         inputData.stream && regexStream.test(inputData.stream.toUpperCase());
+
+  //       if (!isStreamCorrrect) {
+  //         errors.push(`Invalid Stream: ${inputData.stream}`);
+  //       }
+  //       // Handle department for fresh students
+  //       if (selectedValue === "fresh") {
+  //         inputData.department = "Not_yet";
+  //         inputData.studCategory = "fresh";
+  //       } else if (selectedValue === "senior") {
+  //         if(inputData.department===''){
+  //           errors.push(`department not found for ${inputData.userName}`)
+  //         }
+  //         inputData.studCategory = "senior";
+          
+  //       } else {
+  //         inputData.department = "Not_yet";
+  //         inputData.studCategory = "remedial";
+  //       }
+
+  //       const password=inputData.Fname+inputData.Lname[0]+'@123'
+  //       inputData.password=password
+
+  //       // Validate field types
+  //       Object.entries(inputData).forEach(([key, value]) => {
+  //         if (key in data) {
+  //           const expectedType = data[key];
+  //           if (value === null || value === undefined||'') {
+  //             errors.push(`Missing value for ${key}`);
+  //           }
+  //           const actualType = value.constructor;
+  //           if (actualType !== expectedType) {
+  //             errors.push(
+  //               `Invalid type for ${key}: Expected ${expectedType.name}`
+  //             );
+  //           }
+  //         }
+  //       });
+
+  //       // Check for unexpected fields
+  //       Object.keys(inputData).forEach((key) => {
+  //         if (!(key in AllData)) {
+  //           errors.push(`Unexpected field: ${key}`);
+  //         }
+  //       });
+
+  //       if (errors.length > 0) {
+  //         hasErrors = true;
+  //         allErrors.push(...errors);
+  //       }
+  //     });
+
+  //     if (hasErrors) {
+  //       setIsDataNotCorrect(true);
+  //     } else {
+  //       setValidationTrigger(true);
+  //     }
+
+  //     setErrors(allErrors);
+  //   }
+  // }, [dataFormat, selectedValue]);
+
+
   useEffect(() => {
     if (dataFormat && dataFormat.length > 0 && selectedValue !== "gust") {
       const allErrors = [];
       let hasErrors = false;
 
+      // Object to track the original email occurrences.
+      const emailOccurrence = {};
+
       dataFormat.forEach((inputData) => {
+        // Check for duplicate email and adjust to make it unique
+        if (inputData.email) {
+          const originalEmail = inputData.email; // preserve original email
+          if (!emailOccurrence[originalEmail]) {
+            emailOccurrence[originalEmail] = 0;
+          }
+          emailOccurrence[originalEmail]++;
+          if (emailOccurrence[originalEmail] > 1) {
+            const atIndex = originalEmail.indexOf("@");
+            if (atIndex > 0) {
+              const base = originalEmail.substring(0, atIndex);
+              const domain = originalEmail.substring(atIndex);
+              inputData.email = base + (emailOccurrence[originalEmail] - 1) + domain;
+            } else {
+              inputData.email = originalEmail + (emailOccurrence[originalEmail] - 1);
+            }
+          }
+        }
+
         const errors = [];
 
         // Check for missing required fields
@@ -149,39 +261,36 @@ export default function DormAllocation() {
         if (!isUserNameValid) {
           errors.push(`Invalid ID: ${inputData.userName}`);
         }
-        //
 
         const regexStream = /^(SOCIAL|NATURAL)/i;
-
         const isStreamCorrrect =
           inputData.stream && regexStream.test(inputData.stream.toUpperCase());
-
         if (!isStreamCorrrect) {
           errors.push(`Invalid Stream: ${inputData.stream}`);
         }
+
         // Handle department for fresh students
         if (selectedValue === "fresh") {
           inputData.department = "Not_yet";
           inputData.studCategory = "fresh";
         } else if (selectedValue === "senior") {
-          if(inputData.department===''){
+          if (inputData.department === '') {
             errors.push(`department not found for ${inputData.userName}`)
           }
           inputData.studCategory = "senior";
-          
         } else {
           inputData.department = "Not_yet";
           inputData.studCategory = "remedial";
         }
 
-        const password=inputData.Fname+inputData.Lname[0]+'@123'
-        inputData.password=password
+        const password = inputData.Fname + inputData.Lname[0] + '@123';
+        inputData.password = password;
 
         // Validate field types
         Object.entries(inputData).forEach(([key, value]) => {
           if (key in data) {
             const expectedType = data[key];
-            if (value === null || value === undefined||'') {
+            if (value === null || value === undefined || value === '') {
               errors.push(`Missing value for ${key}`);
             }
             const actualType = value.constructor;
