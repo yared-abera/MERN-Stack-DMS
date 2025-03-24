@@ -111,12 +111,12 @@ export default function ProctorViewInfo() {
     setSearchQuery(query);
     
     // Filter students by ID and only show those in proctor's blocks
-    const filtered = students.filter((student) => 
+    const filteredProctorStudents = students.filter((student) => 
       student.userName.toLowerCase().includes(query) && 
       blocks.some(block => block.blockNum === student.blockNum)
     );
     
-    setFilteredStudents(filtered);
+    setFilteredStudents(filteredProctorStudents);
   };
 
  
@@ -166,13 +166,13 @@ export default function ProctorViewInfo() {
         name: "Block Number", 
         selector: (row) => row.blockNum, 
         sortable: true,
-        width: '120px',
+        width: '90px',
       },
       { 
         name: "Dorm Number", 
         selector: (row) => row.dormId, 
         sortable: true,
-        width: '120px',
+        width: '90px',
       },
       { 
         name: "Status",
@@ -193,7 +193,17 @@ export default function ProctorViewInfo() {
         cell: (row) => (
           <button
             onClick={() => {
-              setSelectedStudent(row);
+              // Update the student with lastUpdated timestamp
+              const updatedStudent = {
+                ...row,
+                lastUpdated: new Date().toISOString()
+              };
+              
+              // Update the student in the database
+              dispatch(updateStudent(updatedStudent));
+              
+              // Set selected student and open dialog
+              setSelectedStudent(updatedStudent);
               setIsViewDialogOpen(true);
             }}
             className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -335,7 +345,7 @@ export default function ProctorViewInfo() {
         </div>
 
         {/* Data Table Section */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden w-full">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden w-[100%]">
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-gray-600">Loading Students...</div>
@@ -351,6 +361,7 @@ export default function ProctorViewInfo() {
                   style: {
                     backgroundColor: 'white',
                     borderRadius: '0.5rem',
+                    width: '100%',
                   },
                 },
                 responsiveWrapper: {

@@ -16,6 +16,7 @@ export default function ProctorHomePage() {
     recentlyAccessed: [],
     recentlyRegistered: []
   });
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,23 +35,43 @@ export default function ProctorHomePage() {
       
       try {
         const response = await dispatch(getAllocatedStudent()).unwrap();
+        console.log("Raw API Response:", response.data); // Debug log
+        
         if (response.data) {
           const proctorStudents = response.data.filter((student) =>
             blocks.some((block) => block.blockNum === student.blockNum)
           );
           
+          console.log("Proctor Students:", proctorStudents); // Debug log
+          
           setStudents(proctorStudents);
           
           // Calculate statistics
           const registered = proctorStudents.filter(s => s.status === 'Registered');
+          console.log("Registered Students:", registered); // Debug log
+          
+          // Get recently registered students (only those with registrationDate)
           const recentlyReg = registered
+            .filter(student => {
+              console.log("Student registration date:", student.userName, student.registrationDate); // Debug log
+              return student.registrationDate;
+            })
             .sort((a, b) => new Date(b.registrationDate) - new Date(a.registrationDate))
             .slice(0, 5);
           
+          console.log("Recently Registered:", recentlyReg); // Debug log
+          
+          // Get recently accessed students (only those with lastUpdated)
           const recentlyAcc = proctorStudents
+            .filter(student => {
+              console.log("Student last updated:", student.userName, student.lastUpdated); // Debug log
+              return student.lastUpdated;
+            })
             .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
             .slice(0, 5);
-
+          
+          console.log("Recently Accessed:", recentlyAcc); // Debug log
+  
           setStats({
             totalStudents: proctorStudents.length,
             registeredStudents: registered.length,
@@ -146,7 +167,7 @@ export default function ProctorHomePage() {
         {/* Welcome Section */}
         <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 mb-8">
           <h1 className="text-3xl font-bold text-gray-800">
-            Welcome, Proctor
+            Welcome, {user?.userName || 'Proctor'}
           </h1>
           <p className="text-gray-600 mt-2">
             Managing Block{blocks.length > 1 ? 's' : ''} {blocks.map(block => block.blockNum).join(', ')}
