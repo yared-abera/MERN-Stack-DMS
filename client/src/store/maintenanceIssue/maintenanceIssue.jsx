@@ -28,6 +28,18 @@ export const GetAllMaintainanceIssue=createAsyncThunk('get/MaintainanceIssue',as
 
     return response.data
 })
+
+
+export const GetMaintainanceIssueForAuser=createAsyncThunk('getOne/MaintainanceIssue',async({userName})=>{
+
+   
+    
+    const response=await axios.get(`http://localhost:5000/api/maintainanceIssue/getOne/${userName}`,{
+        withCredentials:true
+    })
+
+    return response.data
+})
 const MaintainanceIssueSlice=createSlice({
     name:'maintenanceIssue',
     initialState,
