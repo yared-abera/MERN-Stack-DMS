@@ -96,4 +96,34 @@ const fetchAllStudent = async (req, res) => {
   }
 };
 
-module.exports = { InsertStudent,fetchAllStudent };
+
+
+const fetchSingleStudent = async (req, res) => {
+  try {
+    const {id}=req.params;
+    console.log(id,"id in single user")
+  
+    const student = await Student.findById(id);
+    if(!student){
+      return  res.json({
+        success: false,
+        message:'user Not found',
+      });
+    }
+
+    console.log(student)
+    res.status(200).json({
+      success: true,
+      data: student,
+    });
+  } catch (error) {
+    console.error("Error fetching single students:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later.",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { InsertStudent,fetchAllStudent,fetchSingleStudent };

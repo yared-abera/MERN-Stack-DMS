@@ -7,24 +7,27 @@ import img6 from "../../assets/img/graugate.jpg";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllocatedStudent } from "@/store/studentAllocation/allocateSlice";
+import { getSingleStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function StudentHome() {
   const Images = [img2, img3, img4, img5, img6];
   const [currentIndex, setCurrentIndex] = useState(0);
   const { user } = useSelector((state) => state.auth);
-  const { AllocatedStudent, isLoading } = useSelector((state) => state.student);
+
   const dispatch = useDispatch();
-  const [hasFetched, setHasFetched] = useState(false); // Track if fetched for current user
-const[AllStudent,setAllStudent]=useState([])
-  if (user && !hasFetched) {
-    setHasFetched(true); // Mark as fetched for the current user
-    dispatch(getAllocatedStudent()).then(data=>{
-      if(data?.payload?.success){
-        setAllStudent(data?.payload?.data)
+
+  const [ThisStudent, setThisStudent] = useState("");
+
+  useEffect(() => {
+    const id = user.id;
+
+    dispatch(getSingleStudent({ id })).then((data) => {
+      if (data?.payload?.success) {
+        setThisStudent(data?.payload?.data);
       }
-    }) 
-  }
+    });
+  }, [user, dispatch]);
+
   // Automatic slideshow effect
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,14 +44,7 @@ const[AllStudent,setAllStudent]=useState([])
     setCurrentIndex((prev) => (prev - 1 + Images.length) % Images.length);
   };
 
-  if (isLoading) {
-    return <div>please Wait ,Loading...</div>;
-  }
-
-  // Calculate ThisStudent inside the render function
-  const ThisStudent = AllStudent?.find(
-    (stud) => stud.userName === user?.username
-  );
+ 
 
   return (
     <div className="mt-20 flex flex-col gap-3 w-full h-screen overflow-hidden">
