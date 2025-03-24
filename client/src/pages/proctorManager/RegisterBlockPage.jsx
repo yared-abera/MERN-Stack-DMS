@@ -1,40 +1,41 @@
-import { useState, useCallback,useEffect } from "react";
-import { useDispatch,useSelector } from "react-redux";
-import { registerBlock,fetchAvailableProctors } from "@/store/blockSlice/index";
+import { useState, useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { registerBlock, fetchAvailableProctors } from "@/store/blockSlice/index";
 import img from "@/assets/unique/building.jpeg";
 import RegisterCard from "@/components/common/RegisterCard";
 import { RegisterBlock } from "@/config/data";
-
+import { toast } from 'sonner';
+ 
 const initialFormData = {
   blockNum: "",
   foundIn: "",
-  isSelectedForSpecialStud:"",
+  isSelectedForSpecialStud: "",
   totalFloors: "",
   proctorId: "",
 };
 
-
-
 const RegisterBlockComp = () => {
   const dispatch = useDispatch();
   const { availableProctors } = useSelector(state => state.block);
-        console.log("availableProtors from regBlockComp",availableProctors);
-        const newRegisterBlock=[...RegisterBlock,{
-          label: "Assign Proctor",
-          name: "proctorId",
-          componentType: "select",
-          options: availableProctors.map(proctor => ({
-            id: proctor._id, // Use proctor's _id as the value
-            label: `${proctor.fName} ${proctor.lName}`, // Combine fName and lName for the label
-          })),
-        },];
+  
+  const newRegisterBlock = [...RegisterBlock, {
+    label: "Assign Proctor",
+    name: "proctorId",
+    componentType: "select",
+    options: availableProctors.map(proctor => ({
+      id: proctor._id,
+      label: `${proctor.fName} ${proctor.lName}`,
+    })),
+  }];
+
   useEffect(() => {
-   dispatch(fetchAvailableProctors());
+    dispatch(fetchAvailableProctors());
   }, [dispatch]);
 
   const [formData, setFormData] = useState(initialFormData);
-   console.log(formData);
+  
   const isFormValid = () => Object.values(formData).every((item) => item !== "");
+  
   const generateFloors = (totalFloors) => {
     return Array.from({ length: parseInt(totalFloors) }, (_, index) => ({
       floorNumber: index + 1,
@@ -44,15 +45,33 @@ const RegisterBlockComp = () => {
   };
 
   const onSubmit = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
-      if (isFormValid()) {
+
+      if (!isFormValid()) {
+        toast.error("Please fill all fields");
+        return;
+      }
+
+      try {
         const floors = generateFloors(formData.totalFloors);
         const newFormData = { ...formData, floors };
-        console.log(newFormData,'from register Component')
-        dispatch(registerBlock(newFormData));
-      } else {
-        alert("Please fill all fields");
+        
+        // Show promise toast
+        toast.promise(
+          dispatch(registerBlock(newFormData)).unwrap(),
+          {
+            loading: 'Registering block...',
+            success: () => {
+              setFormData(initialFormData);
+              return 'Block registered successfully!';
+            },
+            error: (err) => err.message || 'Failed to register block'
+          }
+        );
+        
+      } catch (error) {
+        toast.error(error.message || 'Failed to register block');
       }
     },
     [formData, dispatch]
