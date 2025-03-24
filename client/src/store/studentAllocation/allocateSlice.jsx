@@ -39,6 +39,24 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
 
 })
 
+
+export const getSingleStudent=createAsyncThunk('student/getSingleStudent',async({id})=>{
+    
+    console.log(id,"id onslice");
+    try {
+        const response=await axios.get(`http://localhost:5000/api/student/getOne/${id}`, {
+            withCredentials:true
+        });
+        console.log(response.data,"response of student get from slice");
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+
+})
+
+
+
 export const updateStudent=createAsyncThunk('student/update',async({studentId,updatedData})=>{
     try {
         const response=await axios.put(`http://localhost:5000/api/student/update/${studentId}`,updatedData,{

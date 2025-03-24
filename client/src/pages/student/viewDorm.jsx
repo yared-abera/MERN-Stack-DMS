@@ -1,19 +1,36 @@
-import { useRef } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { getSingleStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function ViewDorm() {
   const { user } = useSelector((state) => state.auth);
   const { AllocatedStudent } = useSelector((state) => state.student);
 
-  const ThisStudent = AllocatedStudent.find(
-    (stud) => stud.userName === user.username
-  );
-  const DormMate = AllocatedStudent.filter(
+ 
+  const dispatch = useDispatch();
+ 
+  const [ThisStudent, setThisStudent] = useState("");
+
+  useEffect(() => {
+    const id = user.id;
+
+    dispatch(getSingleStudent({ id })).then((data) => {
+      if (data?.payload?.success) {
+        setThisStudent(data?.payload?.data);
+      }
+    });
+  }, [user, dispatch]);
+let DormMate
+if(AllocatedStudent.length>0){
+DormMate = AllocatedStudent.filter(
     (student) =>
       student.blockNum === ThisStudent.blockNum &&
       student.dormId === ThisStudent.dormId
   );
+}
+ 
+
   const refElemnt = useRef();
 
   const { scrollYProgress } = useScroll({
