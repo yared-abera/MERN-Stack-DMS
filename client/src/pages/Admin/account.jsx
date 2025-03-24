@@ -1,12 +1,4 @@
-// import AccountPage from "@/components/common/Account";
-// import { Button } from "@/components/ui/button";
-
-// export default function Account() {
-//   return (
-//      <AccountPage/>
-//   );
-// }
-
+ 
 
 
 import AccountPage from "@/components/common/Account";

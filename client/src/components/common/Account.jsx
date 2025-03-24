@@ -89,7 +89,7 @@ export default function AccountPage({ ThisUser }) {
               </Button>
             </div>
           </div>
-          <div className="space-y-4 w-[40%]  mx-auto">
+          <div className="space-y-4 w-[40%] pl-8">
             <div className="flex justify-between">
               <span className="font-medium">First Name:</span>
               <span>{ThisUser.fName}</span>

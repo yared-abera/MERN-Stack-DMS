@@ -42,7 +42,7 @@ export default function StudentDeanHome() {
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col mt-20">
+    <div className="w-full min-h-screen flex flex-col ">
       {/* Header with background image covering 30% of viewport height */}
       <div
         className="w-full h-[60vh] flex justify-center mt-3"
@@ -74,17 +74,7 @@ export default function StudentDeanHome() {
       <div className="flex-1 p-4">
         <div className="flex flex-col gap-4">
           
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-center">
-              <h1 className="text-lg md:text-xl font-bold ">
-                Student Information{" "}
-              </h1>
-            </div>
-
-
-
-            <StudentInfoChart />
-          </div>
+      
 
           <div className="text-center w-full md:w-1/2 mx-auto">
             <h1 className="text-neutral-950 text-xl md:text-3xl font-bold">
@@ -138,11 +128,24 @@ export default function StudentDeanHome() {
               </div>
             </div>
           </div>
+
+
+          <div className="bg-white p-4 rounded shadow">
+            <div className="text-center">
+              <h1 className="text-lg md:text-xl font-bold ">
+                Student Information{" "}
+              </h1>
+            </div>
+
+
+
+            <StudentInfoChart />
+          </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="w-full bg-orange-500 text-center p-4">Footer</div>
+      <div className="w-full bg-sky-200/30 text-center p-4">Footer</div>
     </div>
   );
 }
