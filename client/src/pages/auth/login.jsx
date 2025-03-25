@@ -3,6 +3,7 @@ import { logInForm } from "@/config/data";
 import { checkAuthorization, loginUser } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 const intialFormData = {
   userName: "",
   password: "",
@@ -13,7 +14,15 @@ export default function LogIn() {
   const dispatch=useDispatch()
   const onSubmit = (event) => {
     event.preventDefault();
-    dispatch(loginUser(formData)) 
+    dispatch(loginUser(formData)).then(data=>{
+      console.log(data);
+      if(data?.payload.success){
+        toast.success(`${data?.payload.message}`)
+      }else{
+        toast.error(`${data?.payload.message}`)
+      }
+      
+    })
   };
   
   return (

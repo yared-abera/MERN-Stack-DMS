@@ -52,9 +52,9 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkAuthorization());
-    dispatch(GetAvaiableBlocks())
-    dispatch(getAllocatedStudent())
-    dispatch(getAllUser())
+    // dispatch(GetAvaiableBlocks())
+    // dispatch(getAllocatedStudent())
+    // dispatch(getAllUser())
   }, [dispatch]);
 
 

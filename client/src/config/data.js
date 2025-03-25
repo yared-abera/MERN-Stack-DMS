@@ -152,14 +152,7 @@ export const Maintainance_Issue = [
     type: "text",
     componentType: "input",
   },
-
-  {
-    label: "Date",
-    name: "date",
-
-    type: "date",
-    componentType: "input",
-  },
+ 
   {
     label: "Block",
     name: "block",
@@ -172,6 +165,14 @@ export const Maintainance_Issue = [
     name: "dorm",
     placeholder: "Enter user dorm",
     type: "number",
+    componentType: "input",
+  },
+
+  {
+    label: "Phone Number",
+    name: "phoneNumber",
+    placeholder: "Enter user Phone Number",
+    type: "text",
     componentType: "input",
   },
 ];

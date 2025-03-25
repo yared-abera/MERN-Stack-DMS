@@ -3,23 +3,62 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Maintainance_Issue, typeOfIssue } from "@/config/data";
-import { GetMaintainanceIssueForAuser, SubmitMaintainanceIssue } from "@/store/maintenanceIssue/maintenanceIssue";
+import { typeOfIssue } from "@/config/data";
+import {
+  GetAllMaintainanceIssue,
+  GetMaintenanceIssueForAuser,
+  SubmitMaintainanceIssue,
+} from "@/store/maintenanceIssue/maintenanceIssue";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-export default function MaintenanceIssueSubmit() {
+export default function MaintenanceIssueSubmit({ ThisUser }) {
+  const { user } = useSelector((state) => state.auth);
+
   const initialFormState = {
-    userInfo: Object.fromEntries(Maintainance_Issue.map((item) => [item.name, ""])),
-    issueTypes: Object.fromEntries(typeOfIssue.map((item) => [item.name, false])),
+    id: user?.id || "",
+    Model: capitalizeFirstLetter(user?.role || ""),
+
+    userInfo: ThisUser
+      ? {
+          Fname: ThisUser.Fname || "",
+          Mname: ThisUser.Mname || "",
+          Lname: ThisUser.Lname || "",
+          userName: ThisUser.userName || "",
+          block: ThisUser.blockNum || "",
+          dorm: ThisUser.dormId || "",
+          phoneNumber: ThisUser.phoneNum || "",
+        }
+      : {}, // Ensure userInfo exists even if ThisUser is undefined
+
+    issueTypes: Object.fromEntries(
+      typeOfIssue.map((item) => [item.name, false])
+    ),
     description: "",
     otherIssue: "",
   };
-const {user}=useSelector(state=>state.auth)
+
+  useEffect(() => {
+    if (ThisUser) {
+      setFormData((prev) => ({
+        ...prev,
+        userInfo: {
+          Fname: ThisUser.Fname || "",
+          Mname: ThisUser.Mname || "",
+          Lname: ThisUser.Lname || "",
+          userName: ThisUser.userName || "",
+          block: ThisUser.blockNum || "",
+          dorm: ThisUser.dormId || "",
+          phoneNumber: ThisUser.phoneNum || "",
+        },
+      }));
+    }
+  }, [ThisUser]); // Runs when ThisUser changes
+
   const [formData, setFormData] = useState(initialFormState);
   const dispatch = useDispatch();
-  const [IssueTrigered, setIssueTriggered] = useState(false);
+  const [IssueTrigered, setIssueTriggered] = useState();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,33 +68,39 @@ const {user}=useSelector(state=>state.auth)
       }
     });
   };
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
+  useEffect(() => {
+    const id = user.id;
+    const role = user.role;
+    const Model = capitalizeFirstLetter(role);
 
-  useEffect(()=>{
-    const userName=user.userName
-    console.log(userName,"userName");
-    
-    dispatch(GetMaintainanceIssueForAuser({userName})).then(data=>{
-      console.log(data);
-      
-    })
-  },[user,dispatch])
+    dispatch(GetMaintenanceIssueForAuser({ id, Model })).then((data) => {
+      if (data?.payload?.success) {
+        setIssueTriggered(data.payload?.data);
+      }
+    });
+
+    // dispatch(GetAllMaintainanceIssue()).then(data=>{
+    //   console.log(data,"aalll");
+
+    // })
+  }, [user, dispatch]);
 
   const handleClearForm = () => {
     setFormData(initialFormState);
   };
 
-
- 
-
-
- 
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <form onSubmit={handleSubmit} className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden"
+      >
         <div className="px-8 py-6 border-b border-gray-200 flex flex-col items-center mt-[5%]">
-          <h1 className="text-2xl font-bold text-gray-900 font-new-romance text-4xl">
+          <h1 className=" font-bold text-gray-900 font-new-romance text-4xl">
             Maintenance Issue Submission
           </h1>
           <p className="mt-1 text-sm text-gray-500 text-center">
@@ -63,69 +108,199 @@ const {user}=useSelector(state=>state.auth)
           </p>
         </div>
 
-
         <div className="w-full h-auto flex flex-col gap-2 m-6">
-        <div className="w-1/2">
-          <h1 className="text-center text-xl md:text-2xl font-semibold ">
-            Issue Submitted by User
-          </h1>
+          <div className="w-1/2">
+            <h1 className="text-center text-xl md:text-2xl font-semibold ">
+              Issue Submitted by User
+            </h1>
+          </div>
+          <div className="flex flex-wrap gap-4   w-auto px-6 py-4 ">
+            {IssueTrigered && IssueTrigered.issueTypes.length > 0 ? (
+              IssueTrigered.issueTypes.map((list) => (
+                
+                  <div className="w-full md:w-auto p-3   rounded-lg shadow-lg shadow-yellow-950/50 border border-sky-600 px-6 py-4">
+                    <h2 className="text-sm md:text-base">
+                      Issue Type: {list.issue}
+                    </h2>
+                    <p className="text-xs md:text-sm">
+                      Submited By: {IssueTrigered.userInfo.fName}{" "}
+                      {IssueTrigered.userInfo.lName}
+                    </p>
+                    <p className="text-xs md:text-sm">
+                    Submission Date: 12/34/12
+                    </p>
+                    <p className="text-xs md:text-sm ">
+                      Status:{" "}
+                      <span
+                        className={
+                          list.status === "Pending" ? "text-red-700" : ""
+                        }
+                      >
+                        {list.status}
+                      </span>
+                    </p>
+                  </div>
+                 
+              ))
+            ) : (
+              <div className="text-center p-4">
+                <p className="text-gray-500">"No issue submitted by user"</p>
+              </div>
+            )}
+          </div>
         </div>
-
-        {IssueTrigered ? (
-          <div className="flex flex-wrap   gap-2 p-2">
-            <div className="w-full md:w-auto p-3   rounded-lg shadow-md border border-sky-600">
-              <h2 className="text-sm md:text-base">Issue Type: Electricity</h2>
-              <p className="text-xs md:text-sm">Triggered By: Ahmed Yusuf</p>
-              <p className="text-xs md:text-sm">Triggered Date: 12/34/12</p>
-              <p className="text-xs md:text-sm">Status: Solved</p>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center p-4">
-            <p className="text-gray-500">"No issue submitted by user"</p>
-          </div>
-        )}
-      </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
           <div className="space-y-6">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold text-blue-800 mb-4 font-new-romance text-4xl">
+              <h2 className="  font-semibold text-blue-800 mb-4 font-new-romance text-4xl">
                 User Information
               </h2>
-              {Maintainance_Issue.map((item, index) => (
-                <div key={index} className="mb-4">
+
+              {/* <div>
+                <div className="mb-4">
                   <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    {item.label}
+                    First Name
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input value={ThisUser.Fname} />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Middle Name
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input value={ThisUser.Mname} />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input value={ThisUser.Lname} />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    User Name
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input value={ThisUser.userName} />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Block Number
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input value={ThisUser.blockNum} />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Dorm Number
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input value={ThisUser.dormId} />
+                </div>
+
+                <div className="mb-4">
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
                     <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
-                    value={formData.userInfo[item.name]}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        userInfo: { ...prev.userInfo, [item.name]: e.target.value },
-                      }))
-                    }
-                    placeholder={item.placeholder}
-                    type={item.type}
-                    className="w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
+                    value={formData.userInfo.phoneNumber}
+                    onChange={(e) => {
+                      if (ThisUser._id === user.id) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          userInfo: {
+                            ...prev.userInfo,
+                            phoneNumber: e.target.value,
+                          },
+                        }));
+                      }
+                    }}
+                    className={`${
+                      ThisUser._id !== user.id
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : ""
+                    }`}
+                    readOnly={ThisUser._id !== user.id}
+                  />
+                  {ThisUser._id === user.id ? (
+                    <span className="text-sm ml-5 text-green-900">
+                      You can modify your phone number.
+                    </span>
+                  ) : (
+                    <span className="text-sm ml-5 text-red-500">
+                      You are not allowed to modify this field.
+                    </span>
+                  )}
+                </div>
+              </div> */}
+
+              {[
+                { label: "First Name", value: ThisUser.Fname },
+                { label: "Middle Name", value: ThisUser.Mname },
+                { label: "Last Name", value: ThisUser.Lname },
+                { label: "User Name", value: ThisUser.userName },
+                { label: "Block Number", value: ThisUser.blockNum },
+                { label: "Dorm Number", value: ThisUser.dormId },
+              ].map((field, index) => (
+                <div className="mb-4" key={index}>
+                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+                    {field.label}
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input
+                    value={field.value}
+                    readOnly
+                    className="cursor-not-allowed bg-gray-100"
                   />
                 </div>
               ))}
+
+              <div className="mb-4">
+                <Label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                  <span className="text-red-500 ml-1">*</span>
+                </Label>
+                <Input
+                  value={formData.userInfo.phoneNumber} // Changed from ThisUser.phoneNum
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      userInfo: {
+                        ...prev.userInfo,
+                        phoneNumber: e.target.value,
+                      },
+                    }))
+                  }
+                />
+                <span className="text-sm ml-5 bg-blue-950/5 opacity-30 text-green-900">
+                  You Can Modify the Phone Number
+                </span>
+              </div>
             </div>
           </div>
 
           <div className="space-y-6">
             <div className="bg-indigo-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold text-indigo-800 mb-4">Select Issue Types</h2>
+              <h2 className="text-lg font-semibold text-indigo-800 mb-4">
+                Select Issue Types
+              </h2>
               <div className="grid grid-cols-1 gap-4">
                 {typeOfIssue.map((item, index) => (
                   <div
                     key={index}
                     className={`p-3 rounded-md transition-all ${
-                      formData.issueTypes[item.name] ? "bg-indigo-100 border-2 border-indigo-300" : "bg-white border border-gray-200"
+                      formData.issueTypes[item.name]
+                        ? "bg-indigo-100 border-2 border-indigo-300"
+                        : "bg-white border border-gray-200"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -144,10 +319,15 @@ const {user}=useSelector(state=>state.auth)
                         className="h-5 w-5 text-indigo-600"
                       />
                       <div className="flex-1">
-                        <Label htmlFor={`issue-${item.name}-${index}`} className="block text-sm font-medium text-gray-700 cursor-pointer">
+                        <Label
+                          htmlFor={`issue-${item.name}-${index}`}
+                          className="block text-sm font-medium text-gray-700 cursor-pointer"
+                        >
                           {item.label}
                         </Label>
-                        <p className="mt-1 text-sm text-gray-500">{item.description}</p>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {item.description}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -155,10 +335,17 @@ const {user}=useSelector(state=>state.auth)
               </div>
 
               <div className="mt-6">
-                <Label className="block text-sm font-medium text-gray-700 mb-2">Additional Information</Label>
+                <Label className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional Information
+                </Label>
                 <Input
                   value={formData.otherIssue}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, otherIssue: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      otherIssue: e.target.value,
+                    }))
+                  }
                   placeholder="Describe any other issues not listed above"
                   className="w-full focus:ring-2 focus:ring-indigo-500"
                 />
@@ -175,7 +362,12 @@ const {user}=useSelector(state=>state.auth)
             </Label>
             <Textarea
               value={formData.description}
-              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               placeholder="Please provide a detailed description of the issue..."
               className="w-full h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
@@ -185,10 +377,18 @@ const {user}=useSelector(state=>state.auth)
 
         <div className="px-8 py-4 border-t border-gray-200">
           <div className="flex items-center justify-end gap-4">
-            <Button type="button" variant="outline" className="text-gray-700 hover:bg-gray-50" onClick={handleClearForm}>
+            <Button
+              type="button"
+              variant="outline"
+              className="text-gray-700 hover:bg-gray-50"
+              onClick={handleClearForm}
+            >
               Clear Form
             </Button>
-            <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 shadow-sm transition-colors">
+            <Button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 shadow-sm transition-colors"
+            >
               Submit Request
             </Button>
           </div>
