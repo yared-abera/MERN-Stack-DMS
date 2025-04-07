@@ -85,6 +85,42 @@ const UpdateUser = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if id is missing
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "id is required!",
+      });
+    }
+
+    // Find and delete the user
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found!",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later.",
+      error: error.message,
+    });
+  }
+};
+
 const ChangePassword = async (req, res) => {
   try {
     const { id } = req.params;
@@ -129,4 +165,4 @@ const ChangePassword = async (req, res) => {
   }
 };
 
-module.exports = { fetchAllUser, fetchOneUser, UpdateUser, ChangePassword };
+module.exports = { fetchAllUser, fetchOneUser, UpdateUser, ChangePassword, deleteUser };

@@ -11,7 +11,7 @@ const user_Route=require('./router/user/user_Router')
 const maintenance_Route=require('./router/maintenanceRouter/index')
 
 mongoose
-  .connect(process.env.MONGO_URL, 
+  .connect("mongodb://localhost:27017/DMS", 
     {serverSelectionTimeoutMS: 30000}
   )
   .then(() => {

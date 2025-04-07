@@ -1,5 +1,5 @@
 const User = require("../../model/user/user");
-const bcrypt = require("bcryptjs");
+const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const Student = require("../../model/student/student");
 
@@ -7,6 +7,8 @@ const logInUser = async (req, res) => {
   try {
     const { userName, password } = req.body;
     const userModels = [User, Student];
+
+    console.log(userName,password)
 
     let foundUser = null;
 
@@ -25,6 +27,14 @@ const logInUser = async (req, res) => {
       return res.json({
         success: false,
         message: "User doesn't exist, please first register",
+      });
+    }
+
+    // Check if user is deactivated
+    if (foundUser.status === 'inactive') {
+      return res.json({
+        success: false,
+        message: "Your account has been deactivated. Please contact the administrator for assistance.",
       });
     }
 
@@ -49,7 +59,7 @@ const logInUser = async (req, res) => {
         userName: foundUser.userName,
         sex: foundUser.sex,
       },
-      process.env.CLIENT_SECRET_KEY,
+      process.env.CLIENT_SECRET_KEY||"your_jwt_secret_key_here",
       { expiresIn: "30m" }
     );
 

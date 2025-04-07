@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     email:  {type:String ,unique: true},
     password: { type: String, required: true },
     role: { type: String,   required: true },
-    address:{type:String,default:'wolkite'}
+    address:{type:String,default:'wolkite'},
+    status: { type: String, enum: ['active', 'inactive'], default: 'active' }
 },{ timestamps: true });
 
  module.exports=mongoose.model("User",userSchema)
