@@ -102,13 +102,13 @@ export const UserAccount = [
     type: "password",
     placeholder: "Enter Password",
   },
-  // {
-  //   label: "Confirm Password",
-  //   name: "Confirm_password",
-  //   componentType: "text",
-  //   type: "password",
-  //   placeholder: "Confrim Password",
-  // },
+  {
+    label: "Confirm Password",
+    name: "Confirm_password",
+    componentType: "text",
+    type: "password",
+    placeholder: "Confrim Password",
+  },
   {
     label: "Role",
     name: "role",

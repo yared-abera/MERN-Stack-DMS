@@ -24,6 +24,14 @@ export const loginUser = createAsyncThunk("/auth/LogIn", async (formData) => {
     return result.data;
   } catch (error) {
     console.log(error, "from logIn in loginUser");
+    // Return the error response if available, otherwise create a generic error
+    if (error.response && error.response.data) {
+      return error.response.data;
+    }
+    return {
+      success: false,
+      message: "An error occurred during login. Please try again."
+    };
   }
 });
 
@@ -107,9 +115,15 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         console.log("logIn user from slice", action.payload);
-        //action.payload.success ?
-        state.user = action.payload.user;
-        state.isAuthenticated = true; //action.payload.success;
+        
+        // Only update state if login was successful
+        if (action.payload && action.payload.success) {
+          state.user = action.payload.user;
+          state.isAuthenticated = true;
+        } else {
+          state.user = null;
+          state.isAuthenticated = false;
+        }
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;

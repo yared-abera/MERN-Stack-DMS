@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { Link } from "react-router-dom"
 
 // Menu items.
 const items = [
@@ -29,9 +30,6 @@ const items = [
     url: "/admin/account",
     icon: Settings,
   },
-  
- 
-
 ]
 
 export default function SideBarComponent() {
@@ -45,10 +43,10 @@ export default function SideBarComponent() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}  className=' pl-0 ml-0 my-2'>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}  >
-                    <item.icon    />
+                    <Link to={item.url}>
+                      <item.icon />
                       <span className="text-sm md:text-base font-bold">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

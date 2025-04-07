@@ -48,7 +48,12 @@ function App() {
     (state) => state.auth
   );
  
- 
+//  const user={
+//   role:'Admin',
+//   userName:'abdi'
+//  }
+//  const isAuthenticated=true
+//  const isLoading=false
     
   const dispatch = useDispatch();
   useEffect(() => {
@@ -106,9 +111,9 @@ function App() {
         <Route
           path="/admin"
           element={  
-           
+            
            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <AdminLayout />
+             <AdminLayout />
               </CheckAuthComponent>
             
           }

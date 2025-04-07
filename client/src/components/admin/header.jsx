@@ -39,7 +39,7 @@ export default function Header() {
   }
 
   return (
-    <header className="fixed   top-0  w-full z-0 h-auto flex  p-4  border-b bg-background shadow-lg lg:gap-4">
+    <header className="sticky overflow-x-hidden top-0  w-full z-0 h-auto flex  p-4  border-b bg-background shadow-lg lg:gap-4">
       <div className="text-left flex items-start justify-start">
         <SidebarTrigger />
       </div>
