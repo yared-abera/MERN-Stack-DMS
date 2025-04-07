@@ -9,7 +9,7 @@ const initialState = {
 export const getAllUser = createAsyncThunk("getAll/user", async () => {
   try {
     const respoens = await axios.get(
-      "http://localhost:5000/api/user/getAll",
+      "http://localhost:9000/api/user/getAll",
       {
         withCredentials: true,
         headers: {
@@ -28,7 +28,9 @@ export const getAllUser = createAsyncThunk("getAll/user", async () => {
 
 export const getSingleUser = createAsyncThunk("getOne/user", async (id) => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/user/getOne/${id}`, {
+    console.log(id);
+    
+    const response = await axios.get(`http://localhost:9000/api/user/getOne/${id}`, {
       withCredentials: true,
     });
     return response.data;
@@ -45,7 +47,7 @@ export const UpdateUser = createAsyncThunk("Update/user", async ({formData,id}) 
   try {
     
     
-    const response = await axios.put(`http://localhost:5000/api/user/update/${id}`,formData ,{
+    const response = await axios.put(`http://localhost:9000/api/user/update/${id}`,formData ,{
       withCredentials: true,
     });
     return response.data;
@@ -58,7 +60,7 @@ export const UpdateUser = createAsyncThunk("Update/user", async ({formData,id}) 
 
 export const ComparePasswordAndUpdate=createAsyncThunk('/comparePassword',async ({Password,id})=>{
   try {
-    const result= await axios.put(`http://localhost:5000/api/user/password/${id}`,Password,{
+    const result= await axios.put(`http://localhost:9000/api/user/password/${id}`,Password,{
       withCredentials: true,
      
     });

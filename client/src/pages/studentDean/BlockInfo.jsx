@@ -100,7 +100,7 @@ const BlockInfo = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex-1 relative min-h-screen mt-32">
+      <div className="flex-1 relative min-h-screen mt-2">
         <div className="p-4 pt-0 md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 left-64 w-[calc(100%-17rem)]">
           {/* Back Button */}
           <button

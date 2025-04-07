@@ -23,7 +23,7 @@ export default function DetailAllocationStart() {
   
   
   const BlockData = AvailebleBlocks.data;
-console.log(BlockData,'BlockData');
+ 
 
 
   const [selectedOne, setSelectedOne] = useState(initialOption);

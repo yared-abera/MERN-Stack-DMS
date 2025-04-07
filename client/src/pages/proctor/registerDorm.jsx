@@ -118,7 +118,7 @@ useEffect(() => {
           {
             loading: 'Registering dorm...',
             success: () => {
-              setFormData(initialFormData);
+              
               return 'Dorm registered successfully!';
             },
             error: (err) => err.message || 'Failed to register dorm'

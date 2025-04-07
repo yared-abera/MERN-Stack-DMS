@@ -8,7 +8,7 @@ export const registerDorm = createAsyncThunk(
     try {
       const { blockId, floorNumber, dormNumber, capacity } = formData;
       const response = await axios.patch(
-        `http://localhost:5000/api/dorm/${blockId}/floors/${floorNumber}/dorms`,
+        `http://localhost:9000/api/dorm/${blockId}/floors/${floorNumber}/dorms`,
         { dormNumber, capacity },
         {
           withCredentials: true,

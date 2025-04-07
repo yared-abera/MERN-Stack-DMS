@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, UserRoundPen, View } from "lucide-react";
+import { BugIcon, Cuboid, Home, LayoutGrid, UserRoundPen, View } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -32,13 +32,20 @@ const StudDeanSideBar = [
   {
     title: "View Block Info",
     url: "/dean/block",
-    icon: UserRoundPen,
+    icon: Cuboid ,
+  },
+  {
+    title: "Maintenance Issue",
+    url: "/dean/issue",
+    icon: BugIcon,
   },
   {
     title: "Account",
     url: "/dean/account",
     icon: UserRoundPen,
   },
+
+ 
 ];
 
 export default function StudentDeanSideBar() {

@@ -58,6 +58,10 @@ export default function AccountPage({ ThisUser }) {
     }
   }
 
+
+  console.log(ThisUser,"ThisUser");
+  
+
   return (
     <div className="w-full min-h-screen  mt-20 overflow-hidden">
       <div className="flex flex-col gap-2 p-4   ">

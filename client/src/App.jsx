@@ -40,6 +40,7 @@ import BlockInfo from "./pages/studentDean/BlockInfo";
 import { GetAvaiableBlocks } from "./store/blockSlice";
 import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 import { getAllUser } from "./store/user-slice/userSlice";
+import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
 function App() {
   
   const theme = useSelector((state) => state.theme.mode);
@@ -158,6 +159,7 @@ function App() {
           <Route path="info" element={<StudentInfo />} />
           <Route path="block" element={<BlockInfo/>} />
           <Route path="account" element={<StudDeanAccount />} />
+          <Route path="issue" element={<DeanMaintenanceIssue/>} />
         </Route>
 
         <Route

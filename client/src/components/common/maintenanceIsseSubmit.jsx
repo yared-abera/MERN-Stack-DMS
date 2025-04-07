@@ -25,9 +25,11 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
           Fname: ThisUser.Fname || "",
           Mname: ThisUser.Mname || "",
           Lname: ThisUser.Lname || "",
+          Gender:ThisUser.sex||"",
           userName: ThisUser.userName || "",
           block: ThisUser.blockNum || "",
           dorm: ThisUser.dormId || "",
+
           phoneNumber: ThisUser.phoneNum || "",
         }
       : {}, // Ensure userInfo exists even if ThisUser is undefined
@@ -47,6 +49,7 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
           Fname: ThisUser.Fname || "",
           Mname: ThisUser.Mname || "",
           Lname: ThisUser.Lname || "",
+          Gender:ThisUser.sex||"",
           userName: ThisUser.userName || "",
           block: ThisUser.blockNum || "",
           dorm: ThisUser.dormId || "",
@@ -83,12 +86,9 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
       }
     });
 
-    // dispatch(GetAllMaintainanceIssue()).then(data=>{
-    //   console.log(data,"aalll");
-
-    // })
+  
   }, [user, dispatch]);
-
+ 
   const handleClearForm = () => {
     setFormData(initialFormState);
   };
@@ -157,96 +157,13 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
                 User Information
               </h2>
 
-              {/* <div>
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input value={ThisUser.Fname} />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    Middle Name
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input value={ThisUser.Mname} />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input value={ThisUser.Lname} />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    User Name
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input value={ThisUser.userName} />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    Block Number
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input value={ThisUser.blockNum} />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    Dorm Number
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input value={ThisUser.dormId} />
-                </div>
-
-                <div className="mb-4">
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                    <span className="text-red-500 ml-1">*</span>
-                  </Label>
-                  <Input
-                    value={formData.userInfo.phoneNumber}
-                    onChange={(e) => {
-                      if (ThisUser._id === user.id) {
-                        setFormData((prev) => ({
-                          ...prev,
-                          userInfo: {
-                            ...prev.userInfo,
-                            phoneNumber: e.target.value,
-                          },
-                        }));
-                      }
-                    }}
-                    className={`${
-                      ThisUser._id !== user.id
-                        ? "bg-gray-200 cursor-not-allowed"
-                        : ""
-                    }`}
-                    readOnly={ThisUser._id !== user.id}
-                  />
-                  {ThisUser._id === user.id ? (
-                    <span className="text-sm ml-5 text-green-900">
-                      You can modify your phone number.
-                    </span>
-                  ) : (
-                    <span className="text-sm ml-5 text-red-500">
-                      You are not allowed to modify this field.
-                    </span>
-                  )}
-                </div>
-              </div> */}
+             
 
               {[
                 { label: "First Name", value: ThisUser.Fname },
                 { label: "Middle Name", value: ThisUser.Mname },
                 { label: "Last Name", value: ThisUser.Lname },
+                { label: "Gender", value: ThisUser.sex },
                 { label: "User Name", value: ThisUser.userName },
                 { label: "Block Number", value: ThisUser.blockNum },
                 { label: "Dorm Number", value: ThisUser.dormId },

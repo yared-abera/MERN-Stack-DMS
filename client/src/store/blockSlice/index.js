@@ -17,7 +17,7 @@ export const registerBlock=createAsyncThunk("block/register",
    async(formData)=>{
     try {
         console.log("registerBlock formData from blockASyncThunk",formData);
-    const result= await axios.post("http://localhost:5000/api/block/register",formData,{
+    const result= await axios.post("http://localhost:9000/api/block/register",formData,{
         withCredentials:true
     });
 
@@ -35,7 +35,7 @@ export const GetAvaiableBlocks = createAsyncThunk(
   async () => {
     try {
 
-      const response = await axios.get(`http://localhost:5000/api/block/getAvailabeBlock`, {
+      const response = await axios.get(`http://localhost:9000/api/block/getAvailabeBlock`, {
         withCredentials: true,
       });
  
@@ -52,7 +52,7 @@ export const getAllBlock = createAsyncThunk(
   async () => {
     try {
 
-      const response = await axios.get(`http://localhost:5000/api/block/getAll`, {
+      const response = await axios.get(`http://localhost:9000/api/block/getAll`, {
         withCredentials: true,
       });
  
@@ -69,7 +69,7 @@ export const fetchProctorBlocks = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
 
-      const response = await axios.get(`http://localhost:5000/api/block/proctor/my-block`, {
+      const response = await axios.get(`http://localhost:9000/api/block/proctor/my-block`, {
         withCredentials: true,
       });
         // Log the response
@@ -84,7 +84,7 @@ export const fetchAvailableProctors = createAsyncThunk(
   'blocks/fetchAvailableProctors',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/block/proctors/available', {
+      const response = await axios.get('http://localhost:9000/api/block/proctors/available', {
         withCredentials: true
       });
        
@@ -97,7 +97,7 @@ export const fetchAvailableProctors = createAsyncThunk(
 
 export const UpdateBlock=createAsyncThunk('block/update',async( {updatedBlock})=>{
   try {
-    const respons=await axios.put('http://localhost:5000/api/block/update',updatedBlock ,{
+    const respons=await axios.put('http://localhost:9000/api/block/update',updatedBlock ,{
       withCredentials:true
     })
  

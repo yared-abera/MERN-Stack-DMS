@@ -1,17 +1,18 @@
+ 
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-
-import { toast } from "react-hot-toast";
+ 
 import { useDispatch, useSelector } from "react-redux";
 import {
-  GetAllMaintainanceIssue,
+   
   GetMainenanceIssueByStatus,
+  GetWholeMaintainanceIssueOfDean,
 } from "@/store/maintenanceIssue/maintenanceIssue";
 
 import { Button } from "@/components/ui/button"; // Make sure to import Button
 import IssueTableMaintenanace from "@/components/proctor-manager/issueTable";
 
-const ViewMaintenance = () => {
+const DeanMaintenanceIssue = () => {
  
   const { user } = useSelector((state) => state.auth);
   const [AllMaintainanceIssue, setAllMaintainanceIssue] = useState();
@@ -25,7 +26,7 @@ const ViewMaintenance = () => {
   useEffect(() => {
     let gender = capitalizeFirstLetter(user.sex);
     if (selectedStatus === "All") {
-      dispatch(GetAllMaintainanceIssue(gender)).then((data) => {
+      dispatch(GetWholeMaintainanceIssueOfDean()).then((data) => {
         if (data.payload.success) {
           setAllMaintainanceIssue(data.payload);
         }
@@ -46,7 +47,9 @@ const ViewMaintenance = () => {
       <CardHeader>
         <CardTitle>Maintenance Issues</CardTitle>
       </CardHeader>
+
       <div className="w-full  flex justify-end gap-2 m-3">
+        
         <Button className={selectedStatus==='All'?'bg-green-600':''} onClick={() => setSelectedStatus("All")}>All</Button>
         <Button className={selectedStatus==='Resolved'?'bg-green-600':''} onClick={() => setSelectedStatus("Resolved")}>Resolved</Button>
         <Button className={selectedStatus==='verified'?'bg-green-600':''} onClick={() => setSelectedStatus("verified")}>Verified</Button>
@@ -69,4 +72,4 @@ const ViewMaintenance = () => {
   );
 };
 
-export default ViewMaintenance;
+export default DeanMaintenanceIssue;

@@ -11,7 +11,10 @@ export const InsertAllocatedStudent=createAsyncThunk('student/allocation',async(
     
     
     try {
-        const respons=await axios.post('http://localhost:5000/api/student/insert',updatedStudent,{
+
+      
+        
+        const respons=await axios.post('http://localhost:9000/api/student/insert',updatedStudent,{
             withCredentials:true
         })
      console.log(respons.data,"response of student add");
@@ -28,7 +31,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     
     
     try {
-        const response=await axios.get('http://localhost:5000/api/student/get', {
+        const response=await axios.get('http://localhost:9000/api/student/get', {
             withCredentials:true
         });
         
@@ -43,7 +46,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
 export const getSingleStudent=createAsyncThunk('student/getSingleStudent',async({id})=>{
      
     try {
-        const response=await axios.get(`http://localhost:5000/api/student/getOne/${id}`, {
+        const response=await axios.get(`http://localhost:9000/api/student/getOne/${id}`, {
             withCredentials:true
         });
         console.log(response.data,"response of student get from slice");
@@ -58,7 +61,7 @@ export const getSingleStudent=createAsyncThunk('student/getSingleStudent',async(
 
 export const updateStudent=createAsyncThunk('student/update',async({studentId,updatedData})=>{
     try {
-        const response=await axios.put(`http://localhost:5000/api/student/update/${studentId}`,updatedData,{
+        const response=await axios.put(`http://localhost:9000/api/student/update/${studentId}`,updatedData,{
             withCredentials:true
         })  
         console.log(response.data,"response of student update");

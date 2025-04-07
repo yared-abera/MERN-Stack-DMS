@@ -12,8 +12,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 import DetailAllocationStart from "./detailAllocationStart";
 import { Card, CardContent } from "../ui/card";
+import DefaultAllocation from "./DefaultAllocation";
+import { GetAvaiableBlocks } from "@/store/blockSlice";
+import { getAllocatedStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function AllocationPage({ dataFormat, selectedValue }) {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(GetAvaiableBlocks());
+    dispatch(getAllocatedStudent());
+  }, [dispatch]);
   const [categorizedStudents, setCategorizedStudents] = useState({
     GenderMale: {
       RegularMale: { NaturalStream: [], SoctiaStream: [] },
@@ -30,9 +39,6 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
   const [showAllocationComponent, setShowAllocationComponent] = useState(false); // State to control visibility
 
   // Toggle the visibility of the AllocationComponent
-  const handleShowAllocationComponent = () => {
-    setShowAllocationComponent((prev) => !prev);
-  };
 
   useEffect(() => {
     if (dataFormat?.length && selectedValue !== "gust") {
@@ -132,7 +138,6 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
       femaleSocial,
     };
   }, [categorizedStudents]);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const userCalculatedValue = {
@@ -164,7 +169,7 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
         </div>
 
         <div className="grid grid-cols-1 gap-2 md:gap-0.5 md:grid-cols-2 px-3 md:px-6">
-          <Card className='w-auto'>
+          <Card className="w-auto">
             <CardContent>
               <p>Total Student : {dataFormat.length}</p>
               <p>Total Male : {totalMale}</p>
@@ -200,27 +205,43 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
       <div className="w-full ">
         <Tabs defaultValue="detail" className="  ">
           <div className="mx-auto">
-          <TabsList className="place-content-center flex my-4 ">
-            <TabsTrigger value="default">Default Allocation</TabsTrigger>
-            <TabsTrigger value="detail">Detail Allocation</TabsTrigger>
-          </TabsList>
+            <TabsList className="place-content-center flex my-4 ">
+              <TabsTrigger value="default">Default Allocation</TabsTrigger>
+              <TabsTrigger value="detail">Detail Allocation</TabsTrigger>
+            </TabsList>
           </div>
-          
-          <TabsContent value="default ">
-            <div className="mt-6 flex justify-center">
-              <button
-                onClick={handleShowAllocationComponent}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              >
-                {showAllocationComponent
-                  ? "Hide Allocation"
-                  : "Show Allocation"}
-              </button>
-            </div>
 
-            {showAllocationComponent && (
-              <AllocationComponent categorizedStudents={categorizedStudents} />
-            )}
+          <TabsContent value="default">
+            <div className="px-6 py-8 bg-gray-400/10 rounded-lg shadow-lg ">
+              <div>
+                <h1 className="text-center text-lg md:text-xl font-bold m-4">
+                  About Default Allocation
+                </h1>
+                <p className="text-sm w-[75%] mx-auto">
+                  The default allocation process automatically assigns available
+                  dorm rooms to students. Physical impaired students are
+                  prioritized to receive placement on floor 1 of a selected (designated)
+                   block—if none is available, it take from available blook of floor 1
+                  is used. It follows standard rules, prioritizing students
+                  based on needs (like disability) and category (like gender and
+                  stream), to fill rooms efficiently. You'll see status updates
+                  as it runs
+                </p>
+              </div>
+
+              <Button
+                onClick={() =>
+                  setShowAllocationComponent(!showAllocationComponent)
+                }
+                className=""
+              >
+                Allocte
+              </Button>
+
+              {showAllocationComponent ? (
+                <DefaultAllocation categorizedStudents={categorizedStudents} />
+              ) : null}
+            </div>
           </TabsContent>
           <TabsContent value="detail">
             <DetailAllocationStart />

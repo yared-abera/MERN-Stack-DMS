@@ -160,7 +160,7 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
         {/* Header */}
        
         {/* Main Content */}
-        <div className="flex-1 relative min-h-screen mt-32">
+        <div className="flex-1 relative min-h-screen">
         <div
           className={` p-4 pt-0  md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 ${
             // isCollapsed ? "left-16 w-[calc(100%-5rem)]" : 
