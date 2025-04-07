@@ -26,10 +26,10 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 9000;
 
 app.use(cors({
-    origin: process.env.Client_URL || "http://localhost:5173",
+  origin:["http://localhost:5174","http://localhost:5173"],
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: [
         "content-type",
@@ -46,6 +46,7 @@ app.use("/api/auth/", auth_route);
 app.use("/api/block/", block_route);
 app.use("/api/dorm/", dorm_route);
 app.use('/api/student/', student_Route);
+app.use('/api/user',user_Route)
 app.use('/api/maintainanceIssue/', maintenance_Route); // Add this lineapp.use('/api/user',user_Route)
 
 app.listen(PORT, () => {

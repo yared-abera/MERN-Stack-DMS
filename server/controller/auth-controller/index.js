@@ -1,26 +1,23 @@
 const User = require("../../model/user/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Student=require('../../model/student/student')
-
-
+const Student = require("../../model/student/student");
 
 const logInUser = async (req, res) => {
   try {
     const { userName, password } = req.body;
-    const userModels = [User, Student]; 
+    const userModels = [User, Student];
 
     let foundUser = null;
-    
+
     for (const model of userModels) {
       const findUser = await model.findOne({ userName });
       if (findUser) {
         foundUser = findUser;
         break;
-      }
+      } 
     }
 
-   
     //const foundUser = await User.findOne({ userName });
 
     // Check if user exists
@@ -47,9 +44,10 @@ const logInUser = async (req, res) => {
     const token = jwt.sign(
       {
         id: foundUser._id,
-        role: foundUser.role,
         email: foundUser.email,
+        role: foundUser.role,
         userName: foundUser.userName,
+        sex: foundUser.sex,
       },
       process.env.CLIENT_SECRET_KEY,
       { expiresIn: "30m" }
@@ -60,10 +58,11 @@ const logInUser = async (req, res) => {
       success: true,
       message: "Logged in Successfully",
       user: {
-        email: foundUser.email,
         id: foundUser._id,
+        email: foundUser.email,
         role: foundUser.role,
         userName: foundUser.userName,
+        sex: foundUser.sex,
       },
     });
   } catch (error) {
@@ -74,7 +73,6 @@ const logInUser = async (req, res) => {
     });
   }
 };
-
 
 const UserAccount = async (req, res) => {
   try {
@@ -92,13 +90,12 @@ const UserAccount = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-   
-  
+
     const newUser = new User({
       fName,
       mName,
-      lName, 
-      gender,
+      lName,
+      sex: gender,
       phoneNum,
       userName,
       email,
@@ -129,7 +126,6 @@ const LogOut = async (req, res) => {
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token; // Corrected to req.cookies
-    console.log("token", token);
 
     if (!token) {
       return res.json({
@@ -139,7 +135,6 @@ const authMiddleware = async (req, res, next) => {
     }
     const decode = jwt.verify(token, process.env.CLIENT_SECRET_KEY); // Use environment variable
 
-    console.log(decode, "decode");
     req.user = decode;
     next();
   } catch (e) {

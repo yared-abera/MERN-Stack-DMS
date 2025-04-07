@@ -24,6 +24,9 @@ const InsertStudent = async (req, res) => {
        dorm,
       role,
     } = req.body;
+
+    const stud=req.body
+    console.log(stud,"stud")
     
 
     // Check if username or email already exists
@@ -100,9 +103,7 @@ const fetchAllStudent = async (req, res) => {
 
 const fetchSingleStudent = async (req, res) => {
   try {
-    const {id}=req.params;
-    console.log(id,"id in single user")
-  
+    const {id}=req.params; 
     const student = await Student.findById(id);
     if(!student){
       return  res.json({
@@ -111,7 +112,7 @@ const fetchSingleStudent = async (req, res) => {
       });
     }
 
-    console.log(student)
+     
     res.status(200).json({
       success: true,
       data: student,
