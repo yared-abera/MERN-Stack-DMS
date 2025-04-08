@@ -12,7 +12,17 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String,   required: true },
     address:{type:String,default:'wolkite'},
-    status: { type: String, enum: ['active', 'inactive'], default: 'active' }
+    status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    profileImage: { type: String, default: '' },
+    bio: { type: String, default: '' },
+    country: { type: String, default: 'Ethiopia' },
+    city: { type: String, default: '' },
+    socialLinks: {
+        facebook: { type: String, default: '' },
+        twitter: { type: String, default: '' },
+        telegram: { type: String, default: '' },
+        linkedin: { type: String, default: '' }
+    }
 },{ timestamps: true });
 
  module.exports=mongoose.model("User",userSchema)
