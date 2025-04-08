@@ -43,28 +43,14 @@ export const getSingleUser = createAsyncThunk("getOne/user", async (id) => {
 
 export const UpdateUser = createAsyncThunk("Update/user", async ({formData,id}) => {
   try {
-    console.log(`Updating user with ID: ${id}`);
     
-    // Log the size of the profile image if it exists
-    if (formData.profileImage) {
-      console.log(`Profile image size being sent: ${Math.round(formData.profileImage.length / 1024)} KB`);
-    }
-    
-    const response = await axios.put(`http://localhost:9000/api/user/update/${id}`, formData, {
+    const response = await axios.put(`http://localhost:9000/api/user/update/${id}`,formData ,{
       withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating user:", error);
-    // Return a structured error object that can be handled by the component
-    return {
-      success: false,
-      message: error.response?.data?.message || "Failed to update user. Please try again.",
-      error: error.message
-    };
+    console.error("Error getting single user:", error);
+    throw error; // Optionally throw the error to handle it in your slice
   }
 });
 

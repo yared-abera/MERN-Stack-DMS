@@ -171,84 +171,31 @@ export default function AccountPage({ ThisUser }) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result;
+        setProfileImage(base64String);
         
-        // Compress the image by reducing its quality
-        const img = new Image();
-        img.src = base64String;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          // Set maximum dimensions
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-          
-          let width = img.width;
-          let height = img.height;
-          
-          // Calculate new dimensions while maintaining aspect ratio
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
+        // Update user profile with the new image
+        const updatedUser = {
+          ...ThisUser,
+          profileImage: base64String
+        };
+        
+        dispatch(UpdateUser({ formData: updatedUser, id: ThisUser._id })).then((data) => {
+          setIsLoading(false);
+          if (data?.payload?.success) {
+            toast.success("Profile image updated successfully", {
+              duration: 3000,
+              position: "top-center",
+              style: {
+                background: "#10B981",
+                color: "white",
+                borderRadius: "8px",
+                padding: "16px",
+              },
+            });
+            // Refresh user data after successful update
+            refreshUserData();
           } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          // Draw the image with the new dimensions
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Convert to base64 with reduced quality
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-          
-          // Update the profile image state
-          setProfileImage(compressedBase64);
-          
-          // Update user profile with the compressed image
-          const updatedUser = {
-            ...ThisUser,
-            profileImage: compressedBase64
-          };
-          
-          // Send the update to the server
-          dispatch(UpdateUser({ formData: updatedUser, id: ThisUser._id })).then((data) => {
-            setIsLoading(false);
-            if (data?.payload?.success) {
-              toast.success("Profile image updated successfully", {
-                duration: 3000,
-                position: "top-center",
-                style: {
-                  background: "#10B981",
-                  color: "white",
-                  borderRadius: "8px",
-                  padding: "16px",
-                },
-              });
-              // Refresh user data after successful update
-              refreshUserData();
-            } else {
-              toast.error("Failed to update profile image", {
-                duration: 3000,
-                position: "top-center",
-                style: {
-                  background: "#EF4444",
-                  color: "white",
-                  borderRadius: "8px",
-                  padding: "16px",
-                },
-              });
-            }
-          }).catch(error => {
-            setIsLoading(false);
-            console.error("Error updating profile image:", error);
-            toast.error("Error updating profile image. Please try again.", {
+            toast.error("Failed to update profile image", {
               duration: 3000,
               position: "top-center",
               style: {
@@ -258,8 +205,8 @@ export default function AccountPage({ ThisUser }) {
                 padding: "16px",
               },
             });
-          });
-        };
+          }
+        });
       };
       reader.readAsDataURL(file);
     }
