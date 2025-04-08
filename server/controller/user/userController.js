@@ -58,11 +58,6 @@ const UpdateUser = async (req, res) => {
     }
 
     const formData = req.body;
-    
-    // Log the size of the profile image if it exists
-    if (formData.profileImage) {
-      console.log(`Profile image size: ${Math.round(formData.profileImage.length / 1024)} KB`);
-    }
 
     // Update the user directly using id and formData as the update object
     const updatedUser = await User.findByIdAndUpdate(id, formData, {
