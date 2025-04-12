@@ -159,6 +159,7 @@ export default function AllocationPage({ dataFormat, selectedValue }) {
     );
   }, [categorizedStudents, selectedValue]);
 
+  console.log("dataFormat in allocation page", dataFormat)
   return (
     <div className="w-full min-h-screen m-2 border-solid border-2 px-3 md:px-5">
       <div className="flex flex-col gap-2 p-3 md:p-6">

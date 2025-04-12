@@ -28,7 +28,7 @@ const promSide = [
   { id: "viewFeedback", label: "View Feedback", icon: MessageSquare , url:"/proctor-manager/viewFeedback"},
   { id: "viewMaintenance", label: "View Maintenance", icon: Wrench , url:"/proctor-manager/viewMaintenance"},
   { id: "generateReport", label: "Generate Report", icon: FileText , url:"/proctor-manager/generateReport"},
-  { id: "profile", label: "Profile", icon: User , url:"/proctor-manager/profile"},
+  { id: "Account", label: "Account", icon: User , url:"/proctor-manager/Account"},
 ];
 
 export default function SideBarComponent() {

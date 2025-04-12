@@ -26,6 +26,53 @@ export const InsertAllocatedStudent=createAsyncThunk('student/allocation',async(
 
 })
 
+export const UpdateStudent=createAsyncThunk('UpdateStudent/get',async({id,formData})=>{
+    
+    
+    try {
+        const response=await axios.put(`http://localhost:9000/api/student/update/${id}`, formData, {
+            withCredentials:true
+        });
+        
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+
+})
+
+export const DeleteStudent=createAsyncThunk('DeleteStudent/get',async({ id,blockNum,dormId,sex})=>{
+   
+    
+    try {
+       
+        const response=await axios.delete(`http://localhost:9000/api/student/delete/${id}`,{blockNum,dormId,sex}, {
+            withCredentials:true
+        });
+        
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+            
+})
+
+
+export const DeleteAllStudent = createAsyncThunk(
+    'DeleteAllStudent/deleteAll',
+    async (StudentData, { rejectWithValue }) => {
+      try {
+        const response = await axios.delete(`http://localhost:9000/api/student/deleteAll`, {
+          data: StudentData, // Pass the array in the data property of the config object
+          withCredentials: true
+        });
+        
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );  
 
 export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     

@@ -35,8 +35,11 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { GetAllMaintainanceIssue } from "@/store/maintenanceIssue/maintenanceIssue";
 import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Eye, List } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default function IssueTableMaintenanace({ AllMaintainanceIssue }) {
+export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
   // const { user } = useSelector((state) => state.auth);
   const [openDialog, setDialog] = useState(false);
   const [userData, setUserData] = useState("");
@@ -48,6 +51,7 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue }) {
       (issue) => issue._id === id
     );
 
+    console.log(viewIssue, "viewIssue");
     setUserData(viewIssue);
     setDialog(true);
   }
@@ -58,75 +62,95 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue }) {
   }
 
   function HandleChangeStatus(id, value, issue) {
+    console.log(id, value, issue, "id, value, issue");
     setVerifiedId({ id, value, issue });
     setOpenAlert(true);
   }
   function HandleContinue(id) {
-    dispatch(VerificationIssue(id)).then((data) => {
-      if (data.payload.success) {
-        const gender = capitalizeFirstLetter(user.sex);
-        dispatch(GetAllMaintainanceIssue(gender));
-        toast.success("👍 Status Updated Successfully");
-      }
-    });
+    // dispatch(VerificationIssue(id)).then((data) => {
+    //   if (data.payload.success) {
+    //     const gender = capitalizeFirstLetter(user.sex);
+    //     dispatch(GetAllMaintainanceIssue(gender));
+    //     toast.success("👍 Status Updated Successfully");
+    //   }
+    // });
+    console.log(id, "id");
   }
 
   console.log(AllMaintainanceIssue, "AllMaintainanceIssue");
 
   return (
-    <div>
+    <div className="w-full overflow-auto">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>First Name</TableHead>
-            <TableHead>Middle Name</TableHead>
-            <TableHead>Last Name</TableHead>
-            <TableHead>User Name</TableHead>
-            <TableHead>Block</TableHead>
-            <TableHead>Room</TableHead>
-            <TableHead>Issue Types</TableHead>
-            <TableHead>Date Reported</TableHead>
-            <TableHead>View Detail</TableHead>
+          <TableRow className="bg-gray-50 dark:bg-gray-800/50">
+            <TableHead className="font-semibold">First Name</TableHead>
+            <TableHead className="font-semibold">Middle Name</TableHead>
+            <TableHead className="font-semibold">Last Name</TableHead>
+            <TableHead className="font-semibold">User Name</TableHead>
+            <TableHead className="font-semibold">Block</TableHead>
+            <TableHead className="font-semibold">Room</TableHead>
+            <TableHead className="font-semibold">Issue Types</TableHead>
+            <TableHead className="font-semibold">Date Reported</TableHead>
+            <TableHead className="font-semibold text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {AllMaintainanceIssue?.data?.map((issue, index) => (
-            <TableRow key={index}>
-              {/* Access userInfo properties correctly */}
-              <TableCell>{issue.userInfo.fName}</TableCell>
+            <TableRow 
+              key={index}
+              className={cn(
+                "transition-colors hover:bg-gray-50/50 dark:hover:bg-gray-800/50",
+                index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+              )}
+            >
+              <TableCell className="font-medium">{issue.userInfo.fName}</TableCell>
               <TableCell>{issue.userInfo.mName}</TableCell>
               <TableCell>{issue.userInfo.lName}</TableCell>
-              <TableCell>{issue.userInfo.userName}</TableCell>
-              <TableCell>{issue.userInfo.blockNumber}</TableCell>
-              <TableCell>{issue.userInfo.roomNumber}</TableCell>
-
+              <TableCell className="font-medium text-blue-600">{issue.userInfo.userName}</TableCell>
+              <TableCell>
+                <Badge variant="outline" className="font-medium">
+                  Block {issue.userInfo.blockNumber}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline" className="font-medium">
+                  Room {issue.userInfo.roomNumber}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      View Issues ({issue.issueTypes.length})
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <List className="h-4 w-4" />
+                      <span>Issues ({issue.issueTypes.length})</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
+                  <DropdownMenuContent align="end" className="w-[200px]">
                     {issue.issueTypes.map((type, idx) => (
-                      <DropdownMenuItem key={idx}>
-                        {type.issue}
+                      <DropdownMenuItem key={idx} className="py-2">
+                        <Badge variant="secondary" className="font-medium">
+                          {type.issue}
+                        </Badge>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
-
               <TableCell>
-                {new Date(issue.createdAt).toLocaleDateString()}
+                <Badge variant="secondary" className="font-medium">
+                  {new Date(issue.createdAt).toLocaleDateString()}
+                </Badge>
               </TableCell>
-
-              <TableCell>
+              <TableCell className="text-right">
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={() => handleViewDetail(issue._id)}
+                  className="flex items-center gap-2"
                 >
-                  👀
+                  <Eye className="h-4 w-4" />
+                  View Details
                 </Button>
               </TableCell>
             </TableRow>
@@ -134,220 +158,237 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue }) {
         </TableBody>
       </Table>
 
-      {userData !== "" ? (
-        <Dialog open={openDialog} onOpenChange={() => handleRemoveDialog()}>
-          <DialogContent className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-screen overflow-y-auto ">
-            <DialogHeader className="mb-4">
-              <DialogTitle className="text-xl font-semibold text-gray-800">
-                View Maintenance Issue Detail
-              </DialogTitle>
-            </DialogHeader>
-            <DialogDescription>
-              <div className="flex flex-col gap-4">
-                {/* User Information Section */}
-                <div className="border rounded-md p-4">
-                  <h2 className="text-lg font-bold text-gray-700 mb-2">
-                    User Information
-                  </h2>
-                  <div className="grid grid-cols-2 gap-y-2 gap-x-4">
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        First Name:
-                      </span>
+ 
+
+{userData&& userData!=='' && (
+          <Dialog open={openDialog} onOpenChange={handleRemoveDialog}>
+            <DialogContent className="sm:max-w-md md:max-w-lg lg:max-w-xl max-h-screen overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold text-center text-gray-800">
+                  Maintenance Issue Details
+                </DialogTitle>
+              </DialogHeader>
+              {userData ? (
+                <div className="space-y-4 py-4 px-2">
+                  {/* User Information Section */}
+                  <div className="px-4 py-3 border border-gray-300 rounded-md shadow-sm">
+                    <h2 className="text-center text-lg font-bold mb-3 text-gray-700">
+                      User Information
+                    </h2>
+                    <div className="space-y-1 text-sm text-gray-600">
+                      <p>
+                        <span className="font-semibold mr-2 text-gray-900">
+                          First Name:
+                        </span>
+                        {userData.userInfo.fName}
+                      </p>
+                      <p>
+                        <span className="font-semibold mr-2 text-gray-900">
+                          Middle Name:
+                        </span>
+                        {userData.userInfo.mName}
+                      </p>
+                      <p>
+                        <span className="font-semibold mr-2 text-gray-900">
+                          Last Name:
+                        </span>
+                        {userData.userInfo.lName}
+                      </p>
+                      <p>
+                        <span className="font-semibold mr-2 text-gray-900">
+                          Username:
+                        </span>
+                        {userData.userInfo.userName}
+                      </p>
+                      <p>
+                        <span className="font-semibold mr-2 text-gray-900">
+                          Block Number:
+                        </span>
+                        {userData.userInfo.blockNumber}
+                      </p>
+                      <p>
+                        <span className="font-semibold mr-2 text-gray-900">
+                          Room Number:
+                        </span>
+                        {userData.userInfo.roomNumber}
+                      </p>
+                      {userData.userInfo.phoneNumber && (
+                        <p>
+                          <span className="font-semibold mr-2 text-gray-900">
+                            Phone Number:
+                          </span>
+                          {userData.userInfo.phoneNumber}
+                        </p>
+                      )}
                     </div>
-                    <div>{userData.userInfo.fName}</div>
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        Middle Name:
-                      </span>
-                    </div>
-                    <div>{userData.userInfo.mName}</div>
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        Last Name:
-                      </span>
-                    </div>
-                    <div>{userData.userInfo.lName}</div>
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        User Name:
-                      </span>
-                    </div>
-                    <div>{userData.userInfo.userName}</div>
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        Block Number:
-                      </span>
-                    </div>
-                    <div>{userData.userInfo.blockNumber}</div>
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        Dorm Number:
-                      </span>
-                    </div>
-                    <div>{userData.userInfo.roomNumber}</div>
-                    <div>
-                      <span className="font-medium text-gray-600">
-                        Phone Number:
-                      </span>
-                    </div>
-                    <div>{userData.userInfo.phoneNumber}</div>
                   </div>
-                </div>
-
-                {/* Separator (optional, but can be visually improved) */}
-                <div className="border-t my-2 border-gray-300"></div>
-
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                    Issue Submitted
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2  gap-2  ">
-                    {userData.issueTypes.map((item, index) => (
-                      <div key={index} className="border rounded-md p-4">
-                        <h3 className="font-semibold text-gray-600 mb-1">
-                          Issue #{index + 1}
-                        </h3>
-                        <div className="grid grid-cols-2 gap-y-2 gap-x-4">
-                          <div>
-                            <span className="font-medium text-gray-500">
-                              Issue Type:
-                            </span>
-                          </div>
-                          <div>{item.issue}</div>
-                          <div>
-                            <span className="font-medium text-gray-500">
-                              Issue Status:
-                            </span>
-                          </div>
-                          <div>
-                            <span
-                              className={`inline-flex items-center justify-center px-2 py-1 text-xs font-bold rounded ${
-                                item.status === "pending"
-                                  ? "bg-yellow-200 text-yellow-800"
-                                  : item.status === "resolved"
-                                  ? "bg-green-200 text-green-800"
-                                  : "bg-red-200 text-red-800" // Add more status colors as needed
-                              }`}
-                            >
-                              {item.status}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-500 block">
-                              Description:
+                  <Separator />
+                  {/* Issues Submitted Section */}
+                  <div>
+                    <h2 className="text-lg font-bold text-center mb-3 text-gray-700">
+                      Issues Submitted
+                    </h2>
+                    {userData.issueTypes && userData.issueTypes.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {userData.issueTypes.map((item) => (
+                          <div
+                            key={item._id}
+                            className="px-4 py-3 border border-gray-300 rounded-md shadow-sm space-y-1 text-sm text-gray-600"
+                          >
+                            <p>
+                              <span className="font-semibold mr-2 text-gray-900">
+                                Issue Type:
+                              </span>
+                              {item.issue}
                             </p>
-                          </div>
-                          <div className="text-sm">{item.description}</div>
-                          <div>
-                            <span className="font-medium text-gray-500">
-                              Created At:
-                            </span>
-                          </div>
-                          <div className="text-sm">
-                            {new Date(item.createdAt).toLocaleString()}
-                          </div>{" "}
-                          {/* Format the date */}
-                        </div>
+                            <p>
+                              <span className="font-semibold mr-2 text-gray-900">
+                                Status:
+                              </span>
+                              <span className="px-2 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                                {item.status}
+                              </span>
+                            </p>
+                            <p>
+                              <span className="font-semibold mr-2 text-gray-900">
+                                Description:
+                              </span>
+                              {item.description}
+                            </p>
+                            <p>
+                              <span className="font-semibold mr-2 text-gray-900">
+                                Submitted:
+                              </span>
+                              {item.createdAt
+                                ? new Date(item.createdAt).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    }
+                                  )
+                                : "N/A"}
+                            </p>
+ 
+{user === 'ProctorManager' && item.status === 'verified' && (
+  <div className="flex flex-col gap-2 pt-4">
+    {/* Option 1: Change status */}
+    <div className="flex items-center"> {/* Removed gap-*. Added items-center */}
+      <Label htmlFor={`action-${item._id}-inprogress`} className="text-base text-blue-600 cursor-pointer"> {/* Added htmlFor and cursor-pointer */}
+        Change status to In Progress
+      </Label>
+      <input
+        id={`action-${item._id}-inprogress`} // Added id matching Label's htmlFor
+        type="radio"
+        name={`action-${item._id}`} // unique group per issue
+        value="InProgress"
+        checked={verifiedId.value === 'InProgress'}
+        onChange={(e) =>
+          HandleChangeStatus(item._id, item.issue, e.target.value)
+        }
+        className="ml-2 cursor-pointer" // Added specific margin (e.g., ml-2) and cursor-pointer
+      />
+    </div>
 
-                        {item.status === "verified" ? (
-                          <div className="mt-4 border-t border-gray-300">
-                            <h1 className="text-lg font-semibold">
-                              Change The Status
-                            </h1>
-                            <div className="flex flex-col gap-2 mt-4">
-                              <div className="flex  flex-col  ">
-                                <Label className="text-sm text-violet-900">
-                                  Change the status to Inprogress :
-                                </Label>
-                                <input
-                                  className=" mt-[-15px] ml-4"
-                                  type="radio"
-                                  name={`action-${item._id}`}
-                                  value="InProgress"
-                                  checked={
-                                    verifiedId.id === item._id &&
-                                    verifiedId.value === "InProgress"
-                                  }
-                                  onChange={(e) =>
-                                    HandleChangeStatus(
-                                      item._id,
-                                      e.target.value,
-                                      item.issue
-                                    )
-                                  }
-                                />
-                              </div>
+    {/* Option 2: Pass to Dean */}
+    <div className="flex items-center"> {/* Removed gap-*. Added items-center */}
+      <Label htmlFor={`action-${item._id}-pass`} className="text-base text-red-600 cursor-pointer"> {/* Added htmlFor and cursor-pointer */}
+        Pass The Issue to Dean
+      </Label>
+      <input
+        id={`action-${item._id}-pass`} // Added id matching Label's htmlFor
+        type="radio"
+        name={`action-${item._id}`} // same unique group per issue
+        value="Pass"
+        checked={verifiedId.value === 'Pass'}
+        onChange={(e) =>
+          HandleChangeStatus(item._id, item.issue, e.target.value)
+        }
+        className="ml-2 cursor-pointer" // Added specific margin (e.g., ml-2) and cursor-pointer
+      />
+    </div>
+  </div>
+)}
 
-                              <div className="flex flex-col">
-                                <Label className="text-sm text-green-700">
-                                  Pass the issue to System Admin:
-                                </Label>
-                                <input
-                                  className="mt-[-12px]  ml-[-14px]"
-                                  type="radio"
-                                  name={`action-${item._id}`}
-                                  value="Pass"
-                                  checked={
-                                    verifiedId.id === item._id &&
-                                    verifiedId.value === "Pass"
-                                  }
-                                  onChange={(e) =>
-                                    HandleChangeStatus(
-                                      item._id,
-                                      e.target.value,
-                                      item.issue
-                                    )
-                                  }
-                                />
-                              </div>
-                            </div>
+{user === 'dean' && item.status === 'Pass' && (
+  <div className="flex items-center pt-4"> {/* Removed gap-*. Added items-center */}
+    <Label htmlFor={`action-${item._id}-inprogress-dean`} className="text-base text-blue-600 cursor-pointer"> {/* Added htmlFor and cursor-pointer */}
+      Change status to In Progress:
+    </Label>
+    <input
+      id={`action-${item._id}-inprogress-dean`} // Added id matching Label's htmlFor
+      type="radio"
+      name={`action-${item._id}`} // unique group per issue
+      value="InProgress"
+      checked={verifiedId.value === 'InProgress'}
+      onChange={(e) =>
+        HandleChangeStatus(item._id, item.issue, e.target.value)
+      }
+      className="ml-2 cursor-pointer" // Added specific margin (e.g., ml-2) and cursor-pointer
+    />
+  </div>
+)}
                           </div>
-                        ) : null}
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <p className="text-center text-gray-500">
+                        No issues submitted.
+                      </p>
+                    )}
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-10">Loading details...</div>
+              )}
 
-              <AlertDialog
-                open={openAlert}
-                onOpenChange={() => setOpenAlert(false)}
-              >
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Changing the status of{" "}
-                      <span className="text-violet-600 text-base font-semibold">
-                        {verifiedId.issue}
-                      </span>{" "}
-                      Issue in to
-                      <span className="text-blue-600 text-base font-semibold">
-                        {" " + verifiedId.value === " Pass"
-                          ? "Pass to System admin"
-                          : "In Progress"}
-                      </span>
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to proceed with your action?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setVerifiedId({})}>
-                      No
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => HandleContinue(verifiedId)}
-                    >
-                      Yes
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </DialogDescription>
-          </DialogContent>
-        </Dialog>
-      ) : null}
+             { verifiedId &&
+                Object.values(verifiedId).some(
+                  (action) => action.value!==""  
+                ) && (
+                  <AlertDialog
+                    open={openAlert}
+                    onOpenChange={() => setOpenAlert(false)}
+                  >
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to proceed with your action?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel
+                          onClick={() =>{setVerifiedId({});setOpenAlert(false)}}
+                        >
+                          No
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => HandleContinue(verifyId)}
+                        >
+                          Yes
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )} 
+            </DialogContent>
+          </Dialog>
+        )}
     </div>
   );
 }
+
+// function InfoItem({ label, value }) {
+//   return (
+//     <div className="space-y-1">
+//       <Label className="text-sm text-gray-500 dark:text-gray-400">{label}</Label>
+
+
+//       <div className="font-medium text-gray-900 dark:text-gray-100">{value}</div>
+//     </div>
+//   );
+// }

@@ -74,6 +74,26 @@ export const GetMainenanceIssueByStatus = createAsyncThunk(
   }
 );
 
+export const GetMainenanceIssueByStatusForDean = createAsyncThunk(
+  "get/GetMainenanceIssueByStatus",
+  async (selectedStatus ) => {
+
+    console.log('selectedStatus',selectedStatus)
+    
+    
+    const response = await axios.get(
+      `http://localhost:9000/api/maintainanceIssue/getByStatusForDean/${selectedStatus}`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+);
+
+
+
 
 
 

@@ -1,15 +1,46 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
-import { useDispatch, useSelector} from "react-redux";
-import {  getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
-import { FaArrowLeft, FaSearch } from "react-icons/fa"; 
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllocatedStudent,
+  UpdateStudent,
+  DeleteStudent,
+  DeleteAllStudent,
+} from "../../store/studentAllocation/allocateSlice";
+import { FaArrowLeft, FaSearch } from "react-icons/fa";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { ArrowBigDownDashIcon } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const customStyles = {
   headCells: {
@@ -32,10 +63,12 @@ const customStyles = {
   },
 };
 
-const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for clarity
+const StudentInfo = () => {
+  // Renamed from StudentInfo to IncidentList for clarity
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [Students, setStudents] = useState([]);
+
   const [filteredIncidents, setFilteredStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,21 +76,25 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  
-  const [filterButtonText, setFilterButtonText] = useState(null); // Default filter button text
+  const [sexValue, setSexValue] = useState(selectedStudent?.sex || "");
+  const [deleteUserConfirmation, setDeleteUserConfirmation] = useState(false);
+  const [deleteStudentId, setDeleteStudentId] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [filterButtonText, setFilterButtonText] = useState('All'); // Default filter button text
+  const [deleteAllConfirmation, setDeleteAllConfirmation] = useState(false);
+  const [deleteAllStudents, setDeleteAllStudents] = useState([]);
 
   // Fetch Incidents
   useEffect(() => {
     const getStudents = async () => {
       setLoading(true);
       try {
-        
         const { payload } = await dispatch(getAllocatedStudent());
-         console.log(payload, "payload");
-         
+        console.log(payload, "payload");
+
         if (payload?.data) {
           setStudents(payload.data);
-          setFilteredStudents(payload.data);  
+          setFilteredStudents(payload.data);
         }
       } catch (error) {
         console.error("Error fetching students:", error);
@@ -65,7 +102,7 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
         setLoading(false);
       }
     };
-    
+
     getStudents();
   }, [dispatch]);
 
@@ -95,17 +132,48 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
       )
     );
   };
+  function HandleDeleteStudent(id, blockNum, dormId, sex) {
+    dispatch(DeleteStudent({ id, blockNum, dormId, sex })).then((res) => {
+      if (res.payload.success) {
+       
+
+        toast.success(res.payload.message);
+        dispatch(getAllocatedStudent()).then((res) => {
+          if (res.payload) {
+            setStudents(res.payload.data);
+            setFilteredStudents(res.payload.data);
+          }
+        });
+
+     
+      } else {
+        toast.error(`${res.payload.message}`);
+      }
+
+      setDeleteUserConfirmation(false);
+      setDeleteStudentId("");
+    });
+  }
 
   // Add this function to handle student updates
   const handleUpdateStudent = async (updatedData) => {
     try {
-      // Add your API call here to update the student
-      // After successful update, refresh the student list
-      const { payload } = await dispatch(getAllocatedStudent());
-      if (payload?.data) {
-        setStudents(payload.data);
-        setFilteredStudents(payload.data);
-      }
+      dispatch(
+        UpdateStudent({ id: updatedData._id, formData: updatedData })
+      ).then((res) => {
+        if (res.payload.success) {
+          toast.success(res.payload.message);
+          dispatch(getAllocatedStudent()).then((res) => {
+            if (res.payload) {
+              setStudents(res.payload.data);
+              setFilteredStudents(res.payload.data);
+            }
+          });
+        } else {
+          toast.error(`${res.payload.message}`);
+        }
+      });
+
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating student:", error);
@@ -118,7 +186,11 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
       { name: "Student ID", selector: (row) => row.userName, sortable: true },
       { name: "First Name", selector: (row) => row.Fname, sortable: true },
       { name: "Last Name", selector: (row) => row.Lname, sortable: true },
-      { name: "Student Type", selector: (row) => row.studCategory, sortable: true },
+      {
+        name: "Student Type",
+        selector: (row) => row.studCategory,
+        sortable: true,
+      },
       { name: "Block Number", selector: (row) => row.blockNum, sortable: true },
       {
         name: "Dorm Number",
@@ -129,119 +201,209 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
         name: "Actions",
         cell: (row) => (
           <>
-            <button
-              onClick={() => {
-                setSelectedStudent(row);
-                setIsViewDialogOpen(true);
-              }}
-              className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 mr-2"
-            >
-              View
-            </button>
-            <button
-              onClick={() => {
-                setSelectedStudent(row);
-                setIsEditDialogOpen(true);
-              }}
-              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-            >
-              Edit
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <ArrowBigDownDashIcon />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel className="text-center">
+                  Actions
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <button
+                    onClick={() => {
+                      setSelectedStudent(row);
+                      setIsViewDialogOpen(true);
+                    }}
+                    className="w-full text-left focus:outline-none px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700" // Added focus outline removal and made button fill item
+                  >
+                    View
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <button
+                    onClick={() => {
+                      setSelectedStudent(row);
+                      setIsEditDialogOpen(true);
+                    }}
+                    className="w-full text-left focus:outline-none px-3 py-1 bg-green-600 text-white rounded-md hover:bg-blue-700" // Added focus outline removal and made button fill item
+                  >
+                    edit
+                  </button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <button
+                    onClick={() => {
+                      setDeleteUserConfirmation(true);
+                      setDeleteStudentId(row);
+                    }}
+                    className="w-full text-left focus:outline-none px-3 py-1 bg-red-600 text-white rounded-md hover:bg-blue-700" // Added focus outline removal and made button fill item
+                  >
+                    delete
+                  </button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         ),
       },
     ],
     [] // Removed unnecessary dependency
   );
+function handleDeleteAll(filteredIncidents){
+  console.log('filteredIncidents on delete all',filteredIncidents)
+  dispatch(DeleteAllStudent(filteredIncidents)).then((res)=>{
+    if(res.payload.success){
+     
+      if(res.payload.data.deletedStudents.length>0){
+        toast.success(res.payload.data.deletedStudents.length+' students deleted successfully')
+      }
+      if(res.payload.data.failedStudents.length>0){
+        toast.error(res.payload.data.failedStudents.length+' students failed to delete')
+      }
+      dispatch(getAllocatedStudent()).then((res)=>{
+        if(res.payload.success){
+          setStudents(res.payload.data)
+          setFilteredStudents(res.payload.data)
+        }
+      })
+      console.log('res.payload.data',res.payload.data)
+    }else{
+      toast.error(res.payload.message)
+    }
+  })
+}
 
+  useEffect(() => {
+    if (selectedStudent) {
+      setSexValue(selectedStudent.sex);
+      setEditData({
+        Fname: selectedStudent.Fname,
+        Mname: selectedStudent.Mname,
+        Lname: selectedStudent.Lname,
+        sex: selectedStudent.sex,
+        studCategory: selectedStudent.studCategory,
+        blockNum: selectedStudent.blockNum,
+        dormId: selectedStudent.dormId,
+      });
+    }
+  }, [selectedStudent]);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    console.log(e.target.value, "e.target.value");
+
+    console.log("editData:", editData);
+    handleUpdateStudent({
+      _id: selectedStudent._id,
+      userName: selectedStudent.userName,
+      ...editData,
+    });
+  };
+console.log('filterButtonText',filterButtonText)
+console.log(filteredIncidents,filteredIncidents)
   return (
     <>
       <div className="flex flex-col">
         {/* Header */}
-       
+
         {/* Main Content */}
         <div className="flex-1 relative min-h-screen">
-        <div
-          className={` p-4 pt-0  md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 ${
-            // isCollapsed ? "left-16 w-[calc(100%-5rem)]" : 
-            "left-64 w-[calc(100%-17rem)]"
-          }`}
-        >
-          {/* Back Button */}
-          <button
-            className="flex items-center text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg shadow-md transition duration-300 mr-4"
-            onClick={() => navigate(-1)}
+          <div
+            className={` p-4 pt-0  md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 ${
+              // isCollapsed ? "left-16 w-[calc(100%-5rem)]" :
+              "left-64 w-[calc(100%-17rem)]"
+            }`}
           >
-            <FaArrowLeft className="mr-2 text-lg" /> Back
-          </button>
-          
-          <div  />
-          
-          {/* Search Input */}
-          <div className="relative flex items-center w-72 md:w-1/3 mr-4">
-            <FaSearch className="absolute left-3 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by Student ID"
-              className="h-10 px-4 py-2 border border-gray-300 rounded-md w-full pl-10"
-              value={searchQuery}
-              onChange={filterByInput}
-            />
+            {/* Back Button */}
+            <button
+              className="flex items-center text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg shadow-md transition duration-300 mr-4"
+              onClick={() => navigate(-1)}
+            >
+              <FaArrowLeft className="mr-2 text-lg" /> Back
+            </button>
+
+            <div />
+
+            {/* Search Input */}
+            <div className="relative flex items-center w-72 md:w-1/3 mr-4">
+              <FaSearch className="absolute left-3 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search by Student ID"
+                className="h-10 px-4 py-2 border border-gray-300 rounded-md w-full pl-10"
+                value={searchQuery}
+                onChange={filterByInput}
+              />
+            </div>
+
+            <button
+              onClick={() => setOpen(true)}
+              className=" hidden h-10 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md   items-center justify-center min-w-[150px] md:w-auto"
+            ></button>
           </div>
-          
-          
-         <button
-            onClick={() => setOpen(true)}
-            className=" hidden h-10 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md   items-center justify-center min-w-[150px] md:w-auto"
-          >
-             
-          </button> 
-           
-        </div>
-        
+
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4"> Student List</h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              {" "}
+              Student List
+            </h2>
+
             {/* Filter Buttons placed above the table */}
             <div className="flex justify-end space-x-2 mb-4">
               <button
-                className={`${filterButtonText==="All"?"bg-blue-600":" bg-gray-600"} px-3 py-1 text-white rounded-md hover:opacity-50`}
-                onClick={ 
-                  () => { resetFilters()
-                  setFilterButtonText("All")
-                }
-              }
+                className={`${
+                  filterButtonText === "All" ? "bg-blue-600" : " bg-gray-600"
+                } px-3 py-1 text-white rounded-md hover:opacity-50`}
+                onClick={() => {
+                  resetFilters();
+                  setFilterButtonText("All");
+                }}
               >
                 All
               </button>
               <button
-                className={`${filterButtonText==="Remedial"?"bg-blue-600":"bg-red-600"} px-3 py-1  text-white rounded-md hover:opacity-50 `}
-                onClick={() => {filterByButton("Remedial")
-                  setFilterButtonText("Remedial")
+                className={`${
+                  filterButtonText === "Remedial" ? "bg-blue-600" : "bg-red-600"
+                } px-3 py-1  text-white rounded-md hover:opacity-50 `}
+                onClick={() => {
+                  filterByButton("Remedial");
+                  setFilterButtonText("Remedial");
                 }}
               >
                 Remedial
               </button>
               <button
-                className={`${filterButtonText==="Fresh"?"bg-blue-600":"bg-yellow-600"} px-3 py-1 text-white rounded-md hover:opacity-50`}
-                onClick={() => {filterByButton("Fresh")
-                  setFilterButtonText("Fresh")
+                className={`${
+                  filterButtonText === "Fresh" ? "bg-blue-600" : "bg-yellow-600"
+                } px-3 py-1 text-white rounded-md hover:opacity-50`}
+                onClick={() => {
+                  filterByButton("Fresh");
+                  setFilterButtonText("Fresh");
                 }}
               >
                 Fresh
               </button>
               <button
-                className={`${filterButtonText==="Senior"?"bg-blue-600":" bg-green-600"} px-3 py-1 text-white rounded-md hover:opacity-50`}
-                onClick={() => {filterByButton("Senior")
-                  setFilterButtonText("Senior")
+                className={`${
+                  filterButtonText === "Senior"
+                    ? "bg-blue-600"
+                    : " bg-green-600"
+                } px-3 py-1 text-white rounded-md hover:opacity-50`}
+                onClick={() => {
+                  filterByButton("Senior");
+                  setFilterButtonText("Senior");
                 }}
               >
                 Senior
               </button>
             </div>
-            
+
             {loading ? (
-              <div className="text-center text-gray-600">Loading Students...</div>
+              <div className="text-center text-gray-600">
+                Loading Students...
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <DataTable
@@ -260,71 +422,186 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl rounded-lg h-screen overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Student Details</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">
+              Student Details
+            </DialogTitle>
           </DialogHeader>
+
           {selectedStudent && (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="font-bold">Student ID:</p>
-                <p>{selectedStudent.userName}</p>
+            <dl className="mt-4 border-t border-gray-200 divide-y divide-gray-200 ">
+              {/* Student ID */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Student ID
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.userName}
+                </dd>
               </div>
-              <div>
-                <p className="font-bold">Name:</p>
-                <p>{`${selectedStudent.Fname} ${selectedStudent.Lname}`}</p>
+
+              {/* Full Name */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Full Name</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {`${selectedStudent.Fname} ${selectedStudent.Mname} ${selectedStudent.Lname}`}
+                </dd>
               </div>
-              <div>
-                <p className="font-bold">Student Type:</p>
-                <p>{selectedStudent.studCategory}</p>
+
+              {/* Email */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Email</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.email}
+                </dd>
               </div>
-              <div>
-                <p className="font-bold">Block Number:</p>
-                <p>{selectedStudent.blockNum}</p>
+
+              {/* Phone Number */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Phone</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.phoneNum}
+                </dd>
               </div>
-              <div>
-                <p className="font-bold">Dorm Number:</p>
-                <p>{selectedStudent.dormId}</p>
+
+              {/* Batch */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Batch</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.batch}
+                </dd>
               </div>
-            </div>
+
+              {/* College */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">College</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.collage}
+                </dd>
+              </div>
+
+              {/* Department */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Department
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.department}
+                </dd>
+              </div>
+
+              {/* Stream */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Stream</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.stream}
+                </dd>
+              </div>
+
+              {/* Student Type */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Student Type
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.studCategory}
+                </dd>
+              </div>
+
+              {/* Block Number */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Block #</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.blockNum}
+                </dd>
+              </div>
+
+              {/* Dorm Number */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Dorm #</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.dormId}
+                </dd>
+              </div>
+
+              {/* Address (full width) */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Address</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.address}
+                </dd>
+              </div>
+
+              {/* Disability Status */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Disability Status
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.disabilityStatus}
+                </dd>
+              </div>
+
+              {/* Special Needs */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Special Needs
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.isSpecial}
+                </dd>
+              </div>
+
+              {/* Sex */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Sex</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.sex}
+                </dd>
+              </div>
+
+              {/* Role */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">Role</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.role}
+                </dd>
+              </div>
+
+              {/* Created At */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Created At
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {new Date(selectedStudent.createdAt).toLocaleString()}
+                </dd>
+              </div>
+
+              {/* Updated At */}
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">
+                  Updated At
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {new Date(selectedStudent.updatedAt).toLocaleString()}
+                </dd>
+              </div>
+            </dl>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Edit Student</DialogTitle>
           </DialogHeader>
-          {selectedStudent && (
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target);
-              const updatedData = {
-                userName: formData.get('userName'),
-                Fname: formData.get('Fname'),
-                Lname: formData.get('Lname'),
-                studCategory: formData.get('studCategory'),
-                blockNum: formData.get('blockNum'),
-                dormId: formData.get('dormId'),
-              };
-              handleUpdateStudent(updatedData);
-            }}>
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="userName" className="font-medium text-right">
-                    Student ID:
-                  </label>
-                  <input
-                    id="userName"
-                    name="userName"
-                    defaultValue={selectedStudent.userName}
-                    className="border p-2 rounded col-span-2"
-                    placeholder="Student ID"
-                  />
-                </div>
 
+          {selectedStudent && (
+            <form onSubmit={onSubmit}>
+              <div className="space-y-4">
                 <div className="grid grid-cols-3 items-center gap-4">
                   <label htmlFor="Fname" className="font-medium text-right">
                     First Name:
@@ -333,8 +610,27 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
                     id="Fname"
                     name="Fname"
                     defaultValue={selectedStudent.Fname}
+                    onChange={(e) =>
+                      setEditData({ ...editData, Fname: e.target.value })
+                    }
                     className="border p-2 rounded col-span-2"
                     placeholder="First Name"
+                  />
+                </div>
+
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <label htmlFor="Mname" className="font-medium text-right">
+                    Middle Name:
+                  </label>
+                  <input
+                    id="Mname"
+                    name="Mname"
+                    defaultValue={selectedStudent.Mname}
+                    onChange={(e) =>
+                      setEditData({ ...editData, Mname: e.target.value })
+                    }
+                    className="border p-2 rounded col-span-2"
+                    placeholder="Middle Name"
                   />
                 </div>
 
@@ -346,22 +642,34 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
                     id="Lname"
                     name="Lname"
                     defaultValue={selectedStudent.Lname}
+                    onChange={(e) =>
+                      setEditData({ ...editData, Lname: e.target.value })
+                    }
                     className="border p-2 rounded col-span-2"
                     placeholder="Last Name"
                   />
                 </div>
 
                 <div className="grid grid-cols-3 items-center gap-4">
-                  <label htmlFor="studCategory" className="font-medium text-right">
-                    Student Type:
+                  <label htmlFor="sex" className="font-medium text-right">
+                    Gender:
                   </label>
-                  <input
-                    id="studCategory"
-                    name="studCategory"
-                    defaultValue={selectedStudent.studCategory}
-                    className="border p-2 rounded col-span-2"
-                    placeholder="Student Type"
-                  />
+                  <Select
+                    value={selectedStudent.sex}
+                    onValueChange={(value) => {
+                      setFormData({
+                        ...formData,
+
+                        sex: value,
+                      });
+                    }}
+                  >
+                    <SelectTrigger placeholder="Select gender" />
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid grid-cols-3 items-center gap-4">
@@ -374,6 +682,9 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
                     defaultValue={selectedStudent.blockNum}
                     className="border p-2 rounded col-span-2"
                     placeholder="Block Number"
+                    onChange={(e) =>
+                      setEditData({ ...editData, blockNum: e.target.value })
+                    }
                   />
                 </div>
 
@@ -387,6 +698,9 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
                     defaultValue={selectedStudent.dormId}
                     className="border p-2 rounded col-span-2"
                     placeholder="Dorm Number"
+                    onChange={(e) =>
+                      setEditData({ ...editData, dormId: e.target.value })
+                    }
                   />
                 </div>
 
@@ -403,6 +717,70 @@ const StudentInfo = () => {  // Renamed from StudentInfo to IncidentList for cla
           )}
         </DialogContent>
       </Dialog>
+      {deleteUserConfirmation && deleteStudentId && (
+        <AlertDialog
+          open={deleteUserConfirmation}
+          onOpenChange={() => setDeleteUserConfirmation(false)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription>
+              Are you sure you want to delete student with ID{" "}
+              {deleteStudentId.userName}?
+            </AlertDialogDescription>
+            <AlertDialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteUserConfirmation(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() =>
+                  HandleDeleteStudent(
+                    deleteStudentId._id,
+                    deleteStudentId.blockNum,
+                    deleteStudentId.dormId,
+                    deleteStudentId.sex
+                  )
+                }
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {deleteAllConfirmation && filteredIncidents.length > 0 && (
+        <AlertDialog
+          open={deleteAllConfirmation}
+          onOpenChange={() => setDeleteAllConfirmation(false)}
+        >
+          <AlertDialogContent>  
+            <AlertDialogHeader>       
+              <AlertDialogTitle>Are you sure you want to delete all {filterButtonText} students?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription> 
+              This action will delete all {filterButtonText} students from the system.
+              </AlertDialogDescription>
+            <AlertDialogFooter> 
+              <Button variant="outline" onClick={() => setDeleteAllConfirmation(false)}>Cancel</Button>
+              <Button variant="destructive" onClick={() => handleDeleteAll(filteredIncidents)}>Delete</Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+<div className="flex justify-end m-3">
+  <Button variant="destructive" disabled={filteredIncidents.length === 0} onClick={() => setDeleteAllConfirmation(true)}>
+    Delete {filterButtonText}
+  </Button>
+</div>
+
     </>
   );
 };

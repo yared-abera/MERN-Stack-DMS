@@ -1,11 +1,49 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const initialState = {
   catagorizedStudentData: {}, // Changed to lowercase
   selectOption:null,
   userCalculatedValue:{},
-  selectedStudent:[]
+  selectedStudent:[],
+  searchStudent:'',
+  SearchUsers:'',
+  AllRecentlySearchedUser:[],
 };
+export const getRecentlySearchedUser=createAsyncThunk("getStudentById",async(role)=>{
+  try {
+    console.log(role,'role')
+    const response=await axios.get(`http://localhost:9000/api/recentuser/SearchStudent/${role}`,{
+      withCredentials:true
+    })
+    return response.data
+    
+  } catch (error) {
+    console.error("Error in  student by id:", error); // Log the error
+      return rejectWithValue(error.response.data);
+    
+  }
+
+})
+
+
+
+export const AddRecentlySearchedUser=createAsyncThunk("AddRecentlySearchedUser",async({userName,role})=>{
+  try {
+    console.log(userName,role,'userName,role')
+    const response=await axios.post('http://localhost:9000/api/recentuser/add',{userName,role},{
+      withCredentials:true
+    })
+    console.log(response.data,'response.data')
+    return response.data
+    
+  } catch (error) {
+    console.error("Error in  student by id:", error); // Log the error
+      return rejectWithValue(error.response.data);
+    
+  }
+
+})
 
 export const DataSlice = createSlice({
   name: "data",
@@ -26,9 +64,26 @@ export const DataSlice = createSlice({
        
       
       state.selectedStudent=action.payload
-    }
+    },
+   SearchStudents:(state,action)=>{
+    console.log(action.payload);
+    
+
+    state.searchStudent=action.payload
+   } ,
+   SearchedUsers:(state,action)=>{
+    console.log(action.payload);
+    
+
+    state.SearchUsers=action.payload  
+   } 
   },
+  extraReducers:(builder)=>{
+    builder.addCase(getRecentlySearchedUser.fulfilled,(state,action)=>{
+      state.AllRecentlySearchedUser=action.payload
+    })    
+  }
 });
 
-export const { StudetnDataDirect,SelectedStudentData } = DataSlice.actions;
+export const { StudetnDataDirect,SelectedStudentData,SearchStudents,SearchedUsers } = DataSlice.actions;
 export default DataSlice.reducer;

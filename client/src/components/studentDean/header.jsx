@@ -1,135 +1,143 @@
 import { SidebarTrigger } from "../ui/sidebar";
-
-import { LogOut, Search, UserCog } from "lucide-react";
+import { CalendarX, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
 import DarkMode from "../common/darkMode";
 import AvatarComponent from "../common/avatar";
+import { useDispatch } from "react-redux";
+import { SearchStudents } from "@/store/common/data";
 
 export default function Header() {
-  const [showSearch, setShowSearch] = useState();
-  function handleSearch() {
-    setShowSearch(!showSearch);
-  }
-  const [time, setTime] = useState();
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const NowDate = new Date();
+  const [error, setError] = useState("");
+  const [time, setTime] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = new Date();
-      setTime(now.toLocaleTimeString());
+      setTime(new Date().toLocaleTimeString());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [time]);
+  }, []);
+
+  const toggleCalendar = () => setShowCalendar((prev) => !prev);
+  const dispatch = useDispatch();
+  const handleSearch = () => {
+    if (searchValue !== "") {
+      const regex = /^(NSR|SSR)\/\d{4}\/\d{2}$/i;
+
+      if (regex.test(searchValue)) {
+        // Validation passed, now proceed with transformation
+
+        const firstSlashIndex = searchValue.indexOf("/"); // Find the position of the first '/'
+
+        if (firstSlashIndex !== -1) {
+          // Should always be true if regex passed, but good practice
+          const studentIdPart = searchValue.substring(0, firstSlashIndex); // Get everything before the first '/' (e.g., "nsr")
+          const restOfString = searchValue.substring(firstSlashIndex); // Get everything from the first '/' onwards (e.g., "/1234/56")
+
+          const capitalizedStudentIdPart = studentIdPart.toUpperCase(); // Convert first part to uppercase (e.g., "NSR")
+
+          const correctStudentId = capitalizedStudentIdPart + restOfString; // Combine them correctly
+          setError("");
+          console.log("Original:", searchValue);
+          console.log("Corrected:", correctStudentId); // Output: Corrected: NSR/1234/56
+          dispatch(SearchStudents(correctStudentId));
+        }
+      } else {
+        setError("Invalid Student Id");
+      }
+    }
+  };
 
   return (
-    <header className="overflow-hidden sticky w-full h-20 top-0   md:p-4   border-solid shadow-md  flex gap-4  dark:bg-black bg-white ">
-      <div className="flex text-left ">
-        <SidebarTrigger />
-      </div>
-      <div className="flex-1 flex gap-3 ">
-        <div className="flex   gap-2 w-1/4">
-          <Button>
-             
-            <span className=" hidden md:inline-flex ">Search</span>{" "}
-            <Search className="inline-flex md:hidden " size="sm" />
-          </Button>
-
-          <Input
-            type="text"
-            placeholder="Search user by Using User Name"
-            className="hidden md:inline-flex  dark:text-white  text-sm md:text-base"
-          />
+    <header className="sticky top-0 w-full overflow-auto px-4 py-6 z-10 border-b shadow-md dark:bg-black bg-white mb-2">
+      <div className="flex items-center justify-between w-full">
+        {/* Left Section: Sidebar */}
+        <div className="flex items-center">
+          <SidebarTrigger />
         </div>
-        <div className="flex w-1/2  gap-6">
-          {showSearch ? (
-            <Input
-              type="text"
-              placeholder="Search user "
-              className="md:hidden transition-all duration-300 ease-in-out dark:text-white w-[120px]"
-            />
-          ) : (
-            <div className="flex pl-2 w-[85%] justify-around gap-1   ">
-              <DarkMode />
 
-              <div>
-                <span className="font-sans md:text-lg md:font-bold sm:text-sm sm:font-semibold">
-                  {time}
-                </span>
-              </div>
+        {/* Center Section: Search, Calendar, and Time */}
+        <div className="flex items-center flex-grow mx-4 gap-4">
+          {/* Desktop Search */}
+          <div className="hidden md:flex flex-col gap-0.5 items-center relative w-1/3">
+            <div className="flex items-center relative w-full">
+              <Input
+                type="text"
+                placeholder="Search student by username"
+                className="w-full pr-10"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+
+              <Button
+                className="absolute right-0.5 top-1/2 transform -translate-y-1/2 p-1"
+                onClick={handleSearch}
+                variant="outline"
+              >
+                <Search />
+              </Button>
             </div>
-          )}
-
-          <div className="ml-4 sm:ml-8 ">
-            <AvatarComponent />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
           </div>
+
+          {/* Mobile Search */}
+
+          <div className="flex flex-col gap-0.5 items-center relative w-1/3 md:hidden">
+            <div className="flex items-center relative w-full">
+              <Input
+                type="text"
+                placeholder="Search student by Id"
+                className="w-full pr-10"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+
+              <Button
+                className="absolute right-0.5 top-1/2 transform -translate-y-1/2 p-1"
+                onClick={handleSearch}
+                variant="outline"
+              >
+                <Search />
+              </Button>
+            </div>
+            {error && <p className="text-red-500 text-sm ">{error}</p>}
+          </div>
+
+          {/* Calendar and Time */}
+          <div className="flex items-center gap-4 w-1/3  justify-evenly">
+            <div className="flex items-center">
+              <Button
+                onClick={toggleCalendar}
+                className={
+                  showCalendar ? "hidden" : "border-none cursor-pointer"
+                }
+              >
+                <CalendarX />
+              </Button>
+              {showCalendar && (
+                <div
+                  onClick={toggleCalendar}
+                  className="cursor-pointer ml-2 font-semibold"
+                >
+                  <h3>Date: {NowDate.toLocaleDateString()}</h3>
+                </div>
+              )}
+            </div>
+            <span className="font-sans text-lg font-bold">{time}</span>
+          </div>
+        </div>
+
+        {/* Right Section: Dark Mode & Avatar */}
+        <div className="flex items-center justify-evenly gap-4">
+          <DarkMode />
+          <AvatarComponent />
         </div>
       </div>
     </header>
   );
 }
-
-// import { SidebarTrigger } from "../ui/sidebar";
-// import { AvatarComponent } from "../common/avatar";
-// import { LogOut, Search, UserCog } from "lucide-react";
-// import { Button } from "../ui/button";
-// import { Input } from "../ui/input";
-// import { useEffect, useState } from "react";
-// import DarkMode from "../common/darkMode";
-
-// export default function Header() {
-//   const [showSearch, setShowSearch] = useState(false);
-//   const [time, setTime] = useState("");
-
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       setTime(new Date().toLocaleTimeString());
-//     }, 1000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   return (
-//     <header className="fixed top-0 w-full h-20 flex items-center px-4 border-b shadow-sm dark:bg-black bg-white z-50">
-//       <div className="flex items-center gap-4 w-full">
-//         <SidebarTrigger />
-
-//         {/* Search Container */}
-//         <div className="flex-1 flex items-center gap-2">
-//           <div className="relative flex-1 flex items-center gap-2">
-//             {/* Combined Search Input */}
-//             <Input
-//               type="text"
-//               placeholder="Search user..."
-//               className={`transition-all duration-300 ${
-//                 showSearch ? "w-full" : "w-0 md:w-full"
-//               } text-sm md:text-base`}
-//               onBlur={() => setShowSearch(false)}
-//             />
-            
-//             {/* Adaptive Search Button */}
-//             <Button
-//               variant="outline"
-//               className="md:hidden shrink-0"
-//               size="sm"
-//               onClick={() => setShowSearch(!showSearch)}
-//             >
-//               <Search className="h-4 w-4" />
-//             </Button>
-//           </div>
-
-//           {/* Right Side Controls */}
-//           <div className={`flex items-center gap-4 ${showSearch ? 'hidden md:flex' : ''}`}>
-//             <div className="hidden sm:flex items-center gap-2">
-//               <DarkMode />
-//               <span className="text-sm md:text-base font-medium">
-//                 {time}
-//               </span>
-//             </div>
-//             <AvatarComponent />
-//           </div>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }

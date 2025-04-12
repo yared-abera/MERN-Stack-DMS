@@ -1,4 +1,4 @@
-import { BugIcon, Cuboid, Home, LayoutGrid, UserRoundPen, View } from "lucide-react";
+import { BugIcon, Cuboid, Home, LayoutGrid, LogOut, UserRoundPen, View } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -6,81 +6,162 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
 } from "../ui/sidebar";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { useDispatch } from "react-redux";
+import { LogOutUser } from "@/store/auth-slice";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { ChevronUp } from "lucide-react";
 
-import { Link, useLocation } from "react-router-dom"; // React Router imports
-
-const StudDeanSideBar = [
-  {
-    title: "Home",
-    url: "/dean/home",
-    icon: Home,
-  },
-  {
-    title: "Dorm Allocation",
-    url: "/dean/dorm",
-    icon: LayoutGrid,
-  },
-  {
-    title: "View Student Info",
-    url: "/dean/info",
-    icon: View,
-  },
-
-  {
-    title: "View Block Info",
-    url: "/dean/block",
-    icon: Cuboid ,
-  },
-  {
-    title: "Maintenance Issue",
-    url: "/dean/issue",
-    icon: BugIcon,
-  },
-  {
-    title: "Account",
-    url: "/dean/account",
-    icon: UserRoundPen,
-  },
-
- 
+const menuItems = [
+  { title: "Home", url: "/dean/home", icon: Home },
+  { title: "Dorm Allocation", url: "/dean/dorm", icon: LayoutGrid },
+  { title: "View Student Info", url: "/dean/info", icon: View },
+  { title: "View Block Info", url: "/dean/block", icon: Cuboid },
+  { title: "Maintenance Issue", url: "/dean/issue", icon: BugIcon },
+  { title: "Account", url: "/dean/account", icon: UserRoundPen },
 ];
 
 export default function StudentDeanSideBar() {
-  const location = useLocation(); // Get current location
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  function HandleLogOut(){
+    dispatch(LogOutUser())
+
+  }
 
   return (
-    <Sidebar variant="floating" collapsible="icon">
+    <Sidebar
+      variant="floating"
+      collapsible="icon"
+      className="border-r shadow-sm bg-white dark:bg-gray-900"
+    >
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="sm:text-lg sm:font-semibold md:text-2xl font-bold mb-4">
-            Student Dean
-          </SidebarGroupLabel>
-          <SidebarGroupContent className="mt-4">
-            <SidebarMenu>
-              {StudDeanSideBar.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      to={item.url}
-                      className={`text-lg font-semibold hover:bg-slate-400  dark:hover:bg-blue-400 ${
-                        location.pathname === item.url
-                          ? "bg-blue-500 text-white"
-                          : ""
-                      }`}
-                    >
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+          {/* Title - Full on desktop, short on mobile */}
+          <div className="p-4">
+            <SidebarGroupLabel className="hidden md:block text-2xl font-bold text-gray-800 dark:text-white">
+              Student Dean
+            </SidebarGroupLabel>
+            <SidebarGroupLabel className="md:hidden text-xl font-bold text-gray-800 dark:text-white">
+              SD
+            </SidebarGroupLabel>
+          </div>
+
+          {/* Menu Items */}
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-2 px-2">
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        to={item.url}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                          "hover:bg-gray-100 dark:hover:bg-gray-800",
+                          isActive && "bg-blue-50 dark:bg-blue-900/50"
+                        )}
+                      >
+                        <item.icon 
+                          className={cn(
+                            "h-5 w-5",
+                            isActive 
+                              ? "text-blue-600 dark:text-blue-400" 
+                              : "text-gray-600 dark:text-gray-400"
+                          )} 
+                        />
+                        <span 
+                          className={cn(
+                            "text-sm font-medium transition-all duration-200",
+                            "opacity-0 md:opacity-100", // Hide text on mobile, show on desktop
+                            "absolute md:relative", // Position text for accessibility
+                            "invisible md:visible", // Hide from layout on mobile
+                            isActive 
+                              ? "text-blue-600 dark:text-blue-400" 
+                              : "text-gray-600 dark:text-gray-400"
+                          )}
+                        >
+                          {item.title}
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Logout Button */}
+        {/* <div className="mt-auto p-4">
+          <button
+            onClick={() =>HandleLogOut()}
+            className={cn(
+              "flex items-center gap-3 w-full px-3 py-2 rounded-md transition-colors duration-700",
+              "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            )}
+          >
+            <LogOut className="h-5 w-5 shrink-0" />
+            <span 
+              className={cn(
+                "text-sm font-medium transition-all duration-200",
+                "opacity-0 md:opacity-100",
+                "absolute md:relative",
+                "invisible md:visible"
+              )}
+
+            >
+              Logout
+            </span>
+          </button>
+        </div> */}
+
+        
       </SidebarContent>
+
+
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="w-full">
+                  <div className="flex items-center gap-2 text-center " >
+                    <LogOut className="h-5 w-5 text-center ml-5"  />
+                    {/* <span className={cn(
+                      "text-sm font-medium transition-all duration-200",
+                      "opacity-0 md:opacity-100",
+                      "absolute md:relative",
+                      "invisible md:visible"
+                    )}>
+                      
+                    </span> */}
+                    <ChevronUp className="h-4 w-4 ml-auto shrink-0" />
+                  </div>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                side="top" 
+                className="w-48"
+                align="start"
+              >
+                
+                <DropdownMenuItem onClick={()=>HandleLogOut()}>
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

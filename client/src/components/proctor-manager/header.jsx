@@ -4,12 +4,16 @@ import { Moon, Sun, UserCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "../common/avatar";
+import { SidebarTrigger } from "../ui/sidebar";
 export default function Header() {  
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="w-full bg-white dark:bg-gray-900 shadow-md px-4 pt-8 flex justify-between items-center">
+    <header className="w-full bg-white  dark:bg-gray-900 shadow-md px-3 py-5 flex justify-between items-center">
       {/* Logo & Name */}
+
+      <SidebarTrigger size="icon" className="p-4" />
+
       <div className="flex items-center gap-3">
         <button
           className="lg:hidden p-2 rounded-md text-gray-700 dark:text-gray-300"
@@ -17,9 +21,9 @@ export default function Header() {
         >
           <Menu size={24} />
         </button>
-        <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+        {/* <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
           Proctor Manager
-        </h1>
+        </h1> */}
       </div>
 
       {/* Navigation Links */}

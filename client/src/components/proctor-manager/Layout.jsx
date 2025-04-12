@@ -12,9 +12,7 @@ export default function ProctorManagerLayout() {
      <main className="flex-1 flex flex-col">
         <div className="sticky top-0  z-20">
             <div className="flex">
-            <div className="mt-8">
-            <SidebarTrigger size="icon" className="p-4" />
-            </div>
+             
             <Header />
             </div>
           </div>  

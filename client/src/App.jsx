@@ -41,12 +41,14 @@ import { GetAvaiableBlocks } from "./store/blockSlice";
 import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 import { getAllUser } from "./store/user-slice/userSlice";
 import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
+import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
 function App() {
   
   const theme = useSelector((state) => state.theme.mode);
   const  { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
+ 
  
 //  const user={
 //   role:'Admin',
@@ -136,6 +138,7 @@ function App() {
           <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
           <Route path="GenerateReport" element={<GenerateReport />} />
+          <Route path="Account" element={<ProfileManagement/>} />
         </Route>
 
         <Route path="/proctor" 

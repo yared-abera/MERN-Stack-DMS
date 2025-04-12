@@ -22,6 +22,7 @@ export default function AllocationLast({ studAndBlockInfo }) {
   const [allocatedStudents, setAllocatedStudents] = useState([]);
  
   const dispatch = useDispatch();
+  console.log(selectOption,'selectOption')
 
   // Updated IdentifyStudent function for proper parsing
   function IdentifyStudent({ studAndBlockInfo }) {

@@ -4,6 +4,16 @@ import DataTable from "react-data-table-component";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllBlock } from "@/store/blockSlice";
 import { FaArrowLeft, FaSearch } from "react-icons/fa";
+import { getAllUser } from "@/store/user-slice/userSlice";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const customStyles = {
   headCells: {
@@ -34,6 +44,10 @@ const BlockInfo = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [filterButtonText, setFilterButtonText] = useState(null);
+  const [selectedBlock, setSelectedBlock] = useState(null);
+  const [showBlockDetails, setShowBlockDetails] = useState(false);
+  const { AllUser } = useSelector((state) => state.allUser);
+  const [assignedProctorsInfo, setAssignedProctorsInfo] = useState([]);
 
   useEffect(() => {
     const getBlocks = async () => {
@@ -50,8 +64,11 @@ const BlockInfo = () => {
         setLoading(false);
       }
     };
+    dispatch(getAllUser());
     getBlocks();
   }, [dispatch]);
+
+  console.log(AllUser, "AllUser");
 
   // Filter function for search input
   const filterByInput = (e) => {
@@ -80,16 +97,31 @@ const BlockInfo = () => {
 
   const columns = [
     { name: "Block Number", selector: (row) => row.blockNum, sortable: true },
-    { name: "Total Capacity", selector: (row) => row.totalCapacity, sortable: true },
-    { name: "Available Rooms", selector: (row) => row.totalAvailable, sortable: true },
+    {
+      name: "Total Capacity",
+      selector: (row) => row.totalCapacity,
+      sortable: true,
+    },
+    {
+      name: "Available Rooms",
+      selector: (row) => row.totalAvailable,
+      sortable: true,
+    },
     { name: "Location", selector: (row) => row.location, sortable: true },
     { name: "Status", selector: (row) => row.status, sortable: true },
-    { name: "Number of Floors", selector: (row) => row.floors.length, sortable: true },
+    {
+      name: "Number of Floors",
+      selector: (row) => row.floors.length,
+      sortable: true,
+    },
     {
       name: "Actions",
       cell: (row) => (
         <button
-          onClick={() => {/* Add view details handler */}}
+          onClick={() => {
+            setSelectedBlock(row);
+            setShowBlockDetails(true);
+          }}
           className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
           View Details
@@ -98,10 +130,30 @@ const BlockInfo = () => {
     },
   ];
 
+  useEffect(() => {
+    if (AllUser?.success && selectedBlock) {
+      // If your IDs are strings:
+      // const assigned = AllUser.data.filter(user =>
+      //   selectedBlock.assignedProctors.includes(user._id)
+      // );
+
+      //If they’re Mongoose ObjectIds (or mixed), compare as strings:
+      const assigned = AllUser.data.filter((user) =>
+        selectedBlock.assignedProctors.some(
+          (id) => id.toString() === user._id.toString()
+        )
+      );
+
+      setAssignedProctorsInfo(assigned);
+    }
+  }, [selectedBlock, showBlockDetails]);
+
+  console.log(filteredBlocks, "filteredBlocks");
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-x-hidden">
       <div className="flex-1 relative min-h-screen mt-2">
-        <div className="p-4 pt-0 md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 left-64 w-[calc(100%-17rem)]">
+        <div className="p-4 pt-0 md:w-[90%] flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 left-64 w-[calc(100%-17rem)]">
           {/* Back Button */}
           <button
             className="flex items-center text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg shadow-md transition duration-300 mr-4"
@@ -129,7 +181,9 @@ const BlockInfo = () => {
           {/* Filter Buttons */}
           <div className="flex justify-end space-x-2 mb-4">
             <button
-              className={`${filterButtonText === "All" ? "bg-blue-600" : "bg-gray-600"} px-3 py-1 text-white rounded-md hover:opacity-50`}
+              className={`${
+                filterButtonText === "All" ? "bg-blue-600" : "bg-gray-600"
+              } px-3 py-1 text-white rounded-md hover:opacity-50`}
               onClick={() => {
                 resetFilters();
                 setFilterButtonText("All");
@@ -138,7 +192,9 @@ const BlockInfo = () => {
               All
             </button>
             <button
-              className={`${filterButtonText === "Male" ? "bg-blue-600" : "bg-blue-500"} px-3 py-1 text-white rounded-md hover:opacity-50`}
+              className={`${
+                filterButtonText === "Male" ? "bg-blue-600" : "bg-blue-500"
+              } px-3 py-1 text-white rounded-md hover:opacity-50`}
               onClick={() => {
                 filterByButton("Male");
                 setFilterButtonText("Male");
@@ -147,7 +203,9 @@ const BlockInfo = () => {
               Male Blocks
             </button>
             <button
-              className={`${filterButtonText === "Female" ? "bg-blue-600" : "bg-pink-500"} px-3 py-1 text-white rounded-md hover:opacity-50`}
+              className={`${
+                filterButtonText === "Female" ? "bg-blue-600" : "bg-pink-500"
+              } px-3 py-1 text-white rounded-md hover:opacity-50`}
               onClick={() => {
                 filterByButton("Female");
                 setFilterButtonText("Female");
@@ -160,7 +218,7 @@ const BlockInfo = () => {
           {loading ? (
             <div className="text-center text-gray-600">Loading Blocks...</div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-hidden overflow-y-hidden">
               <DataTable
                 columns={columns}
                 data={filteredBlocks}
@@ -173,8 +231,87 @@ const BlockInfo = () => {
           )}
         </div>
       </div>
+      {showBlockDetails && selectedBlock && (
+  <Dialog open={showBlockDetails} onOpenChange={setShowBlockDetails}>
+    <DialogContent className="max-w-2xl h-screen overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold">Block Details</DialogTitle>
+      </DialogHeader>
+      <DialogDescription  >
+        <div className="space-y-6">
+          {/* Block Summary */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg shadow">
+            <p>
+              <span className="font-semibold">Block Number:</span>{" "}
+              {selectedBlock.blockNum}
+            </p>
+            <p>
+              <span className="font-semibold">Total Capacity:</span>{" "}
+              {selectedBlock.totalCapacity}
+            </p>
+            <p>
+              <span className="font-semibold">Available Rooms:</span>{" "}
+              {selectedBlock.totalAvailable}
+            </p>
+            <p>
+              <span className="font-semibold">Location:</span>{" "}
+              {selectedBlock.location}
+            </p>
+            <p>
+              <span className="font-semibold">Status:</span>{" "}
+              {selectedBlock.status}
+            </p>
+            <p>
+              <span className="font-semibold">Floors:</span>{" "}
+              {selectedBlock.floors.length}
+            </p>
+            <p className="sm:col-span-2">
+              <span className="font-semibold">Assigned Proctors:</span>{" "}
+              {assignedProctorsInfo.map((p) => p.name).join(", ") || "—"}
+            </p>
+          </div>
+
+          {/* Floor Details */}
+          <div>
+            <h2 className="text-xl font-semibold mb-3">Floor Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {selectedBlock.floors.map((floor) => (
+                <div
+                  key={floor._id}
+                  className="p-4 border rounded-lg shadow-sm bg-white"
+                >
+                  <p>
+                    <span className="font-medium">Floor Number:</span>{" "}
+                    {floor.floorNumber}
+                  </p>
+                  <p>
+                    <span className="font-medium">Capacity:</span>{" "}
+                    {floor.floorCapacity}
+                  </p>
+                  <p>
+                    <span className="font-medium">Available:</span>{" "}
+                    {floor.totalAvailable}
+                  </p>
+                  <p>
+                    <span className="font-medium">Status:</span>{" "}
+                    {floor.floorStatus}
+                  </p>
+                  <p>
+                    <span className="font-medium">Dorms:</span>{" "}
+                    {floor.dorms.length}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DialogDescription>
+    </DialogContent>
+  </Dialog>
+)}
+
     </div>
   );
 };
 
-export default BlockInfo; 
+export default BlockInfo;

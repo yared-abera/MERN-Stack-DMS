@@ -152,7 +152,7 @@ export const Maintainance_Issue = [
     type: "text",
     componentType: "input",
   },
- 
+
   {
     label: "Block",
     name: "block",
@@ -281,11 +281,6 @@ export const RadioButton = [
     id: "senior",
     label: "After Having Department",
   },
-  {
-    value: "gust",
-    id: "gust",
-    label: "Gust",
-  },
 ];
 export const RadioFileFormat = [
   {
@@ -317,9 +312,9 @@ export const StudDataSchema = {
   studCategory: String,
   department: String,
   collage: String,
-  dorm:Number,
-  block:Number,
-  role:String
+  dorm: Number,
+  block: Number,
+  role: String,
 };
 export const requiredSchema = {
   Fname: String,
@@ -327,10 +322,10 @@ export const requiredSchema = {
   Lname: String,
   userName: String,
   sex: String,
-  studCategory: String,
+  isSpecial: String,
+  isDisable: String,
   department: String,
   stream: String,
-  batch: String,
 };
 
 export const Gust = {
@@ -341,10 +336,6 @@ export const Gust = {
   block: "",
   dorm: "",
 };
-
-
- 
-
 
 export const AllocationTabscategories = [
   {
@@ -378,14 +369,14 @@ export const RegisterBlock = [
     name: "blockNum",
     placeholder: "Enter Block Number",
     type: "number",
-    componentType: "input"
+    componentType: "input",
   },
   {
     label: "floor Numbers",
     name: "totalFloors",
     placeholder: "Enter Number of floor",
     type: "number",
-    componentType: "input"
+    componentType: "input",
   },
   {
     label: "Found In",
@@ -407,22 +398,20 @@ export const RegisterBlock = [
   },
 ];
 
-
-
 export const RegisterDorm = [
   {
     label: "Block Number",
     name: "blockNum",
     placeholder: "Enter Block Number",
     type: "number",
-    componentType: "input"
+    componentType: "input",
   },
   {
     label: "floor Numbers",
     name: "totalFloors",
     placeholder: "Enter Number of floor",
     type: "number",
-    componentType: "input"
+    componentType: "input",
   },
   {
     label: "Found In",
@@ -458,9 +447,24 @@ export const BlockDemoData = [
         floorCapacity: 40,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 101, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 102, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 103, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
+          {
+            dormNumber: 101,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 102,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 103,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
       {
@@ -469,9 +473,24 @@ export const BlockDemoData = [
         floorCapacity: 40,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 201, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 202, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 203, capacity: 2, dormStatus: "Available", numberOfStudents: 0 },
+          {
+            dormNumber: 201,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 202,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 203,
+            capacity: 2,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
       {
@@ -480,9 +499,24 @@ export const BlockDemoData = [
         floorCapacity: 40,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 301, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 302, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 303, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
+          {
+            dormNumber: 301,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 302,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 303,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
     ],
@@ -501,10 +535,30 @@ export const BlockDemoData = [
         floorCapacity: 100,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 1, capacity: 2, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 2, capacity: 2, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 3, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 4, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
+          {
+            dormNumber: 1,
+            capacity: 2,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 2,
+            capacity: 2,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 3,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 4,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
       {
@@ -530,9 +584,24 @@ export const BlockDemoData = [
         floorCapacity: 40,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 101, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 102, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 103, capacity: 4, dormStatus: "Available", numberOfStudents:  0},
+          {
+            dormNumber: 101,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 102,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 103,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
       {
@@ -541,9 +610,24 @@ export const BlockDemoData = [
         floorCapacity: 40,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 201, capacity: 4, dormStatus: "Available", numberOfStudents:  0},
-          { dormNumber: 202, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 203, capacity: 2, dormStatus: "Available", numberOfStudents:  0},
+          {
+            dormNumber: 201,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 202,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 203,
+            capacity: 2,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
       {
@@ -552,9 +636,24 @@ export const BlockDemoData = [
         floorCapacity: 40,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 301, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 302, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 303, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
+          {
+            dormNumber: 301,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 302,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 303,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
     ],
@@ -573,9 +672,24 @@ export const BlockDemoData = [
         floorCapacity: 75,
         isSelectedFor: "",
         dorms: [
-          { dormNumber: 1, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 2, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
-          { dormNumber: 3, capacity: 4, dormStatus: "Available", numberOfStudents: 0 },
+          {
+            dormNumber: 1,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 2,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
+          {
+            dormNumber: 3,
+            capacity: 4,
+            dormStatus: "Available",
+            numberOfStudents: 0,
+          },
         ],
       },
       {

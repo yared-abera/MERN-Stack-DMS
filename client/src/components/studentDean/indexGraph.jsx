@@ -17,13 +17,13 @@ const StudentInfoChart = () => {
   };
 
   // Debug logging function
-  const logDataIssue = (message, data) => {
-    console.group('Chart Data Issue');
-    console.log(message);
-    console.log('Raw AllocatedStudent:', AllocatedStudent);
-    console.log('Data at issue:', data);
-    console.groupEnd();
-  };
+  // const logDataIssue = (message, data) => {
+  //   console.group('Chart Data Issue');
+  //   console.log(message);
+  //   console.log('Raw AllocatedStudent:', AllocatedStudent);
+  //   console.log('Data at issue:', data);
+  //   console.groupEnd();
+  // };
 
   useEffect(() => {
     // Helper: determine the data array
@@ -42,14 +42,14 @@ const StudentInfoChart = () => {
       const rawData = getDataArray();
 
       if (!rawData.length) {
-        logDataIssue('No valid student array found', AllocatedStudent);
+        console.log('No valid student array found', AllocatedStudent);
         return [];
       }
 
       // Check that at least one item contains the required fields
       const sampleItem = rawData[0];
       if (!sampleItem?.studCategory || !sampleItem?.sex) {
-        logDataIssue('Missing required fields (studCategory or sex) in data items', rawData);
+         console.log('Missing required fields (studCategory or sex) in data items', rawData);
         return [];
       }
 
@@ -98,12 +98,11 @@ const StudentInfoChart = () => {
 
     // Process the data and update chartData
     const processedData = processData();
-    console.log('Processed data:', processedData);
-
+    
     if (processedData.length > 0) {
       setChartData(processedData);
     } else {
-      logDataIssue('Processed data is empty', processedData);
+      console.log('Processed data is empty', processedData);
       setChartData([]);
     }
   }, [AllocatedStudent]);
