@@ -59,7 +59,7 @@ const logInUser = async (req, res) => {
         userName: foundUser.userName,
         sex: foundUser.sex,
       },
-      process.env.CLIENT_SECRET_KEY||"your_jwt_secret_key_here",
+      process.env.CLIENT_SECRET_KEY,
       { expiresIn: "30m" }
     );
 
@@ -136,7 +136,7 @@ const LogOut = async (req, res) => {
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token; // Corrected to req.cookies
-
+console.log(token,"token");
     if (!token) {
       return res.json({
         success: false,

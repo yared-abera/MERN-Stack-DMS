@@ -9,9 +9,10 @@ const dorm_route= require("./router/dormRouter/index")
 const student_Route=require('./router/student/studentRoute')
 const user_Route=require('./router/user/user_Router')
 const maintenance_Route=require('./router/maintenanceRouter/index')
-
+const recentuser_Route=require('./router/recentlySearchedUser/recentuser-router')
+//"mongodb://localhost:27017/DMS"
 mongoose
-  .connect("mongodb://localhost:27017/DMS", 
+  .connect(process.env.MONGO_URL, 
     {serverSelectionTimeoutMS: 30000}
   )
   .then(() => {
@@ -48,7 +49,8 @@ app.use("/api/dorm/", dorm_route);
 app.use('/api/student/', student_Route);
 app.use('/api/user',user_Route)
 app.use('/api/maintainanceIssue/', maintenance_Route); // Add this lineapp.use('/api/user',user_Route)
-
+app.use('/api/recentuser',recentuser_Route)
+ 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

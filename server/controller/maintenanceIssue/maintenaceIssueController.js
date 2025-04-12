@@ -88,7 +88,7 @@ const fetchAllMaintenanceIssueForManager = async (req, res) => {
       .map((issue) => ({
         ...issue,
         issueTypes: issue.issueTypes.filter(
-          (type) => !["Pending", "Reject"].includes(type.status)
+          (type) => !["Pending", "Rejected"].includes(type.status)
         ),
       }))
       .filter((issue) => issue.issueTypes.length > 0); // Remove empty issues
@@ -106,12 +106,12 @@ const fetchAllMaintenanceIssueForManager = async (req, res) => {
     });
   }
 };
-
 const fetchAllMaintenanceIssueForDean = async (req, res) => {
   try {
-    const allIssues = await MaintenanceIssue.find();
+    // Get all issues as plain objects
+    const allIssues = await MaintenanceIssue.find().lean();
 
-    // Optionally, check if no issues were found (i.e., empty array)
+    // If there are no issues at all
     if (allIssues.length === 0) {
       return res.status(404).json({
         success: false,
@@ -119,21 +119,40 @@ const fetchAllMaintenanceIssueForDean = async (req, res) => {
       });
     }
 
-    // Send success response if data is found
+    // Filter out any issueTypes with status Pending or Rejected,
+    // then remove any issue documents that end up with zero types
+    const filteredData = allIssues
+      .map(issue => ({
+        ...issue,
+        issueTypes: issue.issueTypes.filter(
+          type => !['Pending', 'Rejected',"verified"].includes(type.status)
+        ),
+      }))
+      .filter(issue => issue.issueTypes.length > 0);
+
+    // If after filtering there’s nothing left
+    if (filteredData.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No Data Found',
+      });
+    }
+
+    // Success!
     return res.status(200).json({
       success: true,
-      data: allIssues,
+      data: filteredData,
     });
-    
   } catch (error) {
-    console.error("Error fetching all maintenance issues:", error);
+    console.error('Error fetching maintenance issues for dean:', error);
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
       error: error.message,
     });
   }
 };
+
 
 const fetchMaintenanceIssueForUser = async (req, res) => {
   try {
@@ -292,7 +311,53 @@ const fetchAllMaintenanceIssueByStatus = async (req, res) => {
     });
   }
 };
+const fetchIssueByStatusForDean=async(req,res)=>{
+  try {
+const {selectedStatus}=req.params
+ 
+    
+    const maintenanceIssues = await MaintenanceIssue.find(
+      {
+        "issueTypes.status": selectedStatus,
+        
+      },
+      {
+        // Use $filter to include only those subdocuments with the matching status
+        issueTypes: {
+          $filter: {
+            input: "$issueTypes",
+            as: "item",
+            cond: { $eq: ["$$item.status", selectedStatus] },
+          },
+        },
+        // Optionally include other fields from the document
+        userInfo: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      }
+    );
 
+    if (!maintenanceIssues || maintenanceIssues.length === 0) {
+      return res.json({
+        success: false,
+        message: "No issue found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: maintenanceIssues,
+    });
+   
+    
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later.",
+      error: e.message,
+    });
+  }
+}
 module.exports = {
   SubmitMaintenanceIssue,
   fetchAllMaintenanceIssueForDean,
@@ -301,4 +366,5 @@ module.exports = {
   fetchAllMaintenanceIssueByStatus,
   fetchPendingStatusMaintenanceIssue,
   VerificationOFIssue,
+  fetchIssueByStatusForDean
 };

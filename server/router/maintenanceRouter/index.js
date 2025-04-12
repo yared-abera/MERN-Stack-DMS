@@ -7,16 +7,20 @@ const {
   fetchPendingStatusMaintenanceIssue,
   fetchAllMaintenanceIssueByStatus,
   fetchMaintenanceIssueForUser,
-  VerificationOFIssue
+  VerificationOFIssue,
+  fetchIssueByStatusForDean
 } = require("../../controller/maintenanceIssue/maintenaceIssueController");
 const router = express.Router();
 
 router.post("/add", SubmitMaintenanceIssue);
 router.get("/getAll", fetchAllMaintenanceIssueForDean);
 router.get("/get/:gender", fetchAllMaintenanceIssueForManager);
+
+router.get("/getByStatusForDean/:selectedStatus",fetchIssueByStatusForDean);
 router.get("/getOne/:id/:Model", fetchMaintenanceIssueForUser);
 router.get("/getPendingStatus/:status/:id", fetchPendingStatusMaintenanceIssue);
 router.get("/getByStatus/:gender/:selectedStatus", fetchAllMaintenanceIssueByStatus);
 router.put("/verify",VerificationOFIssue);
 module.exports = router;
+
  
