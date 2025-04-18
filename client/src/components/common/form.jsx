@@ -1,5 +1,6 @@
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Link } from "react-router-dom";
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled,
+  isLogIN,
 }) {
   function renderInputsByComponentType(getControlItem) {
     let element = null;
@@ -111,11 +113,11 @@ function CommonForm({
 
   // const display=isLogIN:display:grid ,grid-d
   return (
-    <form onSubmit={onSubmit} className="w-full  ">
-      <div className="flex flex-col gap-2  p-4 ">
+    <form onSubmit={onSubmit} className="w-full">
+      <div className="flex flex-col gap-2 p-4">
         {formControls.map((controlItem) => (
-          <div className="grid grid-cols-2 w-full  gap-4" key={controlItem.name}>
-            <Label className="mb-1 font-sans font-semibold text-sm  dark:text-white md:text-base">
+          <div className="grid grid-cols-2 w-full gap-4" key={controlItem.name}>
+            <Label className="mb-1 font-sans font-semibold text-sm dark:text-white md:text-base">
               {controlItem.label}
             </Label>
             {renderInputsByComponentType(controlItem)}
@@ -125,10 +127,20 @@ function CommonForm({
       <Button
         disabled={isBtnDisabled}
         type="submit"
-        className="mt-10 w-full  hover:bg-slate-500"
+        className="mt-10 w-full hover:bg-slate-500"
       >
         {buttonText || "Submit"}
       </Button>
+      {isLogIN && (
+        <div className="text-center mt-4">
+          <Link 
+            to="/forgot-password" 
+            className="text-blue-600 hover:text-blue-800 text-sm underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
+      )}
     </form>
   );
 }
