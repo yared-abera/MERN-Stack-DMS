@@ -42,6 +42,9 @@ import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 import { getAllUser } from "./store/user-slice/userSlice";
 import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
 import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
+import ResetPassword from './components/ResetPassword';
+import ForgotPassword from './pages/auth/ForgotPassword';
+
 import CommentHover from "./pages/student/myCommnt";
 import ProctorAccount from "./pages/proctor/account";
 import ProctorControleComponent from "./components/proctor/controle";
@@ -60,7 +63,8 @@ function App() {
 //   userName:'abdi'
 //  }
 //  const isAuthenticated=true
-//  const isLoading=false
+//  const isLoading=true
+
     
   const dispatch = useDispatch();
   useEffect(() => {
@@ -194,6 +198,8 @@ function App() {
           <Route path="commentHover" element={<CommentHover/>} />
         </Route>
         <Route path="/unauth-page" element={<UnauthPage/>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
         <Route path="*" element={<Notfound />} />
       </Routes>
     </div>

@@ -59,7 +59,7 @@ console.log(foundUser)
         userName: foundUser.userName,
         sex: foundUser.sex,
       },
-      process.env.CLIENT_SECRET_KEY,
+      process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
 
@@ -143,7 +143,7 @@ const authMiddleware = async (req, res, next) => {
         message: "Unauthorized User", // Corrected spelling
       });
     }
-    const decode = jwt.verify(token, process.env.CLIENT_SECRET_KEY); // Use environment variable
+    const decode = jwt.verify(token, process.env.JWT_SECRET); // Use environment variable
 
     req.user = decode;
     next();

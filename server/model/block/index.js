@@ -7,7 +7,7 @@ const dormSchema = new mongoose.Schema({
   studentsAllocated: { type: Number, default: 0 },
   dormStatus: { 
     type: String, 
-    enum: ["Available", "Full"], 
+    enum: ["Available", "Full","Under Construction"], 
     default: "Available" 
   },
   totalAvailable: { type: Number, default: 0 }

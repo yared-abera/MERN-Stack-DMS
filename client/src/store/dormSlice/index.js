@@ -4,11 +4,16 @@ import axios from 'axios';
 
 export const registerDorm = createAsyncThunk(
   'dorm/registerDorm',
-  async ( formData, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
+      // Extract the required fields
       const { blockId, floorNumber, dormNumber, capacity } = formData;
+      
+      console.log('Registering dorm:', { blockId, floorNumber, dormNumber, capacity });
+      
       const response = await axios.patch(
         `http://localhost:9000/api/dorm/${blockId}/floors/${floorNumber}/dorms`,
+        // Send only the required fields
         { dormNumber, capacity },
         {
           withCredentials: true,
@@ -19,6 +24,7 @@ export const registerDorm = createAsyncThunk(
       );
       return response.data;
     } catch (err) {
+      console.error('Error registering dorm:', err);
       if (!err.response) {
         return rejectWithValue("Network Error - Server unavailable");
       }
@@ -26,6 +32,23 @@ export const registerDorm = createAsyncThunk(
     }
   }
 );
+
+export const updateDormStatus = createAsyncThunk(
+  "dorm/updateStatus",
+  async ({ blockId, floorNumber, dormNumber, status }) => {
+    try {
+      const response = await axios.patch(
+        `${process.env.REACT_APP_API_URL}/api/dorm/${blockId}/floors/${floorNumber}/dorms/${dormNumber}/status`,
+        { status }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+);
+
+// No other changes needed in this file
 
 const dormSlice = createSlice({
   name: 'dorm',
@@ -58,6 +81,29 @@ const dormSlice = createSlice({
       .addCase(registerDorm.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.error?.message || 'Dorm registration failed';
+      })
+      .addCase(updateDormStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateDormStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update the dorm status in the list if needed
+        const { blockId, floorNumber, dormNumber, status } = action.meta.arg;
+        const block = state.registeredDorm.blocks.find(b => b._id === blockId);
+        if (block) {
+          const floor = block.floors.find(f => f.floorNumber === Number(floorNumber));
+          if (floor) {
+            const dorm = floor.dorms.find(d => d.dormNumber === dormNumber);
+            if (dorm) {
+              dorm.dormStatus = status;
+            }
+          }
+        }
+      })
+      .addCase(updateDormStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   }
 });
