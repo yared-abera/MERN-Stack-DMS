@@ -8,47 +8,52 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-import { Avatar, AvatarFallback } from "../ui/avatar";
-import { LogOut,  UserCog } from "lucide-react";
-import { useDispatch, useSelector } from 'react-redux';
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";  // <-- import AvatarImage
+import { LogOut } from "lucide-react";
+import { useDispatch } from 'react-redux';
 import { LogOutUser } from '@/store/auth-slice';
-export default function AvatarComponent() {
+import { toast } from 'sonner';
 
-  const {user}=useSelector(state=>state.auth)
-  const dispatch=useDispatch()
-  
-  function handleLogOut(){
-    console.log("logOut button");
-    
-  dispatch(LogOutUser())
+export default function AvatarComponent({ ThisUser }) {
+  const dispatch = useDispatch();
+
+  function handleLogOut() {
+    dispatch(LogOutUser()).then(({ payload }) => {
+      if (payload.success) {
+        // also fixed your template literal here (use `${…}`, not `&{…}`)
+        toast.success(`${payload.message}`);
+      }
+    });
   }
 
   return (
-    
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="bg-black cursor-pointer dark:bg-white">
-          <AvatarFallback className="bg-black dark:bg-white dark:text-black text-white font-extrabold">
-            YA
+          {/* This is the actual image element: */}
+          <AvatarImage
+            src={ThisUser.profileImage}
+            alt={`${ThisUser.fName || ThisUser.userName}'s avatar`}
+          />
+          {/* Fallback to initials or name if the image URL is missing/broken: */}
+          <AvatarFallback>
+            { ThisUser.fName.charAt(0)||'' }
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" className="w-56">
-        <DropdownMenuLabel>Logged in as <span className='text-violet-600 text-sm md:text-base'>{user?.username}</span> </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <UserCog
-            className="m-2 w-4 h-4"
-            onClick={() => navigate("/proctor/account")}
-          />
-          Account
-        </DropdownMenuItem>
+        <DropdownMenuLabel>
+          Logged in as{" "}
+          <span className="text-violet-600 text-sm md:text-base">
+            {ThisUser.userName}
+          </span>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogOut}>
           <LogOut className="w-4 h-4 m-2" />
-           LogOut
+          Log Out
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu> 
-  )
+    </DropdownMenu>
+  );
 }

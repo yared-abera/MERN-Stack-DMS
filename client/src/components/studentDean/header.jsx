@@ -5,8 +5,9 @@ import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
 import DarkMode from "../common/darkMode";
 import AvatarComponent from "../common/avatar";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SearchStudents } from "@/store/common/data";
+import { getSingleUser } from "@/store/user-slice/userSlice";
 
 export default function Header() {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -14,6 +15,8 @@ export default function Header() {
   const NowDate = new Date();
   const [error, setError] = useState("");
   const [time, setTime] = useState("");
+  const [ThisUser, setThisUser] = useState('');
+  const {user}=useSelector(state=>state.auth)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,6 +56,22 @@ export default function Header() {
     }
   };
 
+    // Initial fetch
+    useEffect(() => {
+      if (user?.id) {
+        console.log("Fetching user data for ID (StudDean):", user.id);
+        dispatch(getSingleUser(user.id)).then((data) => {
+          console.log("User data response (StudDean):", data);
+          if (data.payload?.success) {
+            setThisUser(data.payload.user);
+          }
+        });
+      } else {
+        console.log("No user ID available (StudDean)");
+      }
+    }, [user]);
+
+   
   return (
     <header className="sticky top-0 w-full overflow-auto px-4 py-6 z-10 border-b shadow-md dark:bg-black bg-white mb-2">
       <div className="flex items-center justify-between w-full">
@@ -135,7 +154,7 @@ export default function Header() {
         {/* Right Section: Dark Mode & Avatar */}
         <div className="flex items-center justify-evenly gap-4">
           <DarkMode />
-          <AvatarComponent />
+          {ThisUser&&ThisUser!==''?<AvatarComponent ThisUser={ThisUser} />:null}
         </div>
       </div>
     </header>
