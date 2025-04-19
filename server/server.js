@@ -54,7 +54,8 @@ app.use('/api/user', user_Route);
 app.use('/api/maintainanceIssue/', maintenance_Route);
 app.use('/api/recentuser', recentuser_Route);
 app.use('/api/user', passwordReset_Route);
- 
+app.use('/api/feedBack',feedBack_Route); 
+app.use('/api/attendance',attendance_Route);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -1,5 +1,5 @@
 const User = require("../../model/user/user");
-const bcrypt = require("bcryptjs");
+const bcrypt = require('bcryptjs');
 const fetchAllUser = async (req, res) => {
   try {
     const { page = 1, limit = 20, sortBy, role } = req.query;
