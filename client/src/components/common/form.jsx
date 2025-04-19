@@ -42,15 +42,15 @@ function CommonForm({
             }
           />
         );
-
         break;
+
       case "select":
         element = (
           <Select
-            onValueChange={(value) =>
+            onValueChange={(selectedValue) =>
               setFormData({
                 ...formData,
-                [getControlItem.name]: value,
+                [getControlItem.name]: selectedValue,
               })
             }
             value={value}
@@ -61,7 +61,10 @@ function CommonForm({
             <SelectContent>
               {getControlItem.options && getControlItem.options.length > 0
                 ? getControlItem.options.map((optionItem) => (
-                    <SelectItem key={optionItem.id} value={optionItem.id}>
+                    <SelectItem 
+                      key={optionItem.id} 
+                      value={optionItem.value || optionItem.id}
+                    >
                       {optionItem.label}
                     </SelectItem>
                   ))
@@ -69,8 +72,8 @@ function CommonForm({
             </SelectContent>
           </Select>
         );
-
         break;
+
       case "textarea":
         element = (
           <Textarea
@@ -86,7 +89,6 @@ function CommonForm({
             }
           />
         );
-
         break;
 
       default:

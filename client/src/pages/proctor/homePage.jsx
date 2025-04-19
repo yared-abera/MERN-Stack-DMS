@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProctorBlocks } from '@/store/blockSlice/index';
 import { getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
-import { FaUserGraduate, FaUserCheck, FaUserClock, FaHistory, FaTimes } from 'react-icons/fa';
+import { FaUserGraduate, FaUserCheck, FaUserClock, FaHistory, FaTimes, FaBuilding } from 'react-icons/fa';
+import FloorCard from '@/components/proctor/FloorCard';
 
 export default function ProctorHomePage() {
   const dispatch = useDispatch();
@@ -202,8 +203,33 @@ export default function ProctorHomePage() {
           />
         </div>
 
-        {/* Recent Activities Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Blocks and Floors Section */}
+        {blocks.map((block) => (
+          <div key={block._id} className="bg-white/90 backdrop-blur-sm rounded-lg p-6 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <FaBuilding className="text-2xl text-blue-600" />
+              <h2 className="text-2xl font-bold text-gray-800">
+                Block {block.blockNum} ({block.location})
+              </h2>
+              <span className={`ml-auto px-3 py-1 rounded-full text-sm font-medium ${
+                block.status === "Available" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+              }`}>
+                {block.status}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...block.floors]
+                .sort((a, b) => a.floorNumber - b.floorNumber)
+                .map((floor) => (
+                  <FloorCard key={floor.floorNumber} floor={floor} />
+                ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Recent Activity Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <StudentList
             title="Recently Registered Students"
             students={stats.recentlyRegistered}
