@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 
 const feedbackSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Foreign Key Reference
-    userName: { type: String, required: true },  
-    email: { type: String, required: true }, 
-    message: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "Student", required: true },
+    sex: { type: String, required: true },
+    description: { type: String, required: true }, // Corrected spelling
     createdAt: { type: Date, default: Date.now }
-  });
+});
 
 module.exports = mongoose.model("Feedback", feedbackSchema);

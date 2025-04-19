@@ -28,6 +28,7 @@ const studentSchema = new mongoose.Schema({
     type:Number, // the _id of the dorm subdocument
      
   },
+  absenceDates:  [{ type: Date }]  
   // floorNumber: { type: Number, } 
 },{ timestamps: true });
 

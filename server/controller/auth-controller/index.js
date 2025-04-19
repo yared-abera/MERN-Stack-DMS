@@ -19,7 +19,7 @@ const logInUser = async (req, res) => {
         break;
       } 
     }
-
+console.log(foundUser)
     //const foundUser = await User.findOne({ userName });
 
     // Check if user exists
@@ -136,7 +136,7 @@ const LogOut = async (req, res) => {
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token; // Corrected to req.cookies
-console.log(token,"token");
+ 
     if (!token) {
       return res.json({
         success: false,

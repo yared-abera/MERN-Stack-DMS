@@ -2,6 +2,7 @@ const Student = require("../../model/student/student");
 const bcryptjs = require("bcryptjs");
 const mongoose = require("mongoose");
 const Block = require("../../model/block/index");
+const SearchHistory = require("../../model/user/recentSearchedUser");
 const InsertStudent = async (req, res) => {
   try {
     const {
@@ -28,7 +29,7 @@ const InsertStudent = async (req, res) => {
 
     const stud = req.body;
     console.log(stud, "stud");
-
+ 
     // Check if username or email already exists
     const existingStudentByUsername = await Student.findOne({ userName });
     if (existingStudentByUsername) {
@@ -122,9 +123,6 @@ const fetchSingleStudent = async (req, res) => {
   }
 };
 
- 
-
-
 const updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -184,15 +182,15 @@ const updateStudent = async (req, res) => {
       //
       // A) Compute old vs. new values & locations
       //
-      const oldBlockNum   = existingStudent.blockNum;
-      const oldDormId     = existingStudent.dormId;
-      const oldSex        = existingStudent.sex;
-      const newBlockNum   = updates.blockNum || oldBlockNum;
-      const newDormId     = updates.dormId   || oldDormId;
-      const newSex        = updates.sex      || oldSex;
+      const oldBlockNum = existingStudent.blockNum;
+      const oldDormId = existingStudent.dormId;
+      const oldSex = existingStudent.sex;
+      const newBlockNum = updates.blockNum || oldBlockNum;
+      const newDormId = updates.dormId || oldDormId;
+      const newSex = updates.sex || oldSex;
 
-      const oldBlockLoc = oldSex === "Male"   ? "maleArea"   : "femaleArea";
-      const newBlockLoc = newSex === "Male"   ? "maleArea"   : "femaleArea";
+      const oldBlockLoc = oldSex === "Male" ? "maleArea" : "femaleArea";
+      const newBlockLoc = newSex === "Male" ? "maleArea" : "femaleArea";
 
       //
       // B) Load & adjust the OLD block/dorm (decrement)
@@ -331,6 +329,16 @@ const DeleteStudent = async (req, res) => {
     // 5) Persist the updated block
     await block.save();
 
+    // 6) Delete the student record from the recently searched student
+    const deletedRecentlySearchedStudent = await SearchHistory.findOne({
+      userId: id,
+      role: "Student",
+    });
+    if (deletedRecentlySearchedStudent) {
+      await deletedRecentlySearchedStudent.findByIdAndDelete(
+        deletedRecentlySearchedStudent._id
+      );
+    }
     // 6) Finally, delete the student record
     const deleted = await Student.findByIdAndDelete(id);
     // (we already know it existed, so `deleted` should be truthy)
@@ -349,41 +357,136 @@ const DeleteStudent = async (req, res) => {
   }
 };
 
+// const DeleteAllStudent = async (req, res) => {
+//   try {
+//     const studentData = req.body;
+//     console.log(studentData, "studentData");
+//     const deletedStudents = [];
+//     const failedStudents = [];
+
+//     if (studentData.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "No student to delete",
+//       });
+//     }
+
+//     // Process students sequentially to avoid race conditions
+//     for (const studentItem of studentData) {
+//       try {
+//         // Find the student by ID
+//         const student = await Student.findById(studentItem._id);
+//         if (!student) {
+//           failedStudents.push(studentItem._id);
+//           continue;
+//         }
+
+//         const { blockNum, dormId, sex } = student;
+//         const blockLocation = sex === "Male" ? "maleArea" : "femaleArea";
+
+//         // Load the block document
+//         const block = await Block.findOne({
+//           blockNum,
+//           location: blockLocation,
+//         });
+//         if (!block) {
+//           failedStudents.push(studentItem._id);
+//           continue;
+//         }
+
+//         // Find the dorm inside any floor and decrement its counter
+//         let dormFound = false;
+//         for (const floor of block.floors) {
+//           const dorm = floor.dorms.find(
+//             (d) => d.dormNumber.toString() === dormId.toString()
+//           );
+//           if (dorm) {
+//             dormFound = true;
+//             // Never go below zero
+//             dorm.studentsAllocated = Math.max(0, dorm.studentsAllocated - 1);
+//             break;
+//           }
+//         }
+
+//         if (!dormFound) {
+//           failedStudents.push(studentItem._id);
+//           continue;
+//         }
+
+//         // Persist the updated block
+//         await block.save();
+
+//         // 6) Delete the student record from the recently searched student
+//         const deletedRecentlySearchedStudent = await SearchHistory.findOne({
+//           userId: id,
+//           role: "Student",
+//         });
+//         if (deletedRecentlySearchedStudent) {
+//           await deletedRecentlySearchedStudent.findByIdAndDelete(
+//             deletedRecentlySearchedStudent._id
+//           );
+//         }
+//         // Finally, delete the student record
+//         const deleted = await Student.findByIdAndDelete(studentItem._id);
+//         if (deleted) {
+//           deletedStudents.push(deleted);
+//         } else {
+//           failedStudents.push(studentItem._id);
+//         }
+//       } catch (error) {
+//         // If any individual student deletion fails, add to failed list and continue
+//         failedStudents.push(studentItem._id);
+//         console.error(`Error deleting student ${studentItem._id}:`, error);
+//       }
+//     }
+
+//     // Return the final response after processing all students
+//     return res.status(200).json({
+//       success: true,
+//       message: "Student deletion process completed",
+//       data: {
+//         deletedStudents,
+//         failedStudents,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error in DeleteAllStudent:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error while deleting students",
+//       error: error.message,
+//     });
+//   }
+// };
 const DeleteAllStudent = async (req, res) => {
   try {
     const studentData = req.body;
-    console.log(studentData,'studentData')
-    const deletedStudents = [];
-    const failedStudents = [];
-
-    if (studentData.length === 0) {
+    if (!Array.isArray(studentData) || studentData.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No student to delete'
+        message: "No student to delete",
       });
     }
 
-    // Process students sequentially to avoid race conditions
+    const deletedStudents = [];
+    const failedStudents = [];
+
     for (const studentItem of studentData) {
       try {
-        // Find the student by ID
         const student = await Student.findById(studentItem._id);
         if (!student) {
           failedStudents.push(studentItem._id);
           continue;
         }
 
+        // 1) Decrement the dorm count
         const { blockNum, dormId, sex } = student;
         const blockLocation = sex === "Male" ? "maleArea" : "femaleArea";
-
-        // Load the block document
         const block = await Block.findOne({ blockNum, location: blockLocation });
         if (!block) {
           failedStudents.push(studentItem._id);
           continue;
         }
-
-        // Find the dorm inside any floor and decrement its counter
         let dormFound = false;
         for (const floor of block.floors) {
           const dorm = floor.dorms.find(
@@ -391,53 +494,94 @@ const DeleteAllStudent = async (req, res) => {
           );
           if (dorm) {
             dormFound = true;
-            // Never go below zero
             dorm.studentsAllocated = Math.max(0, dorm.studentsAllocated - 1);
             break;
           }
         }
-
         if (!dormFound) {
           failedStudents.push(studentItem._id);
           continue;
         }
-
-        // Persist the updated block
         await block.save();
 
-        // Finally, delete the student record
-        const deleted = await Student.findByIdAndDelete(studentItem._id);
+        // 2) Remove all search‑history entries for this student
+        await SearchHistory.deleteMany({
+          userId: student._id,
+          role: "Student",
+        });
+
+        // 3) Finally delete the student
+        const deleted = await Student.findByIdAndDelete(student._id);
         if (deleted) {
           deletedStudents.push(deleted);
         } else {
           failedStudents.push(studentItem._id);
         }
-      } catch (error) {
-        // If any individual student deletion fails, add to failed list and continue
+
+      } catch (err) {
+        console.error(`Error deleting student ${studentItem._id}:`, err);
         failedStudents.push(studentItem._id);
-        console.error(`Error deleting student ${studentItem._id}:`, error);
       }
     }
 
-    // Return the final response after processing all students
     return res.status(200).json({
       success: true,
-      message: 'Student deletion process completed',
-      data: {
-        deletedStudents,
-        failedStudents
-      }
+      message: "Student deletion process completed",
+      data: { deletedStudents, failedStudents },
     });
+
   } catch (error) {
-    console.error('Error in DeleteAllStudent:', error);
+    console.error("Error in DeleteAllStudent:", error);
     return res.status(500).json({
       success: false,
-      message: 'Server error while deleting students',
-      error: error.message
+      message: "Server error while deleting students",
+      error: error.message,
+    });
+  }
+};
+  
+const fetchStuentForProctor = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.json({
+        success: false,
+        message: 'Proctor ID is required'
+      });
+    }
+    console.log(id,"id")
+    // Find the block assigned to the proctor using the $in operator
+    const getBlock = await Block.findOne({ assignedProctors: { $in: [id] } });
+
+    if (!getBlock) {
+      return res.status(404).json({
+        success: false,
+        message: 'Block not found for this proctor'
+      });
+    }
+
+    // Assuming your Student schema has a 'blockNum' field that corresponds to the Block's blockNum
+    const students = await Student.find({ blockNum: getBlock.blockNum });
+
+    res.status(200).json({
+      success: true,
+      data: students
+    });
+
+    console.log(students,"students")
+
+  } catch (error) {
+    console.error("Error fetching students for proctor:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching students",
+      error: error.message,
     });
   }
 };
 
+ 
 
 module.exports = {
   InsertStudent,
@@ -446,4 +590,5 @@ module.exports = {
   updateStudent,
   DeleteStudent,
   DeleteAllStudent,
+  fetchStuentForProctor
 };

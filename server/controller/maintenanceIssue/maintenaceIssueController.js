@@ -2,75 +2,75 @@ const MaintenanceIssue = require("../../model/maintenance/index");
 const Block = require("../../model/block/index");
 const SubmitMaintenanceIssue = async (req, res) => {
   try {
-    const { id, Model, userInfo, issueTypes, description, otherIssue } =
-      req.body;
+      const { id, Model, userInfo, issueTypes } = req.body;
 
-    // Validate required fields (add your validations here)
+      // Validate required fields (add your validations here)
+      
+      // Map selectedIssues to the array of objects required by the schema
+      const mappedIssues = issueTypes.map((request) => ({
+          issue: request.issue,
+          status: "Pending",
+          description: request.description,
+      }));
 
-    // Convert issueTypes object to array of selected issues
-    const selectedIssues = Object.entries(issueTypes)
-      .filter(([_, value]) => value === true)
-      .map(([key]) => key);
+      // Check if the user already submitted a maintenance issue
+      let existingIssue = await MaintenanceIssue.findOne({ userId: id });
+ 
+      const isDuplicatePendingIssue = mappedIssues.some(newIssue =>
+          existingIssue?.issueTypes.some(existing =>
+              existing.issue === newIssue.issue && existing.status === "Pending"
+          )
+      );
 
-    // Add otherIssue if provided and not empty
-    if (otherIssue && otherIssue.trim()) {
-      selectedIssues.push(otherIssue.trim());
-    }
+      if (isDuplicatePendingIssue) {
+          return res.json({
+              success: false,
+              message: 'The issue has already been submitted and is currently pending.',
+          });
+      }
 
-    // Map selectedIssues to the array of objects required by the schema
-    const mappedIssues = selectedIssues.map((issue) => ({
-      issue,
-      status: "Pending",
-      description: description,
-    }));
+      if (existingIssue) {
+          // Update only the issueTypes
+          existingIssue.issueTypes.push(...mappedIssues);
+          await existingIssue.save();
+          return res.status(201).json({
+              success: true,
+              message: "Maintenance issue submitted successfully",
+              issue: existingIssue,
+          });
+      } else {
+          // Create a new maintenance issue document
+          const newIssue = new MaintenanceIssue({
+              userId: id,
+              userModel: Model,
+              userInfo: {
+                  fName: userInfo.Fname,
+                  mName: userInfo.Mname,
+                  lName: userInfo.Lname,
+                  sex: userInfo.Gender,
+                  userName: userInfo.userName,
+                  blockNumber: userInfo.block,
+                  roomNumber: userInfo.dorm,
+                  phoneNumber: userInfo.phoneNumber,
+              },
+              issueTypes: mappedIssues,
+          });
 
-    // Check if the user already submitted a maintenance issue
-    const existingIssue = await MaintenanceIssue.findOne({ userId: id });
+          // Save the new document to the database
+          await newIssue.save();
 
-    if (existingIssue) {
-      // Update only the issueTypes
-      existingIssue.issueTypes.push(...mappedIssues);
-
-      await existingIssue.save();
-
-      return res.status(201).json({
-        success: true,
-        message: "Maintenance issue submitted successfully",
-        issue: existingIssue,
-      });
-    } else {
-      // Create a new maintenance issue document
-      const newIssue = new MaintenanceIssue({
-        userId: id,
-        userModel: Model,
-        userInfo: {
-          fName: userInfo.Fname,
-          mName: userInfo.Mname,
-          lName: userInfo.Lname,
-          sex: userInfo.Gender,
-          userName: userInfo.userName,
-          blockNumber: userInfo.block,
-          roomNumber: userInfo.dorm,
-          phoneNumber: userInfo.phoneNumber,
-        },
-        issueTypes: mappedIssues,
-      });
-
-      // Save the new document to the database
-      await newIssue.save();
-
-      return res.status(201).json({
-        success: true,
-        message: "Maintenance issue submitted successfully",
-        issue: newIssue,
-      });
-    }
+          return res.status(201).json({
+              success: true,
+              message: "Maintenance issue submitted successfully",
+              issue: newIssue,
+          });
+      }
   } catch (error) {
-    console.error("Error submitting maintenance issue:", error);
-    res.status(500).json({
-      message: "Failed to submit maintenance issue",
-      error: error.message,
-    });
+      console.error("Error submitting maintenance issue:", error);
+      res.status(500).json({
+          message: "Failed to submit maintenance issue",
+          error: error.message,
+      });
   }
 };
 
@@ -115,26 +115,26 @@ const fetchAllMaintenanceIssueForDean = async (req, res) => {
     if (allIssues.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'No Data Found',
+        message: "No Data Found",
       });
     }
 
     // Filter out any issueTypes with status Pending or Rejected,
     // then remove any issue documents that end up with zero types
     const filteredData = allIssues
-      .map(issue => ({
+      .map((issue) => ({
         ...issue,
         issueTypes: issue.issueTypes.filter(
-          type => !['Pending', 'Rejected',"verified"].includes(type.status)
+          (type) => !["Pending", "Rejected", "Verified"].includes(type.status)
         ),
       }))
-      .filter(issue => issue.issueTypes.length > 0);
+      .filter((issue) => issue.issueTypes.length > 0);
 
     // If after filtering there’s nothing left
     if (filteredData.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'No Data Found',
+        message: "No Data Found",
       });
     }
 
@@ -144,15 +144,14 @@ const fetchAllMaintenanceIssueForDean = async (req, res) => {
       data: filteredData,
     });
   } catch (error) {
-    console.error('Error fetching maintenance issues for dean:', error);
+    console.error("Error fetching maintenance issues for dean:", error);
     return res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: "Server error",
       error: error.message,
     });
   }
 };
-
 
 const fetchMaintenanceIssueForUser = async (req, res) => {
   try {
@@ -236,12 +235,13 @@ const fetchPendingStatusMaintenanceIssue = async (req, res) => {
 
 const VerificationOFIssue = async (req, res) => {
   try {
-    const { id, value } = req.body; // assuming `id` is the _id of the subdocument and `value` is the new status
+    const { id,  status } = req.body; // assuming `id` is the _id of the subdocument and `value` is the new status
+ 
 
     // Find the document with the matching subdocument id and update the status field
     const updatedDoc = await MaintenanceIssue.findOneAndUpdate(
       { "issueTypes._id": id }, // query to find the document containing the subdocument
-      { $set: { "issueTypes.$.status": value } }, // update operation using the positional operator
+      { $set: { "issueTypes.$.status": status } }, // update operation using the positional operator
       { new: true } // return the updated document
     );
 
@@ -301,8 +301,6 @@ const fetchAllMaintenanceIssueByStatus = async (req, res) => {
       success: true,
       data: maintenanceIssues,
     });
-   
-    
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -311,15 +309,13 @@ const fetchAllMaintenanceIssueByStatus = async (req, res) => {
     });
   }
 };
-const fetchIssueByStatusForDean=async(req,res)=>{
+const fetchIssueByStatusForDean = async (req, res) => {
   try {
-const {selectedStatus}=req.params
- 
-    
+    const { selectedStatus } = req.params;
+
     const maintenanceIssues = await MaintenanceIssue.find(
       {
         "issueTypes.status": selectedStatus,
-        
       },
       {
         // Use $filter to include only those subdocuments with the matching status
@@ -348,8 +344,6 @@ const {selectedStatus}=req.params
       success: true,
       data: maintenanceIssues,
     });
-   
-    
   } catch (e) {
     res.status(500).json({
       success: false,
@@ -357,7 +351,7 @@ const {selectedStatus}=req.params
       error: e.message,
     });
   }
-}
+};
 module.exports = {
   SubmitMaintenanceIssue,
   fetchAllMaintenanceIssueForDean,
@@ -366,5 +360,5 @@ module.exports = {
   fetchAllMaintenanceIssueByStatus,
   fetchPendingStatusMaintenanceIssue,
   VerificationOFIssue,
-  fetchIssueByStatusForDean
+  fetchIssueByStatusForDean,
 };

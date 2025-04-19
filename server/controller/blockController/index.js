@@ -34,7 +34,7 @@ const getAvailableProctors = async (req, res) => {
     const availableProctors = await User.find({
       _id: { $nin: assignedProctors },
       role: "proctor",
-    }).select("fName lName email");
+    }).select("fName lName email gender");
 
     res.status(200).json({
       success: true,
@@ -48,63 +48,148 @@ const getAvailableProctors = async (req, res) => {
     });
   }
 };
-
 const registerBlock = async (req, res) => {
   try {
     const {
       blockNum,
-      foundIn,
+      foundIn, // Assuming this maps to 'location' in the schema
       isSelectedForSpecialStud,
-      floors,
+      floors, // Assuming this is an array of floor details
       totalFloors,
-      proctorId,
+      selectedProctorIds, // Assuming this is an array of proctor IDs
     } = req.body;
 
+    // --- Validation ---
     // Validate required fields
-    if (!blockNum || !proctorId) {
+    // Corrected: Check for selectedProctorIds instead of proctorId
+    if (!blockNum || !selectedProctorIds || selectedProctorIds.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Block number and proctor ID are required",
+        message: "Block number and at least one proctor ID are required.",
       });
     }
 
-    // Convert string boolean to actual boolean
-    const isSpecial = isSelectedForSpecialStud === "true";
+    // Validate floors structure if floors are expected
+    if (floors && !Array.isArray(floors)) {
+       return res.status(400).json({
+         success: false,
+         message: "Floors must be an array.",
+       });
+     }
 
-    // Create new block with proper data types
+
+    // --- Data Processing ---
+    // Convert string boolean to actual boolean (robust check)
+    const isSpecial = isSelectedForSpecialStud === true || isSelectedForSpecialStud === "true";
+
+    // Ensure totalFloors is a number
+    const parsedTotalFloors = Number(totalFloors);
+    if (isNaN(parsedTotalFloors)) {
+         return res.status(400).json({
+            success: false,
+            message: "Total floors must be a number.",
+         });
+    }
+
+
+    // --- Create and Save Block ---
+    // Assuming Block is your Mongoose model
     const newBlock = new Block({
       blockNum,
-      location: foundIn,
+      location: foundIn, // Map foundIn to location
       isSelectedForSpecialStud: isSpecial,
-      floors: floors, // Remove array wrapper since floors is already an array
-      totalFloors: Number(totalFloors),
-      assignedProctors: [proctorId], // Wrap in array if schema expects array
+      floors: floors || [], // Use provided floors array or an empty array if none
+      totalFloors: parsedTotalFloors,
+      assignedProctors: selectedProctorIds, // Assuming schema expects an array of IDs
     });
 
-    // Validate floors structure
-    if (!Array.isArray(newBlock.floors)) {
-      return res.status(400).json({
-        success: false,
-        message: "Floors must be an array",
-      });
-    }
-
+    // Mongoose will handle further schema validation during save
     await newBlock.save();
 
-    res.status(200).json({
-      // 201 for resource creation
+    // --- Success Response ---
+    res.status(201).json({ // 201 Created is more appropriate for resource creation
       success: true,
-      message: "Block registered successfully",
-      block: newBlock, // Return created block
+      message: "Block registered successfully.",
+      block: newBlock, // Return the created block object
     });
+
   } catch (error) {
+    // --- Error Handling ---
+    console.error("Error registering block:", error); // Log the error on the server side
+
+    // Check for Mongoose validation errors
+    if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(val => val.message);
+        return res.status(400).json({
+            success: false,
+            message: "Validation error(s): " + messages.join(', '),
+            error: error.message,
+        });
+    }
+
     res.status(500).json({
       success: false,
-      message: "Block registration failed",
-      error: error.message,
+      message: "Block registration failed.",
+      error: error.message, // Provide the specific error message
     });
   }
 };
+// const registerBlock = async (req, res) => {
+//   try {
+//     const {
+//       blockNum,
+//       foundIn,
+//       isSelectedForSpecialStud,
+//       floors,
+//       totalFloors,
+//       proctorId,
+//     } = req.body;
+
+//     // Validate required fields
+//     if (!blockNum || !proctorId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Block number and proctor ID are required",
+//       });
+//     }
+
+//     // Convert string boolean to actual boolean
+//     const isSpecial = isSelectedForSpecialStud === "true";
+
+//     // Create new block with proper data types
+//     const newBlock = new Block({
+//       blockNum,
+//       location: foundIn,
+//       isSelectedForSpecialStud: isSpecial,
+//       floors: floors, // Remove array wrapper since floors is already an array
+//       totalFloors: Number(totalFloors),
+//       assignedProctors: [proctorId], // Wrap in array if schema expects array
+//     });
+
+//     // Validate floors structure
+//     if (!Array.isArray(newBlock.floors)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Floors must be an array",
+//       });
+//     }
+
+//     await newBlock.save();
+
+//     res.status(200).json({
+//       // 201 for resource creation
+//       success: true,
+//       message: "Block registered successfully",
+//       block: newBlock, // Return created block
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Block registration failed",
+//       error: error.message,
+//     });
+//   }
+// };
 const getAvailableBlocks = async (req, res) => {
   try {
     // Find blocks where block status is "Available"

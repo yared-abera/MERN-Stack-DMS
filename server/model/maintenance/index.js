@@ -25,11 +25,13 @@ const maintenanceIssueSchema = new mongoose.Schema({
     issue:String,
     status: {
       type: String,
+      
       enum: ["Pending", "InProgress", "Resolved","Rejected","verified","Pass"],
       default: "Pending",
+     
     },
-
-    description: { type: String, required: true },
+    description: { type: String,  },
+  
     createdAt: { type: Date, default: Date.now },
  
   }],
