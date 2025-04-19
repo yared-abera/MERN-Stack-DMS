@@ -175,11 +175,11 @@ const BlockInfo = () => {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-6 ">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Block List</h2>
 
           {/* Filter Buttons */}
-          <div className="flex justify-end space-x-2 mb-4">
+          <div className="flex justify-end space-x-2 mb-4 w-[100%]">
             <button
               className={`${
                 filterButtonText === "All" ? "bg-blue-600" : "bg-gray-600"
@@ -218,8 +218,8 @@ const BlockInfo = () => {
           {loading ? (
             <div className="text-center text-gray-600">Loading Blocks...</div>
           ) : (
-            <div className="overflow-x-hidden overflow-y-hidden">
-              <DataTable
+            <div className="flex flex-col mx-auto" >
+              <DataTable className="max-w-4xl flex mx-auto"
                 columns={columns}
                 data={filteredBlocks}
                 pagination

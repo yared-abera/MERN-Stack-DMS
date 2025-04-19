@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 
-import { BlockDemoData } from "@/config/data";
+ 
 import {
   Tooltip,
   TooltipContent,

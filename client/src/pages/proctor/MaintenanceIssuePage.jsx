@@ -81,30 +81,37 @@ export default function MaintenanceIssuePage() {
     setDialog(false);
   }
 
-  const handleVerify = (id, issue, value) => {
+  const handleVerify = (id, issue, status) => {
     setSelectedIssues((prev) => ({ ...prev, [id]: "verified" }));
-    setVerifyId({ id, issue, value });
+    setVerifyId({ id, issue, status });
 
     setOpenAlert(true);
     // any other logic, like setting a verification id, etc.
   };
 
-  const handleReject = (id, issue, value) => {
+  const handleReject = (id, issue, status) => {
     setSelectedIssues((prev) => ({ ...prev, [id]: "Rejected" }));
-    setVerifyId({ id, issue, value });
+    setVerifyId({ id, issue, status });
     setOpenAlert(true);
     // any other logic for rejection
   };
 
-  function HandleContinue(verifiedId) {
+  function HandleContinue(id) {
+    console.log(id);
+    
+    dispatch(VerificationIssue(id)).then((data) => {
+      if (data.payload.success) {
+        const status = "Pending";
+        const id = user.id;
+    
+        dispatch(GetPendingStatusMaintenaceIssue({ status, id }));
+        toast.success("👍 Status Updated Successfully");
+      }
+    });
     setOpenAlert(false);
   }
 
-  useEffect(() => {
-    if (Object.values(verifyId).some((action) => action.issue !== "")) {
-      dispatch(VerificationIssue(verifyId));
-    }
-  }, [selectedIssues, verifyId]);
+ 
 
   return (
     <Card className="mt-8 mx-4">

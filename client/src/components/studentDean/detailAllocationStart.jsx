@@ -1,4 +1,4 @@
-import { AllocationTabscategories, BlockDemoData } from "@/config/data";
+import { AllocationTabscategories,   } from "@/config/data";
 import { useState } from "react";
 import { Label } from "../ui/label";
 import DetailAllocation from "./DetailAllocation";

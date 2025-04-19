@@ -16,6 +16,8 @@ const StudentInfoChart = () => {
     }
   };
 
+  console.log("AllocatedStudent in indexGraph", AllocatedStudent)
+
   // Debug logging function
   // const logDataIssue = (message, data) => {
   //   console.group('Chart Data Issue');

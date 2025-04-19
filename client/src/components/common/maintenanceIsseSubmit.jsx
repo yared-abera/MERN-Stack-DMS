@@ -5,42 +5,59 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { typeOfIssue } from "@/config/data";
 import {
-  GetAllMaintainanceIssue,
   GetMaintenanceIssueForAuser,
   SubmitMaintainanceIssue,
 } from "@/store/maintenanceIssue/maintenanceIssue";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
+import { Separator } from "../ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export default function MaintenanceIssueSubmit({ ThisUser }) {
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
   const initialFormState = {
     id: user?.id || "",
     Model: capitalizeFirstLetter(user?.role || ""),
-
     userInfo: ThisUser
       ? {
           Fname: ThisUser.Fname || "",
           Mname: ThisUser.Mname || "",
           Lname: ThisUser.Lname || "",
-          Gender:ThisUser.sex||"",
+          Gender: ThisUser.sex || "",
           userName: ThisUser.userName || "",
           block: ThisUser.blockNum || "",
           dorm: ThisUser.dormId || "",
-
           phoneNumber: ThisUser.phoneNum || "",
         }
-      : {}, // Ensure userInfo exists even if ThisUser is undefined
-
-    issueTypes: Object.fromEntries(
-      typeOfIssue.map((item) => [item.name, false])
-    ),
-    description: "",
+      : {},
+    issueTypes: typeOfIssue.map((item) => ({
+      issue: false,
+      name: item.name,
+      description: item.description,
+    })),
     otherIssue: "",
+    description: "",
   };
 
+  const [formData, setFormData] = useState(initialFormState);
+  const [IssueTriggered, setIssueTriggered] = useState(null);
+  const [statusChange, setStatusChange] = useState({});
+  const [openDialog, setOpenDialog] = useState(false);
+
+  // Sync ThisUser into formData.userInfo
   useEffect(() => {
     if (ThisUser) {
       setFormData((prev) => ({
@@ -49,7 +66,7 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
           Fname: ThisUser.Fname || "",
           Mname: ThisUser.Mname || "",
           Lname: ThisUser.Lname || "",
-          Gender:ThisUser.sex||"",
+          Gender: ThisUser.sex || "",
           userName: ThisUser.userName || "",
           block: ThisUser.blockNum || "",
           dorm: ThisUser.dormId || "",
@@ -57,108 +74,178 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
         },
       }));
     }
-  }, [ThisUser]); // Runs when ThisUser changes
+  }, [ThisUser]);
 
-  const [formData, setFormData] = useState(initialFormState);
-  const dispatch = useDispatch();
-  const [IssueTrigered, setIssueTriggered] = useState();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    dispatch(SubmitMaintainanceIssue(formData)).then((data) => {
-      if (data?.payload?.success) {
-        toast.success(`${data?.payload?.message}`);
-      }
-    });
-  };
-  function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-
+  // Fetch existing issues
   useEffect(() => {
     const id = user.id;
-    const role = user.role;
-    const Model = capitalizeFirstLetter(role);
-
+    const Model = capitalizeFirstLetter(user.role);
     dispatch(GetMaintenanceIssueForAuser({ id, Model })).then((data) => {
       if (data?.payload?.success) {
-        setIssueTriggered(data.payload?.data);
+        setIssueTriggered(data.payload.data);
       }
     });
-
-  
   }, [user, dispatch]);
- 
+
+  // Handlers
+  const handleCheckboxChange = (idx, checked) =>
+    setFormData((prev) => {
+      const issues = [...prev.issueTypes];
+      issues[idx].issue = checked;
+      return { ...prev, issueTypes: issues };
+    });
+
+  const handleDescriptionChange = (idx, desc) =>
+    setFormData((prev) => {
+      const issues = [...prev.issueTypes];
+      issues[idx].description = desc;
+      return { ...prev, issueTypes: issues };
+    });
+
   const handleClearForm = () => {
     setFormData(initialFormState);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const selected = formData.issueTypes
+      .filter((it) => it.issue)
+      .map((it) => ({ issue: it.name, description: it.description }));
+    if (formData.otherIssue.trim()) {
+      selected.push({
+        issue: formData.otherIssue.trim(),
+        description: formData.description.trim(),
+      });
+    }
+    const payload = { ...formData, issueTypes: selected };
+    dispatch(SubmitMaintainanceIssue(payload)).then((data) => {
+      if (data.payload?.success) {
+        toast.success(data.payload.message);
+        handleClearForm();
+      } else {
+        toast.error(data.payload?.message || "Submission failed");
+      }
+    });
+  };
+
+  const handleStatusChange = (list) => {
+    setStatusChange(list);
+    setOpenDialog(true);
+  };
+
+  const handleCancel = () => {
+    setOpenDialog(false);
+    setStatusChange({});
+  };
+
+  const handleContinue = () => {
+    // TODO: dispatch status update to backend
+    console.log(statusChange)
+    setOpenDialog(false);
+    setStatusChange({});
+    toast.success("Status updated to Resolved");
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      {/* Confirmation Dialog */}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change status to Resolved?</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            <p className="mb-4">
+              Are you sure you want to mark issue{" "}
+              <strong>
+                { statusChange.issue}
+              </strong>{" "}
+              as Resolved?
+            </p>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button onClick={handleContinue}>Continue</Button>
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
+
       <form
         onSubmit={handleSubmit}
-        className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden"
+        className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border"
       >
-        <div className="px-8 py-6 border-b border-gray-200 flex flex-col items-center mt-[5%]">
-          <h1 className=" font-bold text-gray-900 font-new-romance text-4xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-2">
             Maintenance Issue Submission
           </h1>
-          <p className="mt-1 text-sm text-gray-500 text-center">
+          <p className="text-blue-100">
             Please fill in all required fields to submit a maintenance request
           </p>
         </div>
 
-        <div className="w-full h-auto flex flex-col gap-2 m-6">
-          <div className="w-1/2">
-            <h1 className="text-center text-xl md:text-2xl font-semibold ">
-              Issue Submitted by User
-            </h1>
-          </div>
-          <div className="flex flex-wrap gap-4   w-auto px-6 py-4 ">
-            {IssueTrigered && IssueTrigered.issueTypes.length > 0 ? (
-              IssueTrigered.issueTypes.map((list) => (
-                
-                  <div className="w-full md:w-auto p-3   rounded-lg shadow-lg shadow-yellow-950/50 border border-sky-600 px-6 py-4">
-                    <h2 className="text-sm md:text-base">
-                      Issue Type: {list.issue}
-                    </h2>
-                    <p className="text-xs md:text-sm">
-                      Submited By: {IssueTrigered.userInfo.fName}{" "}
-                      {IssueTrigered.userInfo.lName}
-                    </p>
-                    <p className="text-xs md:text-sm">
-                    Submission Date: 12/34/12
-                    </p>
-                    <p className="text-xs md:text-sm ">
-                      Status:{" "}
-                      <span
-                        className={
-                          list.status === "Pending" ? "text-red-700" : ""
-                        }
-                      >
-                        {list.status}
+        {/* Previously Submitted Issues */}
+        <div className="px-6 py-8">
+          <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
+            Previously Submitted Issues
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {IssueTriggered?.issueTypes?.length ? (
+              IssueTriggered.issueTypes.map((list, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white rounded-xl shadow-lg border p-4 hover:shadow-xl transition"
+                >
+                  <div className="flex items-center mb-2">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <span className="text-blue-600 font-semibold">
+                        {list.issue.charAt(0)}
                       </span>
-                    </p>
+                    </div>
+                    <h3 className="text-lg font-semibold">{list.issue}</h3>
                   </div>
-                 
+                  <p className="text-sm text-gray-600 mb-1">
+                    {new Date(list.createdAt).toLocaleDateString()}
+                  </p>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      list.status === "Pending"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {list.status}
+                  </span>
+                  <Separator className="my-4" />
+                  <div className="flex items-center space-x-2">
+                    <Label>Mark as Resolved:</Label>
+                    <input
+                      type="radio"
+                      name={`resolve-${idx}`}
+                      onChange={() => handleStatusChange(list)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+                </div>
               ))
             ) : (
-              <div className="text-center p-4">
-                <p className="text-gray-500">"No issue submitted by user"</p>
-              </div>
+              <p className="col-span-full text-center text-gray-500">
+                No issues have been submitted yet.
+              </p>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-          <div className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h2 className="  font-semibold text-blue-800 mb-4 font-new-romance text-4xl">
-                User Information
-              </h2>
-
-             
-
+        {/* Form Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 pb-8">
+          {/* User Information */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+            <h2 className="text-2xl font-semibold text-blue-800 mb-6">
+              User Information
+            </h2>
+            <div className="space-y-4">
               {[
                 { label: "First Name", value: ThisUser.Fname },
                 { label: "Middle Name", value: ThisUser.Mname },
@@ -167,148 +254,134 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
                 { label: "User Name", value: ThisUser.userName },
                 { label: "Block Number", value: ThisUser.blockNum },
                 { label: "Dorm Number", value: ThisUser.dormId },
-              ].map((field, index) => (
-                <div className="mb-4" key={index}>
-                  <Label className="block text-sm font-medium text-gray-700 mb-1">
+              ].map((field, i) => (
+                <div key={i} className="space-y-1">
+                  <Label className="text-sm font-medium text-gray-700">
                     {field.label}
-                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
-                    value={field.value}
                     readOnly
-                    className="cursor-not-allowed bg-gray-100"
+                    value={field.value}
+                    className="bg-white cursor-not-allowed"
                   />
                 </div>
               ))}
-
-              <div className="mb-4">
-                <Label className="block text-sm font-medium text-gray-700 mb-1">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-gray-700">
                   Phone Number
-                  <span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Input
-                  value={formData.userInfo.phoneNumber} // Changed from ThisUser.phoneNum
+                  value={formData.userInfo.phoneNumber}
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      userInfo: {
-                        ...prev.userInfo,
-                        phoneNumber: e.target.value,
-                      },
+                      userInfo: { ...prev.userInfo, phoneNumber: e.target.value },
                     }))
                   }
                 />
-                <span className="text-sm ml-5 bg-blue-950/5 opacity-30 text-green-900">
-                  You Can Modify the Phone Number
-                </span>
+                <p className="text-xs text-gray-500">
+                  You can modify the phone number
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-indigo-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold text-indigo-800 mb-4">
-                Select Issue Types
-              </h2>
-              <div className="grid grid-cols-1 gap-4">
-                {typeOfIssue.map((item, index) => (
+          {/* Issue Types */}
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-xl border border-indigo-100">
+            <h2 className="text-2xl font-semibold text-indigo-800 mb-6">
+              Select Issue Types
+            </h2>
+            <div className="space-y-4">
+              {formData.issueTypes.map((item, idx) => {
+                const label = typeOfIssue.find((t) => t.name === item.name)?.label;
+                const desc = typeOfIssue.find((t) => t.name === item.name)?.description;
+                return (
                   <div
-                    key={index}
-                    className={`p-3 rounded-md transition-all ${
-                      formData.issueTypes[item.name]
+                    key={idx}
+                    className={`p-4 rounded-lg transition-all ${
+                      item.issue
                         ? "bg-indigo-100 border-2 border-indigo-300"
-                        : "bg-white border border-gray-200"
+                        : "bg-white border border-gray-200 hover:border-indigo-300"
                     }`}
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-start space-x-3">
                       <Checkbox
-                        id={`issue-${item.name}-${index}`}
-                        checked={formData.issueTypes[item.name]}
-                        onCheckedChange={(checked) => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            issueTypes: {
-                              ...prev.issueTypes,
-                              [item.name]: checked,
-                            },
-                          }));
-                        }}
-                        className="h-5 w-5 text-indigo-600"
+                        checked={item.issue}
+                        onCheckedChange={(checked) =>
+                          handleCheckboxChange(idx, checked)
+                        }
                       />
-                      <div className="flex-1">
-                        <Label
-                          htmlFor={`issue-${item.name}-${index}`}
-                          className="block text-sm font-medium text-gray-700 cursor-pointer"
-                        >
-                          {item.label}
+                      <div className="flex-1 space-y-2">
+                        <Label className="text-sm font-medium text-gray-900">
+                          {label}
                         </Label>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {item.description}
-                        </p>
+                        <p className="text-sm text-gray-500">{desc}</p>
+                        {item.issue && (
+                          <Textarea
+                            value={item.description}
+                            onChange={(e) =>
+                              handleDescriptionChange(idx, e.target.value)
+                            }
+                            placeholder="More details..."
+                            rows={3}
+                            className="mt-2 resize-none"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
 
-              <div className="mt-6">
-                <Label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Information
+        {/* Other Issue */}
+        <div className="px-6 pb-8">
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-100">
+            <h2 className="text-2xl font-semibold text-purple-800 mb-6">
+              Other Issue
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium text-gray-700">
+                  Issue Name
                 </Label>
                 <Input
                   value={formData.otherIssue}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      otherIssue: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, otherIssue: e.target.value }))
                   }
-                  placeholder="Describe any other issues not listed above"
-                  className="w-full focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Custom issue (max 12 chars)"
+                  maxLength={12}
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-gray-700">
+                  Description
+                </Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, description: e.target.value }))
+                  }
+                  placeholder="Details (max 30 chars)"
+                  rows={3}
+                  maxLength={30}
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-8 py-6 border-t border-gray-200 bg-gray-50">
-          <div className="max-w-3xl mx-auto">
-            <Label className="block text-sm font-medium text-gray-700 mb-3">
-              Detailed Description
-              <span className="text-red-500 ml-1">*</span>
-            </Label>
-            <Textarea
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              placeholder="Please provide a detailed description of the issue..."
-              className="w-full h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="px-8 py-4 border-t border-gray-200">
-          <div className="flex items-center justify-end gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="text-gray-700 hover:bg-gray-50"
-              onClick={handleClearForm}
-            >
-              Clear Form
-            </Button>
-            <Button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 shadow-sm transition-colors"
-            >
-              Submit Request
-            </Button>
-          </div>
+        {/* Actions */}
+        <div className="flex justify-end space-x-4 px-6 pb-8">
+          <Button variant="outline" onClick={handleClearForm}>
+            Clear Form
+          </Button>
+          <Button type="submit" className="bg-blue-600 text-white">
+            Submit Issue
+          </Button>
         </div>
       </form>
     </div>

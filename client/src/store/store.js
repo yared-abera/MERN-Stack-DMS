@@ -6,6 +6,8 @@ import DataSlice  from "./common/data";
 import AllocateSlice from './studentAllocation/allocateSlice'
 import MaintainanceIssueSlice from './maintenanceIssue/maintenanceIssue'
 import UserSlice from './user-slice/userSlice'
+import feedBackSlice from './feedBack/feedBack'
+import attendanceSlice from './attendance/attendance-Slice'
 
 import blockReducer from "./blockSlice";
 const store = configureStore({
@@ -18,7 +20,9 @@ const store = configureStore({
         block:blockReducer,
         student:AllocateSlice,
         allUser:UserSlice,
-        issue:MaintainanceIssueSlice
+        issue:MaintainanceIssueSlice,
+        feedBack:feedBackSlice,
+        attendance:attendanceSlice
     }
 })
 

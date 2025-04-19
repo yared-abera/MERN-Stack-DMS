@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { motion, useScroll, useTransform } from "framer-motion";
+ 
 import { getSingleStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function ViewDorm() {
   const { user } = useSelector((state) => state.auth);
   const { AllocatedStudent } = useSelector((state) => state.student);
 
- 
   const dispatch = useDispatch();
- 
+
   const [ThisStudent, setThisStudent] = useState("");
 
   useEffect(() => {
@@ -21,73 +20,68 @@ export default function ViewDorm() {
       }
     });
   }, [user, dispatch]);
-let DormMate
-if(AllocatedStudent.length>0){
-DormMate = AllocatedStudent.filter(
-    (student) =>
-      student.blockNum === ThisStudent.blockNum &&
-      student.dormId === ThisStudent.dormId
-  );
-}
- 
+  let DormMate;
+  if (AllocatedStudent.length > 0) {
+    DormMate = AllocatedStudent.filter(
+      (student) =>
+        student.blockNum === ThisStudent.blockNum &&
+        student.dormId === ThisStudent.dormId
+    );
+  }
 
-  const refElemnt = useRef();
 
-  const { scrollYProgress } = useScroll({
-    target: refElemnt,
-    offset: ["start 20px", "start 0px"], // Animation starts when top of element reaches 20px, ends at 0px
-  });
-
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.5]); // Scale from 1 to 0.5
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.5]); // Opacity from 1 to 0.5
 
   return (
-    <motion.div
-      ref={refElemnt}
-      style={{
-        scaleY: scale, // Apply scale to the Y-axis
-        opacity: opacity,
-        originY: 0, // Set the origin for scaling to the top
-      }}
-      className="mt-20 overflow-hidden flex flex-col w-full min-h-screen m-4 shadow-md shadow-sky-500 border-solid"
-    >
-      <div className="w-full h-[40%]   flex flex-col text-center   ">
-        <h2 className="sm:text-xl md:text-2xl m-4">
-          {" "}
+    <div className="mt-20 mx-4 min-h-screen space-y-12">
+      {/* ── Student Header ─────────────────────────────────────────── */}
+      <div className="bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl shadow-xl p-8 text-center">
+        <h2 className="text-3xl font-bold mb-4">
           Student:{" "}
-          <span className="text-green-600">
-          {ThisStudent ? `${ThisStudent.Fname} ${ThisStudent.Lname}` :null}
+          <span className="text-green-300">
+            {ThisStudent
+              ? `${ThisStudent.Fname} ${ThisStudent.Lname}`
+              : "Loading..."}
           </span>
         </h2>
-        <p>
-          <span className="text-lg font-bold text-blue-600">Block</span>:
-          {ThisStudent?ThisStudent.blockNum:"please Refreash it"}
-        </p>
-        <p>
-          <span className="text-lg font-bold text-blue-600">Dorm</span>:
-          {ThisStudent?ThisStudent.dormId:"please Refreash it"}
-        </p>
-      </div>
-      <div>
-        <h1 className="text-xl font-semibold   ml-4 ">Dorm mates</h1>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2 m-4 ">
-          {DormMate && DormMate.length > 0 ? (
-            DormMate.map((dorm) => (
-              <div
-                key={dorm.userName}
-                className="w-[300px] bg-zinc-600/5 rounded-md border-solid border-2 px-7 py-3"
-              >
-                <p>First Name :{dorm.Fname}</p>
-                <p>Middle Name :{dorm.Mname}</p>
-                <p>Last Name :{dorm.Lname}</p>
-                <p>User Name : {dorm.userName}</p>
-              </div>
-            ))
-          ) : (
-            <p>No Dorm Mate is Found </p>
-          )}
+        <div className="flex justify-center space-x-12 text-lg">
+          <div>
+            <p className="uppercase text-sm font-medium opacity-80">Block</p>
+            <p className="mt-1 text-2xl font-semibold">
+              {ThisStudent?.blockNum ?? "—"}
+            </p>
+          </div>
+          <div>
+            <p className="uppercase text-sm font-medium opacity-80">Dorm</p>
+            <p className="mt-1 text-2xl font-semibold">
+              {ThisStudent?.dormId ?? "—"}
+            </p>
+          </div>
         </div>
       </div>
-    </motion.div>
+  
+      {/* ── Dorm‑mates Grid ───────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl shadow-xl p-6">
+        <h1 className="text-2xl font-semibold mb-6">Dorm Mates</h1>
+        {DormMate && DormMate.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {DormMate.map((dorm) => (
+              <div
+                key={dorm.userName}
+                className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg transition-shadow"
+              >
+                <p className="text-lg font-medium">
+                  {dorm.Fname} {dorm.Mname} {dorm.Lname}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">@{dorm.userName}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">No dorm mates found.</p>
+        )}
+      </div>
+    </div>
   );
+  
+  
 }

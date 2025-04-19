@@ -17,6 +17,7 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled,
+  onClick
 }) {
   function renderInputsByComponentType(getControlItem) {
     let element = null;
@@ -28,10 +29,12 @@ function CommonForm({
           <Input
           className='text-sm md:text-base'
             name={getControlItem.name}
+            readOnly={getControlItem.name === 'foundIn'}
             placeholder={getControlItem.placeholder}
             id={getControlItem.name}
             type={getControlItem.type}
             value={value}
+
             onChange={(event) =>
               setFormData({
                 ...formData,
@@ -86,7 +89,7 @@ function CommonForm({
         );
 
         break;
-
+ 
       default:
         element = (
           <Input

@@ -80,7 +80,7 @@ const StudentInfo = () => {
   const [deleteUserConfirmation, setDeleteUserConfirmation] = useState(false);
   const [deleteStudentId, setDeleteStudentId] = useState(null);
   const [editData, setEditData] = useState({});
-  const [filterButtonText, setFilterButtonText] = useState('All'); // Default filter button text
+  const [filterButtonText, setFilterButtonText] = useState("All"); // Default filter button text
   const [deleteAllConfirmation, setDeleteAllConfirmation] = useState(false);
   const [deleteAllStudents, setDeleteAllStudents] = useState([]);
 
@@ -135,8 +135,6 @@ const StudentInfo = () => {
   function HandleDeleteStudent(id, blockNum, dormId, sex) {
     dispatch(DeleteStudent({ id, blockNum, dormId, sex })).then((res) => {
       if (res.payload.success) {
-       
-
         toast.success(res.payload.message);
         dispatch(getAllocatedStudent()).then((res) => {
           if (res.payload) {
@@ -144,8 +142,6 @@ const StudentInfo = () => {
             setFilteredStudents(res.payload.data);
           }
         });
-
-     
       } else {
         toast.error(`${res.payload.message}`);
       }
@@ -251,29 +247,35 @@ const StudentInfo = () => {
     ],
     [] // Removed unnecessary dependency
   );
-function handleDeleteAll(filteredIncidents){
-  console.log('filteredIncidents on delete all',filteredIncidents)
-  dispatch(DeleteAllStudent(filteredIncidents)).then((res)=>{
-    if(res.payload.success){
-     
-      if(res.payload.data.deletedStudents.length>0){
-        toast.success(res.payload.data.deletedStudents.length+' students deleted successfully')
-      }
-      if(res.payload.data.failedStudents.length>0){
-        toast.error(res.payload.data.failedStudents.length+' students failed to delete')
-      }
-      dispatch(getAllocatedStudent()).then((res)=>{
-        if(res.payload.success){
-          setStudents(res.payload.data)
-          setFilteredStudents(res.payload.data)
+  function handleDeleteAll(filteredIncidents) {
+    console.log("filteredIncidents on delete all", filteredIncidents);
+    dispatch(DeleteAllStudent(filteredIncidents)).then((res) => {
+      if (res.payload.success) {
+        console.log("res.payload on delete all", res.payload.data);
+
+        if (res.payload.data.deletedStudents.length > 0) {
+          toast.success(
+            res.payload.data.deletedStudents.length +
+              " students deleted successfully"
+          );
         }
-      })
-      console.log('res.payload.data',res.payload.data)
-    }else{
-      toast.error(res.payload.message)
-    }
-  })
-}
+        if (res.payload.data.failedStudents.length > 0) {
+          toast.error(
+            res.payload.data.failedStudents.length +
+              " students failed to delete"
+          );
+        }
+        dispatch(getAllocatedStudent()).then((res) => {
+          if (res.payload.success) {
+            setStudents(res.payload.data);
+            setFilteredStudents(res.payload.data);
+          }
+        });
+      } else {
+        toast.error(res.payload.message);
+      }
+    });
+  }
 
   useEffect(() => {
     if (selectedStudent) {
@@ -301,20 +303,16 @@ function handleDeleteAll(filteredIncidents){
       ...editData,
     });
   };
-console.log('filterButtonText',filterButtonText)
-console.log(filteredIncidents,filteredIncidents)
+
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col mt-2">
         {/* Header */}
 
         {/* Main Content */}
         <div className="flex-1 relative min-h-screen">
-          <div
-            className={` p-4 pt-0  md:w-full flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 ${
-              // isCollapsed ? "left-16 w-[calc(100%-5rem)]" :
-              "left-64 w-[calc(100%-17rem)]"
-            }`}
+          <div className=
+           "p-4 pt-0 md:w-[90%] flex flex-wrap items-center justify-between transition-all duration-300 ml-2 gap-4 left-64 w-[calc(100%-17rem)]"
           >
             {/* Back Button */}
             <button
@@ -351,7 +349,7 @@ console.log(filteredIncidents,filteredIncidents)
             </h2>
 
             {/* Filter Buttons placed above the table */}
-            <div className="flex justify-end space-x-2 mb-4">
+            <div className="flex justify-end space-x-2 mb-4 w-[95%]">
               <button
                 className={`${
                   filterButtonText === "All" ? "bg-blue-600" : " bg-gray-600"
@@ -405,8 +403,8 @@ console.log(filteredIncidents,filteredIncidents)
                 Loading Students...
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <DataTable
+              <div  >
+                <DataTable className="max-w-4xl flex mx-auto"
                   columns={columns}
                   data={filteredIncidents}
                   pagination
@@ -760,27 +758,43 @@ console.log(filteredIncidents,filteredIncidents)
           open={deleteAllConfirmation}
           onOpenChange={() => setDeleteAllConfirmation(false)}
         >
-          <AlertDialogContent>  
-            <AlertDialogHeader>       
-              <AlertDialogTitle>Are you sure you want to delete all {filterButtonText} students?</AlertDialogTitle>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Are you sure you want to delete all {filterButtonText} students?
+              </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription> 
-              This action will delete all {filterButtonText} students from the system.
-              </AlertDialogDescription>
-            <AlertDialogFooter> 
-              <Button variant="outline" onClick={() => setDeleteAllConfirmation(false)}>Cancel</Button>
-              <Button variant="destructive" onClick={() => handleDeleteAll(filteredIncidents)}>Delete</Button>
+            <AlertDialogDescription>
+              This action will delete all {filterButtonText} students from the
+              system.
+            </AlertDialogDescription>
+            <AlertDialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteAllConfirmation(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleDeleteAll(filteredIncidents)}
+              >
+                Delete
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       )}
 
-<div className="flex justify-end m-3">
-  <Button variant="destructive" disabled={filteredIncidents.length === 0} onClick={() => setDeleteAllConfirmation(true)}>
-    Delete {filterButtonText}
-  </Button>
-</div>
-
+      <div className="flex justify-end m-3">
+        <Button
+          variant="destructive"
+          disabled={filteredIncidents.length === 0}
+          onClick={() => setDeleteAllConfirmation(true)}
+        >
+          Delete {filterButtonText}
+        </Button>
+      </div>
     </>
   );
 };

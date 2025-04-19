@@ -99,29 +99,7 @@ export default function StudentDeanSideBar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Logout Button */}
-        {/* <div className="mt-auto p-4">
-          <button
-            onClick={() =>HandleLogOut()}
-            className={cn(
-              "flex items-center gap-3 w-full px-3 py-2 rounded-md transition-colors duration-700",
-              "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-            )}
-          >
-            <LogOut className="h-5 w-5 shrink-0" />
-            <span 
-              className={cn(
-                "text-sm font-medium transition-all duration-200",
-                "opacity-0 md:opacity-100",
-                "absolute md:relative",
-                "invisible md:visible"
-              )}
-
-            >
-              Logout
-            </span>
-          </button>
-        </div> */}
+     
 
         
       </SidebarContent>
@@ -136,14 +114,7 @@ export default function StudentDeanSideBar() {
                 <SidebarMenuButton className="w-full">
                   <div className="flex items-center gap-2 text-center " >
                     <LogOut className="h-5 w-5 text-center ml-5"  />
-                    {/* <span className={cn(
-                      "text-sm font-medium transition-all duration-200",
-                      "opacity-0 md:opacity-100",
-                      "absolute md:relative",
-                      "invisible md:visible"
-                    )}>
-                      
-                    </span> */}
+                     
                     <ChevronUp className="h-4 w-4 ml-auto shrink-0" />
                   </div>
                 </SidebarMenuButton>

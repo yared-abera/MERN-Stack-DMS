@@ -47,7 +47,7 @@ export default function StudentHome() {
  
 
   return (
-    <div className="mt-20 flex flex-col gap-3 w-full h-screen overflow-hidden">
+    <div className="mt-2 flex flex-col gap-3 w-full h-screen overflow-hidden">
       <div className="flex items-center justify-center flex-col z-10">
         <div>
           <img src={img} alt="campus Logo" />

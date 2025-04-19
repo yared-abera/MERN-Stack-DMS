@@ -16,12 +16,15 @@ const initialState={
 export const registerBlock=createAsyncThunk("block/register",
    async(formData)=>{
     try {
-        console.log("registerBlock formData from blockASyncThunk",formData);
-    const result= await axios.post("http://localhost:9000/api/block/register",formData,{
-        withCredentials:true
-    });
 
-    return result.data
+      console.log(formData,"formData");
+      
+    //     console.log("registerBlock formData from blockASyncThunk",formData);
+    // const result= await axios.post("http://localhost:9000/api/block/register",formData,{
+    //     withCredentials:true
+    // });
+
+    // return result.data
     } catch (error) {
        console.log(error,'error from registerBlock');
         

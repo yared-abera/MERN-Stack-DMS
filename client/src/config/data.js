@@ -247,21 +247,42 @@ export const Comment_Report = [
     type: "text",
     componentType: "input",
   },
-
   {
-    label: "Date",
-    name: "date",
-    type: "date",
+    label: "Gender",
+    name: "sex",
+ 
+    type: "text",
+    componentType: "input",
+  },
+  {
+    label: "Block",
+    name: "block",
+ 
+    type: "text",
     componentType: "input",
   },
 
   {
+    label: "Dorm",
+    name: "dormId",
+ 
+    type: "text",
+    componentType: "input",
+  },
+
+
+ 
+
+  {
     label: "Description",
-    name: "text_area",
+    name: "textarea",
     placeholder: "Enter Desciption",
     type: "textarea",
     componentType: "input",
   },
+ 
+
+ 
 ];
 
 export const RadioButton = [
@@ -369,24 +390,22 @@ export const RegisterBlock = [
     name: "blockNum",
     placeholder: "Enter Block Number",
     type: "number",
-    componentType: "input",
+   
   },
   {
     label: "floor Numbers",
     name: "totalFloors",
     placeholder: "Enter Number of floor",
     type: "number",
-    componentType: "input",
+    
   },
   {
     label: "Found In",
     name: "foundIn",
-    componentType: "select",
-    options: [
-      { id: "maleArea", label: "Male Area" },
-      { id: "femaleArea", label: "Female Area" },
-    ],
+     type:'text'
   },
+ 
+
   {
     label: "Special Student Selection",
     name: "isSelectedForSpecialStud",
@@ -433,273 +452,4 @@ export const RegisterDorm = [
   },
 ];
 
-export const BlockDemoData = [
-  {
-    blockNum: 1,
-    location: "boys_Campus",
-    totalCapacity: 120,
-    availableRoom: 2,
-    isFull: false,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 40,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 101,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 102,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 103,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 40,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 201,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 202,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 203,
-            capacity: 2,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-      {
-        floorNumber: 3,
-        floorStatus: "Available",
-        floorCapacity: 40,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 301,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 302,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 303,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-    ],
-    description: "Block A - for general students",
-  },
-  {
-    blockNum: 2,
-    location: "girls_Campus",
-    totalCapacity: 200,
-    availableRoom: 100,
-    isFull: false,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 100,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 1,
-            capacity: 2,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 2,
-            capacity: 2,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 3,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 4,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 100,
-        isSelectedFor: "",
-        dorms: [],
-      },
-    ],
-    description: "Block B - for special program students",
-  },
-  {
-    blockNum: 3,
-    location: "girls_Campus",
-    totalCapacity: 120,
-    availableRoom: 2,
-    isFull: false,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 40,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 101,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 102,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 103,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 40,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 201,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 202,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 203,
-            capacity: 2,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-      {
-        floorNumber: 3,
-        floorStatus: "Available",
-        floorCapacity: 40,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 301,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 302,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 303,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-    ],
-    description: "Block C - for female students",
-  },
-  {
-    blockNum: 4,
-    location: "boys_Campus",
-    totalCapacity: 150,
-    availableRoom: 10,
-    isFull: false,
-    floors: [
-      {
-        floorNumber: 1,
-        floorStatus: "Available",
-        floorCapacity: 75,
-        isSelectedFor: "",
-        dorms: [
-          {
-            dormNumber: 1,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 2,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-          {
-            dormNumber: 3,
-            capacity: 4,
-            dormStatus: "Available",
-            numberOfStudents: 0,
-          },
-        ],
-      },
-      {
-        floorNumber: 2,
-        floorStatus: "Available",
-        floorCapacity: 75,
-        isSelectedFor: "",
-        dorms: [],
-      },
-    ],
-    description: "Block D - for boys",
-  },
-];
+ 

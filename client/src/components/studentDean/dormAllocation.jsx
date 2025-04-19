@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "../ui/label";
-import { AllocationTabscategories, BlockDemoData } from "@/config/data";
+import { AllocationTabscategories,  } from "@/config/data";
 
 import AllocationComponent from "./AllocationComponent"; // Import the AllocationComponent
 

@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, UserRoundPen, View } from "lucide-react";
+import { Home, LayoutGrid, TowerControl, UserRoundPen, View } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -52,11 +52,18 @@ const ProSideBar = [
     url: "/proctor/issue",
     icon: UserRoundPen,
   },
+
+  {
+    title: "Attendance",
+    url: "/proctor/controle",
+    icon:TowerControl,
+  },
   {
     title: "Account",
     url: "/proctor/account",
     icon: UserRoundPen,
   },
+
 ];
 
 export default function ProctorSideBar() {

@@ -1,108 +1,161 @@
-import { Bug, Home, LogOut, MessageSquareShare, UserCog, View,  } from "lucide-react";
+import { Bug, Home, LogOut, MessageSquareShare, View } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
+  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "../ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "../ui/avatar";
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar";
-
 import StudentSideBar from "./sideBar";
 import AvatarComponent from "../common/avatar";
 import DarkMode from "../common/darkMode";
- 
+import Comment from "@/pages/student/comment";
+
+import MyCommnt from "@/pages/student/myCommnt";
+import { useSelector } from "react-redux";
+
 const headerComponent = [
+  { label: "home", url: "/student/home", icon: Home },
+  { label: "viewDorm", url: "/student/dorm", icon: View },
+  { label: "Maintenance Issue", url: "/student/issue", icon: Bug },
+
   {
-    label: "home",
-    url: "/student/home",
-    icon: Home,
-  },
-  {
-    label: "viewDorm",
-    url: "/student/dorm",
-    icon: View,
-  },
-  {
-    label: "Maintenance Issue",
-    url: "/student/issue",
-    icon: Bug,
-  },
-  {
-    label: "Comment",
-    url: "/student/comment",
-    icon: MessageSquareShare  ,
+    label: "CommentHover",
+    url: "/student/commentHover",
+    icon: MessageSquareShare,
   },
 ];
 
 export default function StudentHeader() {
-  const [time, setTime] = useState();
+  const [time, setTime] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
-
- 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const {user}=useSelector(state=>state.auth)
+  const [selectedNavigation, setNavigation] = useState("");
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setTime(now.toLocaleTimeString());
-
-      return () => clearInterval(interval);
+    const id = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
     }, 1000);
-  }, [time]);
+    return () => clearInterval(id);
+  }, []);
+  function HandleRemoveDialog() {
+    setIsDialogOpen(false);
+    setNavigation("");
+  }
 
   return (
     <>
-      <div className="fixed top-0   z-10 h-auto py-3 shadow-lg border-solid w-[100vw]     ">
-        <div className=" hidden md:flex   ">
-     
+      <div className="sticky top-0 w-full overflow-hidden p-3 z-30 border-b shadow-md dark:bg-black bg-white ">
+       
+        <div className="hidden md:flex items-center justify-between px-6">
           <div className="w-[60%] flex items-center justify-evenly ml-4 h-full gap-6">
-            {headerComponent.map((item, index) => (
-              <Link
-                key={index}
-                to={item.url}
-                className={`flex sm:px-1 sm:py-2 dark:text-black   md:px-4 md:py-3 rounded-md hover:bg-sky-500 ${
-                  location.pathname === item.url
-                    ? "bg-blue-500 text-white"
-                    : "bg-sky-50"
-                }`}
-              >
-                <item.icon className="mr-2" />
+            {headerComponent.map((item, idx) =>
+              item.label === "CommentHover" ? (
+                <DropdownMenu
+                  key={idx}
+                  open={menuOpen}
+                  onOpenChange={setMenuOpen}
+                >
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      onMouseEnter={() => setMenuOpen(true)}
+                      onMouseLeave={() => setMenuOpen(false)}
+                      className={`flex items-center px-4 py-2 rounded-md transition ${
+                        location.pathname === item.url
+                          ? "bg-blue-500 text-white"
+                          : "bg-sky-50 text-gray-700 hover:bg-sky-500"
+                      }`}
+                    >
+                      <item.icon className="mr-2" />
+                      {item.label}
+                    </button>
+                  </DropdownMenuTrigger>
 
-                <span>{item.label}</span>
-              </Link>
-            ))}
+                  <DropdownMenuContent
+                    side="bottom"
+                    align="start"
+                    className="w-40"
+                    onMouseEnter={() => setMenuOpen(true)}
+                    onMouseLeave={() => setMenuOpen(false)}
+                  >
+                    <DropdownMenuLabel>Comment Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setNavigation("submit");  
+                        setIsDialogOpen(true);
+                      }}>
+                      submit Comment
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setNavigation("see");
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      My comment
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  key={idx}
+                  to={item.url}
+                  className={`flex items-center px-4 py-2 rounded-md transition ${
+                    location.pathname === item.url
+                      ? "bg-blue-500 text-white"
+                      : "bg-sky-50 text-gray-700 hover:bg-sky-500"
+                  }`}
+                >
+                  <item.icon className="mr-2" />
+                  {item.label}
+                </Link>
+              )
+            )}
           </div>
 
           <div className=" flex items-center justify-around  w-[40%]">
-            <div>
-              <h1 className="text-xl font-bold">{time}</h1>
-            </div>
-
-            <div>
-             <DarkMode/>
-            </div>
-           
-
-            <div>
-              <AvatarComponent/>
-            </div>
+            <span className="text-xl font-bold">{time}</span>
+            <DarkMode />
+            <AvatarComponent />
           </div>
         </div>
-
+ 
+        
+        {selectedNavigation === "submit" && (
+          <Comment
+          
+            isDialogOpen={isDialogOpen}
+            HandleRemoveDialog={HandleRemoveDialog}
+          />
+        )}
+     
+        {selectedNavigation === "see" && (
+          <MyCommnt
+          
+            isDialogOpen={isDialogOpen}
+            HandleRemoveDialog={HandleRemoveDialog}
+            id={user.id}
+          />
+        )}
+     
         <div className="sm:flex md:hidden">
           <SidebarProvider className="sm:inline-flex md:hidden">
             <StudentSideBar />
             <main className="w-full">
               <SidebarTrigger />
-             
+              <Outlet/>
             </main>
           </SidebarProvider>
         </div>
       </div>
+
+    
     </>
   );
 }

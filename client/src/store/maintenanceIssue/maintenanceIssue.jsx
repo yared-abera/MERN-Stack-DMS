@@ -123,10 +123,13 @@ export const GetMaintenanceIssueForAuser = createAsyncThunk(
   );
 
 
-
+  
   export const VerificationIssue = createAsyncThunk(
     "get/verificationIssue",
     async (verifyId) => {
+
+
+      console.log(verifyId,"verifyID")
       const response = await axios.put(
         'http://localhost:9000/api/maintainanceIssue/verify/',verifyId,
         {
@@ -135,6 +138,26 @@ export const GetMaintenanceIssueForAuser = createAsyncThunk(
       );
   
       return response.data;
+    }
+  );
+  export const UpdateMaintenanceIssueStatus = createAsyncThunk(
+    "get/update",
+    async ({mainId,
+      issueId,
+      status}) => {
+
+
+        console.log(mainId,
+          issueId,
+          status)
+      // const response = await axios.put(
+      //   'http://localhost:9000/api/maintainanceIssue/verify/',verifyId,
+      //   {
+      //     withCredentials: true,
+      //   }
+      // );
+  
+      // return response.data;
     }
   );
   

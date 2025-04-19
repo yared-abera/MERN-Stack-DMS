@@ -6,6 +6,8 @@ import {
   FileText,
   User,
   Menu,
+  LucideFireExtinguisher,
+  OctagonPauseIcon,
 } from "lucide-react";
 import {
   Sidebar,
@@ -24,10 +26,11 @@ import { useSelector, useDispatch } from "react-redux";
 
 const promSide = [
   { id: "registerBlock", label: "Register Block", icon: LayoutDashboard, url:"/proctor-manager/registerBlock" },
-  { id: "updateAllocation", label: "Register Student", icon: Users , url:"/proctor-manager/registerStudent"},
+  { id: "updateAllocation", label: "Update Allocation", icon: Users , url:"/proctor-manager/registerStudent"},
   { id: "viewFeedback", label: "View Feedback", icon: MessageSquare , url:"/proctor-manager/viewFeedback"},
   { id: "viewMaintenance", label: "View Maintenance", icon: Wrench , url:"/proctor-manager/viewMaintenance"},
   { id: "generateReport", label: "Generate Report", icon: FileText , url:"/proctor-manager/generateReport"},
+  { id: "Attendance", label: "Attendance Report", icon:OctagonPauseIcon , url:"/proctor-manager/attendance"},
   { id: "Account", label: "Account", icon: User , url:"/proctor-manager/Account"},
 ];
 

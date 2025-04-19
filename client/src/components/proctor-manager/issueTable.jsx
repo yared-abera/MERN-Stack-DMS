@@ -32,15 +32,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { GetAllMaintainanceIssue } from "@/store/maintenanceIssue/maintenanceIssue";
+import { useDispatch, useSelector } from "react-redux";
+import { GetAllMaintainanceIssue, VerificationIssue } from "@/store/maintenanceIssue/maintenanceIssue";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Eye, List } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
-  // const { user } = useSelector((state) => state.auth);
+export default function IssueTableMaintenanace({ AllMaintainanceIssue,userRole }) {
+  const { user } = useSelector(state=> state.auth);
   const [openDialog, setDialog] = useState(false);
   const [userData, setUserData] = useState("");
   const [openAlert, setOpenAlert] = useState(false);
@@ -51,7 +52,7 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
       (issue) => issue._id === id
     );
 
-    console.log(viewIssue, "viewIssue");
+    
     setUserData(viewIssue);
     setDialog(true);
   }
@@ -61,19 +62,26 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
     setDialog(false);
   }
 
-  function HandleChangeStatus(id, value, issue) {
-    console.log(id, value, issue, "id, value, issue");
-    setVerifiedId({ id, value, issue });
+  function HandleChangeStatus(id, value, status) {
+    console.log(id, value, status, "id, value, issue");
+    setVerifiedId({ id, value, status });
     setOpenAlert(true);
   }
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+console.log(user,"user");
+
   function HandleContinue(id) {
-    // dispatch(VerificationIssue(id)).then((data) => {
-    //   if (data.payload.success) {
-    //     const gender = capitalizeFirstLetter(user.sex);
-    //     dispatch(GetAllMaintainanceIssue(gender));
-    //     toast.success("👍 Status Updated Successfully");
-    //   }
-    // });
+    dispatch(VerificationIssue(id)).then((data) => {
+      if (data.payload.success) {
+        const sex=user.sex
+        const gender = capitalizeFirstLetter(sex);
+        dispatch(GetAllMaintainanceIssue(gender));
+        toast.success("👍 Status Updated Successfully");
+      }
+    });
     console.log(id, "id");
   }
 
@@ -271,7 +279,7 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
                                 : "N/A"}
                             </p>
  
-{user === 'ProctorManager' && item.status === 'verified' && (
+{userRole === 'ProctorManager' && item.status === 'verified' && (
   <div className="flex flex-col gap-2 pt-4">
     {/* Option 1: Change status */}
     <div className="flex items-center"> {/* Removed gap-*. Added items-center */}
@@ -311,7 +319,7 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
   </div>
 )}
 
-{user === 'dean' && item.status === 'Pass' && (
+{userRole === 'dean' && item.status === 'Pass' && (
   <div className="flex items-center pt-4"> {/* Removed gap-*. Added items-center */}
     <Label htmlFor={`action-${item._id}-inprogress-dean`} className="text-base text-blue-600 cursor-pointer"> {/* Added htmlFor and cursor-pointer */}
       Change status to In Progress:
@@ -367,7 +375,7 @@ export default function IssueTableMaintenanace({ AllMaintainanceIssue,user }) {
                           No
                         </AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => HandleContinue(verifyId)}
+                          onClick={() => HandleContinue(verifiedId)}
                         >
                           Yes
                         </AlertDialogAction>

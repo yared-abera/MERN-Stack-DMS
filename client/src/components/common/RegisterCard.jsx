@@ -2,9 +2,10 @@ import React from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import CommonForm from "./form";
 import { motion } from "framer-motion";
-export default function RegisterCard({RegisterBlock, formData, setFormData, onSubmit, isFormValid,cardTitle,buttonText}) {
+import { Button } from '../ui/button';
+export default function RegisterCard({RegisterBlock, formData, setFormData, onSubmit, isFormValid,cardTitle,buttonText,HandleSelectProctors}) {
   return (
-    <motion.div
+    <motion.div    
                       initial={{ x: "+100%" }}
                       animate={{ x: 0 }}
                       exit={{ x: "-100%" }}
@@ -16,6 +17,7 @@ export default function RegisterCard({RegisterBlock, formData, setFormData, onSu
           <CardTitle>{cardTitle}</CardTitle>
         </CardHeader>
         <CardContent>
+         
          <CommonForm
             formControls={RegisterBlock}
             formData={formData}
@@ -23,8 +25,11 @@ export default function RegisterCard({RegisterBlock, formData, setFormData, onSu
             onSubmit={onSubmit}
             buttonText={buttonText}
             isBtnDisabled={!isFormValid()}
+         
           />
+           <Button className='mt-3' disabled={!isFormValid()} variant='outline' onClick={HandleSelectProctors}>select Proctor</Button>
         </CardContent>
+
       </Card>
        </motion.div>
   )

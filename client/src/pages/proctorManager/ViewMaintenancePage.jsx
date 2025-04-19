@@ -60,7 +60,7 @@ const ViewMaintenance = () => {
       </div>
       <CardContent>
         {AllMaintainanceIssue&&AllMaintainanceIssue.success ? (
-          <IssueTableMaintenanace AllMaintainanceIssue={AllMaintainanceIssue} user="ProctorManager" />
+          <IssueTableMaintenanace AllMaintainanceIssue={AllMaintainanceIssue} userRole="ProctorManager" />
         ) : (
           <p>No Data is Found</p>
         )}

@@ -74,6 +74,8 @@ export const DeleteAllStudent = createAsyncThunk(
     }
   );  
 
+  
+
 export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     
     
@@ -118,6 +120,18 @@ export const updateStudent=createAsyncThunk('student/update',async({studentId,up
     }
 })
 
+
+export const getStudentForProctor=createAsyncThunk('getstudent/forProctor',async(id)=>{
+    try {
+                const response=await axios.get(`http://localhost:9000/api/student/getForProctor/${id}` ,{
+                    withCredentials:true
+                })  
+                console.log(response.data,"response of student update");
+                return response.data
+            } catch (error) {
+                return rejectWithValue(error.response.data);
+            }
+})
 
  
 

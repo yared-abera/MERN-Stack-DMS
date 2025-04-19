@@ -260,17 +260,17 @@ export default function DormAllocation() {
         }
 
          // 4. Generate Password if missing
-        if (!processedItem.password) {
-            const firstName = (processedItem.Fname || "").trim();
-            const lastName = (processedItem.Lname || "").trim();
-            const firstLetterOfLastName = lastName.length > 0 ? lastName[0] : "";
+       
+            const firstName = (processedItem.Fname).trim();
+            const lastName = (processedItem.Lname).trim();
+            const firstLetterOfLastName = lastName[0]  
              // Ensure password complexity if needed, this is very basic
             if (firstName && firstLetterOfLastName) {
                  processedItem.password = `${firstName}${firstLetterOfLastName}@123`;
-            } else {
-                 processedItem.password = `Password@${generateRandomNumber()}`; // Fallback
+            }else{
+              processedItem.password = "12345"
             }
-        }
+        
 
         // 5. Extract Batch from userName (if valid format)
         const idRegex = /^(NSR|SSR)\/(\d{4})\/(\d{2})$/i;

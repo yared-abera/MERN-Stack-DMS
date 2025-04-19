@@ -19,7 +19,7 @@ import ViewDorm from "./pages/student/viewDorm";
 import ReportMaintenace from "./pages/student/maintenanceIssue";
 import StudentAccount from "./pages/student/account";
 import RegisterBlockComp from "./pages/proctorManager/RegisterBlockPage";
-import RegisterStudent from "./pages/proctorManager/RegisterStudentPage";
+import RegisterStudent from "./pages/proctorManager/UpdateAllocation";
 import ViewFeedback from "./pages/proctorManager/ViewFeedbackPage";
 import ViewMaintenance from "./pages/proctorManager/ViewMaintenancePage";
 import GenerateReport from "./pages/proctorManager/GenerateReportPage";
@@ -42,6 +42,11 @@ import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 import { getAllUser } from "./store/user-slice/userSlice";
 import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
 import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
+import CommentHover from "./pages/student/myCommnt";
+import ProctorAccount from "./pages/proctor/account";
+import ProctorControleComponent from "./components/proctor/controle";
+import ProctorAttendance from "./pages/proctor/Attendance";
+import ManagerAttendance from "./pages/proctorManager/attendance";
 function App() {
   
   const theme = useSelector((state) => state.theme.mode);
@@ -138,6 +143,7 @@ function App() {
           <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
           <Route path="GenerateReport" element={<GenerateReport />} />
+          <Route path="Attendance" element={<ManagerAttendance/>} />
           <Route path="Account" element={<ProfileManagement/>} />
         </Route>
 
@@ -152,6 +158,8 @@ function App() {
           <Route path="info" element={<ProctorViewInfo/>} />
           <Route path="report" element={<ProctorGenerateReport/>} />  
           <Route path="issue" element={<MaintenanceIssuePage/>} /> 
+          <Route path="account" element={<ProctorAccount/>}/>
+          <Route path="controle" element={<ProctorAttendance/>}/>
         </Route>
 
         <Route
@@ -183,6 +191,7 @@ function App() {
           <Route path="issue" element={<ReportMaintenace />} />
           <Route path="account" element={<StudentAccount />} />
           <Route path="comment" element={<Comment />} />
+          <Route path="commentHover" element={<CommentHover/>} />
         </Route>
         <Route path="/unauth-page" element={<UnauthPage/>} />
         <Route path="*" element={<Notfound />} />

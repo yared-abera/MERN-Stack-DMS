@@ -83,7 +83,7 @@ const DeanMaintenanceIssue = () => {
         <CardContent className="p-6">
           {AllMaintainanceIssue && AllMaintainanceIssue.success ? (
             <div className="rounded-lg border bg-card">
-              <IssueTableMaintenanace AllMaintainanceIssue={AllMaintainanceIssue} user="dean" />
+              <IssueTableMaintenanace AllMaintainanceIssue={AllMaintainanceIssue} userRole="dean" />
             </div>
           ) : (
             <div className="text-center py-10 px-6 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
