@@ -8,10 +8,10 @@ const userSchema = new mongoose.Schema({
     sex: { type: String, required: true },
     phoneNum: { type: String, required: true, unique: true },
     userName: { type: String, required: true, unique: true },
-    email:  {type:String ,unique: true},
+    email:  {type: String, unique: true},
     password: { type: String, required: true },
     role: { type: String,   required: true },
-    address:{type:String,default:'wolkite'},
+    address:{type: String,default: 'wolkite'},
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     profileImage: { type: String, default: '' },
     bio: { type: String, default: '' },
@@ -22,6 +22,15 @@ const userSchema = new mongoose.Schema({
         twitter: { type: String, default: '' },
         telegram: { type: String, default: '' },
         linkedin: { type: String, default: '' }
+    },
+    // New fields for chat functionality
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date },
+    socketId: { type: String },
+    chatSettings: {
+        notifications: { type: Boolean, default: true },
+        soundEnabled: { type: Boolean, default: true },
+        showReadReceipts: { type: Boolean, default: true }
     }
 },{ timestamps: true });
 

@@ -30,40 +30,31 @@ import AdminDashboard from "./pages/Admin/dashbord";
 import { checkAuthorization } from "./store/auth-slice";
 import Notfound from "./components/common/notFound";
 import UnauthPage from "./components/common/unAuth-page";
-import ProctorHomePage from "./pages/proctor/homePage"
-import RegisterDormComp from "./pages/proctor/registerDorm"
-import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
-import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
-import ProctorGenerateReport from "./pages/proctor/generateReport"
-import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
+import ProctorHomePage from "./pages/proctor/homePage";
+import RegisterDormComp from "./pages/proctor/registerDorm";
+import RegisterStudentPage from "./pages/proctor/RegisterStudentPage";
+import ProctorViewInfo from "./pages/proctor/viewStudentInfo";
+import ProctorGenerateReport from "./pages/proctor/generateReport";
+import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage";
 import BlockInfo from "./pages/studentDean/BlockInfo";
 import { GetAvaiableBlocks } from "./store/blockSlice";
 import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 import { getAllUser } from "./store/user-slice/userSlice";
 import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
+import MessagesPage from "./pages/MessagesPage";
+import { Toaster } from "./components/ui/sonner";
+ 
+
 function App() {
-  
   const theme = useSelector((state) => state.theme.mode);
-  const  { user, isAuthenticated, isLoading } = useSelector(
+  const { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
- 
-//  const user={
-//   role:'Admin',
-//   userName:'abdi'
-//  }
-//  const isAuthenticated=true
-//  const isLoading=false
-    
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkAuthorization());
-    // dispatch(GetAvaiableBlocks())
-    // dispatch(getAllocatedStudent())
-    // dispatch(getAllUser())
   }, [dispatch]);
-
-
 
   useEffect(() => {
     if (theme === "dark") {
@@ -73,118 +64,129 @@ function App() {
     }
   }, [theme]);
 
-  if (isLoading){
-    console.log(isLoading,"isLoading");
-    
+  if (isLoading) {
+    console.log(isLoading, "isLoading");
     return (
       <div>
         <h1 className="w-[100px] h-[20px] rounded-full text-center bg-black">Loading...</h1>
       </div>
     );
-
-  } 
+  }
 
   return (
-    <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
-      {/* common header  */}
-
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <Home />
-            </CheckAuthComponent>
-          }
-        />
-        <Route
-          path="/auth"
-          element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <LogInLayout />
-            </CheckAuthComponent>
-          }
-        >
-          <Route path="logIn" element={<LogIn />} />
-        </Route>
-
-        <Route
-          path="/admin"
-          element={  
-            
-           <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-             <AdminLayout />
+    <>
+      <Toaster />
+      <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <Home />
               </CheckAuthComponent>
-            
-          }
-        >
-          <Route path="home" element={<AdminDashboard />} />
-          <Route path="manage" element={<ManageAccount />} />
-          <Route path="account" element={<AdminAccount />} />
-        </Route>
+            }
+          />
+          <Route
+            path="/auth"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <LogInLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="logIn" element={<LogIn />} />
+          </Route>
 
-        <Route
-          path="/proctor-manager"
-          element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <ProctorManagerLayout />
-            </CheckAuthComponent>
-          }
-        >
-          <Route path="RegisterBlock" element={<RegisterBlockComp />} />
-          <Route path="RegisterStudent" element={<RegisterStudent />} />
-          <Route path="ViewFeedback" element={<ViewFeedback />} />
-          <Route path="ViewMaintenance" element={<ViewMaintenance />} />
-          <Route path="GenerateReport" element={<GenerateReport />} />
-        </Route>
+          <Route
+            path="/admin"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <AdminLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="home" element={<AdminDashboard />} />
+            <Route path="manage" element={<ManageAccount />} />
+            <Route path="account" element={<AdminAccount />} />
+          </Route>
 
-        <Route path="/proctor" 
-        element={
-          <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <ProctorLayout />
-            </CheckAuthComponent>}>
-           <Route path="home" element={<ProctorHomePage/>} />
-          <Route path="dorm" element={<RegisterDormComp/>} />
-          <Route path="register" element={<RegisterStudentPage/>} />
-          <Route path="info" element={<ProctorViewInfo/>} />
-          <Route path="report" element={<ProctorGenerateReport/>} />  
-          <Route path="issue" element={<MaintenanceIssuePage/>} /> 
-        </Route>
+          <Route
+            path="/proctor-manager"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <ProctorManagerLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="RegisterBlock" element={<RegisterBlockComp />} />
+            <Route path="RegisterStudent" element={<RegisterStudent />} />
+            <Route path="ViewFeedback" element={<ViewFeedback />} />
+            <Route path="ViewMaintenance" element={<ViewMaintenance />} />
+            <Route path="GenerateReport" element={<GenerateReport />} />
+          </Route>
 
-        <Route
-          path="/dean"
-          element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <StudentDeanLayout />
-            </CheckAuthComponent>
-          }
-        >
-          <Route path="home" element={<StudentDeanHome />} />
-          <Route path="dorm" element={<DormAllocation />} />
-          <Route path="info" element={<StudentInfo />} />
-          <Route path="block" element={<BlockInfo/>} />
-          <Route path="account" element={<StudDeanAccount />} />
-          <Route path="issue" element={<DeanMaintenanceIssue/>} />
-        </Route>
+          <Route
+            path="/proctor"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <ProctorLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="home" element={<ProctorHomePage />} />
+            <Route path="dorm" element={<RegisterDormComp />} />
+            <Route path="register" element={<RegisterStudentPage />} />
+            <Route path="info" element={<ProctorViewInfo />} />
+            <Route path="report" element={<ProctorGenerateReport />} />
+            <Route path="issue" element={<MaintenanceIssuePage />} />
+          </Route>
 
-        <Route
-          path="/student"
-          element={
-            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-              <StudentLayout />
-            </CheckAuthComponent>
-          }
-        >
-          <Route path="home" element={<StudentHome />} />
-          <Route path="dorm" element={<ViewDorm />} />
-          <Route path="issue" element={<ReportMaintenace />} />
-          <Route path="account" element={<StudentAccount />} />
-          <Route path="comment" element={<Comment />} />
-        </Route>
-        <Route path="/unauth-page" element={<UnauthPage/>} />
-        <Route path="*" element={<Notfound />} />
-      </Routes>
-    </div>
+          <Route
+            path="/dean"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <StudentDeanLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="home" element={<StudentDeanHome />} />
+            <Route path="dorm" element={<DormAllocation />} />
+            <Route path="info" element={<StudentInfo />} />
+            <Route path="block" element={<BlockInfo />} />
+            <Route path="account" element={<StudDeanAccount />} />
+            <Route path="issue" element={<DeanMaintenanceIssue />} />
+          </Route>
+
+          <Route
+            path="/student"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <StudentLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="home" element={<StudentHome />} />
+            <Route path="dorm" element={<ViewDorm />} />
+            <Route path="issue" element={<ReportMaintenace />} />
+            <Route path="account" element={<StudentAccount />} />
+            <Route path="comment" element={<Comment />} />
+          </Route>
+
+          <Route
+            path="/messages"
+            element={   
+                <div className="h-screen w-full">
+                  <MessagesPage />
+                </div>
+               
+            }
+          />
+
+          <Route path="/unauth-page" element={<UnauthPage />} />
+          <Route path="*" element={<Notfound />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 

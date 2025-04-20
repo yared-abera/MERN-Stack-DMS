@@ -1,4 +1,4 @@
-import {   ChevronUp, Home, Inbox, Search, Settings, User2 } from "lucide-react"
+import {   ChevronUp, Home, Inbox, Search, Settings, User2, MessageSquare } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +29,11 @@ const items = [
     title: "My Account",
     url: "/admin/account",
     icon: Settings,
+  },
+  {
+    title: "Messages",
+    url: "/messages",
+    icon: MessageSquare,
   },
 ]
 

@@ -139,7 +139,7 @@ const ChangePassword = async (req, res) => {
       pass.currentPassword,
       user.password
     );
-
+ 
     if (!isPasswordMatch) {
       return res.json({
         success: false,
@@ -165,4 +165,39 @@ const ChangePassword = async (req, res) => {
   }
 };
 
-module.exports = { fetchAllUser, fetchOneUser, UpdateUser, ChangePassword, deleteUser };
+// New function for searching users
+const searchUsers = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({
+        success: false,
+        message: "Search query 'q' is required.",
+      });
+    }
+
+    // Case-insensitive search by userName or email
+    const query = {
+      $or: [
+        { userName: { $regex: q, $options: 'i' } },
+        { email: { $regex: q, $options: 'i' } }
+      ]
+    };
+
+    // Find users matching the query, exclude password
+    const users = await User.find(query).select("-password");
+
+    // Send back the array of found users
+    res.status(200).json(users);
+
+  } catch (error) {
+    console.error("Error searching users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during user search.",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { fetchAllUser, fetchOneUser, UpdateUser, ChangePassword, deleteUser, searchUsers };

@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, UserRoundPen, View } from "lucide-react";
+import { Home, LayoutGrid, UserRoundPen, View, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +11,7 @@ import {
 } from "../ui/sidebar";
 import { setUpdateAllocation } from  "@/store/common/sidebarSlice";
 
-import { Link, useLocation } from "react-router-dom"; // React Router imports
+import { Link, useLocation, useNavigate } from "react-router-dom"; // React Router imports
 
 import { useSelector, useDispatch } from "react-redux";
 
@@ -53,6 +53,12 @@ const ProSideBar = [
     icon: UserRoundPen,
   },
   {
+    id: "messages",
+    title: "Messages",
+    url: "/messages",
+    icon: MessageSquare,
+  },
+  {
     title: "Account",
     url: "/proctor/account",
     icon: UserRoundPen,
@@ -63,6 +69,7 @@ export default function ProctorSideBar() {
   const updateAllocation = useSelector((state) => state.sidebar.updateAllocation);
   const location = useLocation(); // Get current location
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -74,18 +81,34 @@ export default function ProctorSideBar() {
           <SidebarGroupContent className='mt-4'>
             <SidebarMenu>
               {ProSideBar.map((item) => (
-                <SidebarMenuItem className="py-4" key={item.title}>
+                <SidebarMenuItem className="py-4" key={item.title || item.id}>
                   <SidebarMenuButton asChild>
-                    <Link
-                      to={item.url}
-                      className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
-                        location.pathname === item.url ? "bg-blue-500 text-white" : ""
-                      }`}
-                     onClick={() => {item.id === "registerStudent" && dispatch(setUpdateAllocation(updateAllocation))}}  
-                    >
-                      <item.icon />
-                      <span className="text-xl ">{item.title}</span>
-                    </Link>
+                    {item.id === "messages" ? (
+                      <Link
+                        to={item.url}
+                        className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
+                          location.pathname === item.url ? "bg-blue-500 text-white" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(item.url);
+                        }}
+                      >
+                        <item.icon />
+                        <span className="text-xl ">{item.title}</span>
+                      </Link>
+                    ) : (
+                      <Link
+                        to={item.url}
+                        className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
+                          location.pathname === item.url ? "bg-blue-500 text-white" : ""
+                        }`}
+                        onClick={() => {item.id === "registerStudent" && dispatch(setUpdateAllocation(updateAllocation))}}
+                      >
+                        <item.icon />
+                        <span className="text-xl ">{item.title}</span>
+                      </Link>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

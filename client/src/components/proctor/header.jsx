@@ -1,7 +1,9 @@
 import { SidebarTrigger } from "../ui/sidebar";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "@/components/common/avatar";
+import ChatButton from "@/components/common/ChatButton";
 import { useState } from "react";
+
 export default function Header() {
   
       const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar default state
@@ -19,6 +21,7 @@ export default function Header() {
     
           <div className="flex items-center gap-4 ml-auto">
             <DarkMode />
+            <ChatButton />
             <AvatarComponent />
           </div>
         </nav>

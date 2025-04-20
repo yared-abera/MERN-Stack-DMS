@@ -20,9 +20,19 @@ const auth = async (req, res, next) => {
     // Check user status
     await checkUserStatus(req, res, next);
   } catch (error) {
+    // Log the specific JWT error for debugging
+    console.error("JWT Verification Error:", error.message); 
+    
+    let message = "Token verification failed. Please log in again.";
+    if (error.name === 'TokenExpiredError') {
+      message = "Your session has expired. Please log in again.";
+    } else if (error.name === 'JsonWebTokenError') {
+      message = "Invalid token. Please log in again.";
+    }
+    
     res.status(401).json({
       success: false,
-      message: "Token is not valid"
+      message: message // Use the more specific message
     });
   }
 };

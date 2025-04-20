@@ -12,7 +12,7 @@ import {
  
 import { Link, useLocation } from "react-router-dom";
  
-  import { Bug, Home, LogOut, MessageSquareShare, UserCog, View } from "lucide-react";
+  import { Bug, Home, LogOut, MessageSquareShare, UserCog, View, MessageSquare } from "lucide-react";
   const headerComponent = [
     {
       label: "home",
@@ -33,6 +33,11 @@ import { Link, useLocation } from "react-router-dom";
       label: "Comment",
       url: "/student/comment",
       icon: MessageSquareShare ,
+    },
+    {
+      label: "Messages",
+      url: "/messages",
+      icon: MessageSquare,
     },
   ];
 

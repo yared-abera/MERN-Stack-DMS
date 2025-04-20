@@ -1,4 +1,4 @@
-import { BugIcon, Cuboid, Home, LayoutGrid, UserRoundPen, View } from "lucide-react";
+import { BugIcon, Cuboid, Home, LayoutGrid, UserRoundPen, View, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -43,6 +43,11 @@ const StudDeanSideBar = [
     title: "Account",
     url: "/dean/account",
     icon: UserRoundPen,
+  },
+  {
+    title: "Messages",
+    url: "/messages",
+    icon: MessageSquare,
   },
 
  

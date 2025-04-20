@@ -6,6 +6,7 @@ import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
 import DarkMode from "../common/darkMode";
 import AvatarComponent from "../common/avatar";
+import ChatButton from "../common/ChatButton";
 
 export default function Header() {
   const [showSearch, setShowSearch] = useState();
@@ -61,7 +62,8 @@ export default function Header() {
             </div>
           )}
 
-          <div className="ml-4 sm:ml-8 ">
+          <div className="flex items-center gap-4 ml-4 sm:ml-8">
+            <ChatButton />
             <AvatarComponent />
           </div>
         </div>

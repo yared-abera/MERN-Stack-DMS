@@ -55,13 +55,21 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
 
   // Public paths that don't require authentication
   const isPublicPath = ["/", "/auth/logIn"].includes(currentPath);
+  
+  // Shared paths that all authenticated users can access
+  const isSharedPath = ["/messages"].includes(currentPath) || currentPath.startsWith("/messages/");
 
   // 1. Handle unauthenticated users
   if (!isAuthenticated) {
     return isPublicPath ? children : <Navigate to="/auth/logIn" replace />;
   }
 
-  // 2. Handle authenticated users
+  // 2. If it's a shared path like messages, allow access for any authenticated user
+  if (isSharedPath) {
+    return children;
+  }
+
+  // 3. Handle authenticated users accessing role-specific paths
   const userRole = user?.role;
   const allowedBasePath = roleBasePaths[userRole];
 
@@ -77,7 +85,7 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
     return <Navigate to={roleRoutes[userRole]} replace />;
   }
 
-  // 3. Prevent access to login page when authenticated
+  // 4. Prevent access to login page when authenticated
   if (currentPath === "/auth/logIn") {
     return <Navigate to={roleRoutes[userRole]} replace />;
   }

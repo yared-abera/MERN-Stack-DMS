@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "../ui/sidebar";
 import AvatarComponent from "../common/avatar";
+import ChatButton from "../common/ChatButton";
 
 export default function Header() {
   const NowDate = new Date();
@@ -85,31 +86,9 @@ export default function Header() {
         {time}
       </span>
     </div>
-    <div className="md:mr-20 sm:ml-2 flex-1">
-      {/* <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Avatar className="bg-black cursor-pointer dark:bg-white">
-            <AvatarFallback className="bg-black dark:bg-white dark:text-black text-white font-extrabold">
-              xu
-            </AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="right" className="w-56">
-          <DropdownMenuLabel>Logged in as</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <UserCog className="m-2 w-4 h-4" onClick={() => navigate("/admin/account")} />
-            Account
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <LogOut className="w-4 h-4 m-2" />
-            LogOut
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu> */}
-<AvatarComponent/>
-      
+    <div className="flex items-center gap-4 md:mr-20 sm:ml-2 flex-1">
+      <ChatButton />
+      <AvatarComponent/>
     </div>
   </div>
 </div>

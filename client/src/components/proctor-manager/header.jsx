@@ -4,6 +4,8 @@ import { Moon, Sun, UserCircle, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "../common/avatar";
+import ChatButton from "../common/ChatButton";
+
 export default function Header() {  
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -30,16 +32,19 @@ export default function Header() {
         <Link to="/feedback" className="hover:text-blue-500">Feedback</Link>
       </nav>
 
-      {/* Right Section: Dark Mode & Profile */}
+      {/* Right Section: Dark Mode, Chat & Profile */}
       <div className="flex items-center gap-4">
-         {/* dark mode component */}
-          <DarkMode/>
+        {/* dark mode component */}
+        <DarkMode/>
+        
+        {/* Chat Button */}
+        <ChatButton />
          
         {/* User Profile Dropdown */}
         <div className="relative">
           <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
             <AvatarComponent/>
-             </button>
+          </button>
         </div>
       </div>
     </header>

@@ -27,6 +27,7 @@ const promSide = [
   { id: "updateAllocation", label: "Register Student", icon: Users , url:"/proctor-manager/registerStudent"},
   { id: "viewFeedback", label: "View Feedback", icon: MessageSquare , url:"/proctor-manager/viewFeedback"},
   { id: "viewMaintenance", label: "View Maintenance", icon: Wrench , url:"/proctor-manager/viewMaintenance"},
+  { id: "messages", label: "Messages", icon: MessageSquare, url:"/messages"},
   { id: "generateReport", label: "Generate Report", icon: FileText , url:"/proctor-manager/generateReport"},
   { id: "profile", label: "Profile", icon: User , url:"/proctor-manager/profile"},
 ];
