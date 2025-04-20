@@ -47,9 +47,10 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 
 import CommentHover from "./pages/student/myCommnt";
 import ProctorAccount from "./pages/proctor/account";
-import ProctorControleComponent from "./components/proctor/controle";
+import ProctorControleComponent from "./components/proctor/attendanceControl";
 import ProctorAttendance from "./pages/proctor/Attendance";
 import ManagerAttendance from "./pages/proctorManager/attendance";
+import ProctorControl from "./pages/proctor/control";
 function App() {
   
   const theme = useSelector((state) => state.theme.mode);
@@ -163,7 +164,8 @@ function App() {
           <Route path="report" element={<ProctorGenerateReport/>} />  
           <Route path="issue" element={<MaintenanceIssuePage/>} /> 
           <Route path="account" element={<ProctorAccount/>}/>
-          <Route path="controle" element={<ProctorAttendance/>}/>
+          <Route path="attendance" element={<ProctorAttendance/>}/>
+          <Route path="control" element={<ProctorControl/>}/>
         </Route>
 
         <Route

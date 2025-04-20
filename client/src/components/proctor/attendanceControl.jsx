@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { addAttendance } from "@/store/attendance/attendance-Slice";
 
-export default function ProctorControleComponent({ students }) {
+export default function ProctorAttendanceControleComponent({ students }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 

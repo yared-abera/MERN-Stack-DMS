@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, TowerControl, UserRoundPen, View } from "lucide-react";
+import { ContainerIcon, Home, LayoutGrid, TowerControl, UserRoundPen, View } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -55,8 +55,15 @@ const ProSideBar = [
 
   {
     title: "Attendance",
-    url: "/proctor/controle",
+    url: "/proctor/attendance",
     icon:TowerControl,
+  },
+
+  
+  {
+    title: "Control",
+    url: "/proctor/control",
+    icon:ContainerIcon,
   },
   {
     title: "Account",

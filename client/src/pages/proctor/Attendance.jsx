@@ -3,10 +3,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import ProctorControleComponent from "../../components/proctor/controle";
+ 
 import AbsentStudentOnProctor from "@/components/proctor/viewAbsentStudents";
 import { useDispatch, useSelector } from "react-redux";
 import { getStudentForProctor } from "@/store/studentAllocation/allocateSlice";
+import ProctorAttendanceControleComponent from "../../components/proctor/attendanceControl";
 
 export default function ProctorAttendance() {
   const { user } = useSelector((state) => state.auth);
@@ -68,7 +69,7 @@ export default function ProctorAttendance() {
         {/* Add margin/padding as needed */}
         {selectedOption === "takeAttendance" && (
           // Render your attendance taking component here
-          <ProctorControleComponent students={students} />
+          <ProctorAttendanceControleComponent students={students} />
         )}
         {selectedOption === "viewAbsentStudent" && (
           

@@ -1,9 +1,29 @@
 import { SidebarTrigger } from "../ui/sidebar";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "@/components/common/avatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getSingleUser } from "@/store/user-slice/userSlice";
 export default function Header() {
-  
+
+  const [ThisUser, setThisUser] = useState('');
+  const {user}=useSelector(state=>state.auth)
+
+   // Initial fetch
+   const dispatch=useDispatch()
+   useEffect(() => {
+    if (user?.id) {
+      console.log("Fetching user data for ID (StudDean):", user.id);
+      dispatch(getSingleUser(user.id)).then((data) => {
+        console.log("User data response (StudDean):", data);
+        if (data.payload?.success) {
+          setThisUser(data.payload.user);
+        }
+      });
+    } else {
+      console.log("No user ID available (StudDean)");
+    }
+  }, [user]);
       const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar default state
     
       return (
@@ -19,7 +39,7 @@ export default function Header() {
     
           <div className="flex items-center gap-4 ml-auto">
             <DarkMode />
-            <AvatarComponent />
+            {ThisUser&&ThisUser!==''&& <AvatarComponent ThisUser={ThisUser}/>}
           </div>
         </nav>
       );
