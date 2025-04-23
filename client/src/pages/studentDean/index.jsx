@@ -34,7 +34,7 @@ import FooterPage from "@/components/common/FooterPage";
 export default function StudentDeanHome() {
   const dispatch = useDispatch();
   const { searchStudent } = useSelector((state) => state.Data);
-
+const{user}=useSelector((state)=>state.auth)
   const Images = [img2, img3, img4, img5, img6];
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -45,7 +45,8 @@ export default function StudentDeanHome() {
     dispatch(getAllBlock());
     dispatch(getAllocatedStudent());
     const role = "Student";
-    dispatch(getRecentlySearchedUser(role));
+    const id=user.id
+    dispatch(getRecentlySearchedUser({role,id}));
   }, [dispatch]);
 
   // Automatic slideshow effect
@@ -86,12 +87,15 @@ export default function StudentDeanHome() {
         const userName = searchStudent;
 
         // Dispatch the action to add the recently searched user.
-        dispatch(AddRecentlySearchedUser({ userName, role })).then((res) => {
+        const id=user.id
+ 
+        dispatch(AddRecentlySearchedUser({ userName, role,id })).then((res) => {
           if (res.payload.success) {
             // Once added, dispatch to fetch the latest search history.
             setRecentlySearchedUser(res.payload.data);
             setRecentUserFound(true);
-            dispatch(getRecentlySearchedUser(role));
+          
+            dispatch(getRecentlySearchedUser({role,id}));
           } else {
             toast.error(res.payload.message);
           }

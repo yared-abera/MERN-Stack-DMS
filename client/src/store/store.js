@@ -8,6 +8,7 @@ import MaintainanceIssueSlice from './maintenanceIssue/maintenanceIssue'
 import UserSlice from './user-slice/userSlice'
 import feedBackSlice from './feedBack/feedBack'
 import attendanceSlice from './attendance/attendance-Slice'
+import ControlSlice from './control/controlSclice.jsx'
 
 import blockReducer from "./blockSlice";
 const store = configureStore({
@@ -22,7 +23,8 @@ const store = configureStore({
         allUser:UserSlice,
         issue:MaintainanceIssueSlice,
         feedBack:feedBackSlice,
-        attendance:attendanceSlice
+        attendance:attendanceSlice,
+        control:ControlSlice
     }
 })
 

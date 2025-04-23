@@ -84,7 +84,7 @@ const RegisterBlockComp = () => {
     useEffect(() => {
         if (userGender) {
             const derivedFoundInValue =
-                userGender === "male" ? "maleArea" : "femaleArea";
+                userGender === "female" ? "femaleArea" : "maleArea";
             // Update formData safely
             setFormData((prevFormData) => ({
                 ...prevFormData,

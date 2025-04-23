@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
  
-import { getSingleStudent } from "@/store/studentAllocation/allocateSlice";
+import { getAllocatedStudent, getSingleStudent } from "@/store/studentAllocation/allocateSlice";
 
 export default function ViewDorm() {
   const { user } = useSelector((state) => state.auth);
@@ -14,12 +14,15 @@ export default function ViewDorm() {
   useEffect(() => {
     const id = user.id;
 
+    dispatch(getAllocatedStudent())
+
     dispatch(getSingleStudent({ id })).then((data) => {
       if (data?.payload?.success) {
         setThisStudent(data?.payload?.data);
       }
     });
-  }, [user, dispatch]);
+  },[dispatch]);
+
   let DormMate;
   if (AllocatedStudent.length > 0) {
     DormMate = AllocatedStudent.filter(
@@ -32,9 +35,9 @@ export default function ViewDorm() {
 
 
   return (
-    <div className="mt-20 mx-4 min-h-screen space-y-12">
+    <div className="mt-28 mx-4 min-h-screen space-y-12">
       {/* ── Student Header ─────────────────────────────────────────── */}
-      <div className="bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl shadow-xl p-8 text-center">
+      <div className="  bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl shadow-xl p-8 text-center">
         <h2 className="text-3xl font-bold mb-4">
           Student:{" "}
           <span className="text-green-300">

@@ -1,4 +1,4 @@
-import { BugIcon, Cuboid, Home, LayoutGrid, LogOut, UserRoundPen, View } from "lucide-react";
+import { BugIcon, CircleSlash2, Cuboid, Home, LayoutGrid, LogOut, TowerControlIcon, UserRoundPen, View } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -15,7 +15,9 @@ import { cn } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 import { LogOutUser } from "@/store/auth-slice";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+
 import { ChevronUp } from "lucide-react";
+import { toast } from "sonner";
 
 const menuItems = [
   { title: "Home", url: "/dean/home", icon: Home },
@@ -23,6 +25,7 @@ const menuItems = [
   { title: "View Student Info", url: "/dean/info", icon: View },
   { title: "View Block Info", url: "/dean/block", icon: Cuboid },
   { title: "Maintenance Issue", url: "/dean/issue", icon: BugIcon },
+  { title: "Control", url: "/dean/control", icon: CircleSlash2 },
   { title: "Account", url: "/dean/account", icon: UserRoundPen },
 ];
 
@@ -31,7 +34,14 @@ export default function StudentDeanSideBar() {
   const dispatch = useDispatch();
 
   function HandleLogOut(){
-    dispatch(LogOutUser())
+    dispatch(LogOutUser()).then(data=>{
+      if(data.payload.success){
+        toast.success(`${data.payload.message}`)
+      }
+      else{
+        toast.error(`${data.payload.message}`)
+      }
+    })
 
   }
 

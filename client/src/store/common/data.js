@@ -10,10 +10,10 @@ const initialState = {
   SearchUsers:'',
   AllRecentlySearchedUser:[],
 };
-export const getRecentlySearchedUser=createAsyncThunk("getStudentById",async(role)=>{
+export const getRecentlySearchedUser=createAsyncThunk("getStudentById",async({role,id})=>{
   try {
-    console.log(role,'role')
-    const response=await axios.get(`http://localhost:9000/api/recentuser/SearchStudent/${role}`,{
+    console.log(role ,id,'role id')
+    const response=await axios.get(`http://localhost:9000/api/recentuser/SearchStudent/${role}/${id}`,{
       withCredentials:true
     })
     return response.data
@@ -28,10 +28,13 @@ export const getRecentlySearchedUser=createAsyncThunk("getStudentById",async(rol
 
 
 
-export const AddRecentlySearchedUser=createAsyncThunk("AddRecentlySearchedUser",async({userName,role})=>{
+export const AddRecentlySearchedUser=createAsyncThunk("AddRecentlySearchedUser",async({userName,role,id})=>{
+  
+  console.log(id,userName,role,  'AddRecentlySearchedUser');
+  
   try {
     console.log(userName,role,'userName,role')
-    const response=await axios.post('http://localhost:9000/api/recentuser/add',{userName,role},{
+    const response=await axios.post('http://localhost:9000/api/recentuser/add',{userName,role,id},{
       withCredentials:true
     })
     console.log(response.data,'response.data')

@@ -7,7 +7,7 @@ import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
 import DarkMode from "../common/darkMode";
 import AvatarComponent from "../common/avatar";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SearchedUsers } from "@/store/common/data";
 import { getSingleUser } from "@/store/user-slice/userSlice";
  

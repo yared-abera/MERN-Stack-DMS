@@ -1,37 +1,51 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Moon, Sun, UserCircle, Menu } from "lucide-react";
+import { Moon, Sun, UserCircle, Menu, LucideHome } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "../common/avatar";
 import { SidebarTrigger } from "../ui/sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleUser } from "@/store/user-slice/userSlice";
-export default function Header() {  
+export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
- // Initial fetch
- const [ThisUser, setThisUser] = useState('');
-  const {user}=useSelector(state=>state.auth)
-const dispatch=useDispatch()
- useEffect(() => {
-  if (user?.id) {
-    console.log("Fetching user data for ID (StudDean):", user.id);
-    dispatch(getSingleUser(user.id)).then((data) => {
-      console.log("User data response (StudDean):", data);
-      if (data.payload?.success) {
-        setThisUser(data.payload.user);
-      }
-    });
-  } else {
-    console.log("No user ID available (StudDean)");
-  }
-}, [user]);
+  // Initial fetch
+  const [ThisUser, setThisUser] = useState("");
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (user?.id) {
+      console.log("Fetching user data for ID (StudDean):", user.id);
+      dispatch(getSingleUser(user.id)).then((data) => {
+        console.log("User data response (StudDean):", data);
+        if (data.payload?.success) {
+          setThisUser(data.payload.user);
+        }
+      });
+    } else {
+      console.log("No user ID available (StudDean)");
+    }
+  }, [user]);
 
   return (
     <header className="w-full bg-white  dark:bg-gray-900 shadow-md px-3 py-5 flex justify-between items-center">
       {/* Logo & Name */}
-
-      <SidebarTrigger size="icon" className="p-4" />
+      <div className="flex gap-3 items-center    w-1/3">
+        <SidebarTrigger size="icon" className="p-4" />
+        {/* <div className="flex mx-auto">
+        <nav
+          className={cn(
+            "hidden lg:flex gap-6 text-gray-700 dark:text-gray-300"
+          )}
+        >
+          <Link to="/proctor-manager/dashboard" className="hover:text-blue-500 text-base font-semibold flex gap-1">
+           <LucideHome/> Home
+          </Link>
+         
+        </nav>
+        </div> */}
+       
+      </div>
 
       <div className="flex items-center gap-3">
         <button
@@ -46,23 +60,19 @@ const dispatch=useDispatch()
       </div>
 
       {/* Navigation Links */}
-      <nav className={cn("hidden lg:flex gap-6 text-gray-700 dark:text-gray-300")}>
-        <Link to="/dashboard" className="hover:text-blue-500">Dashboard</Link>
-        <Link to="/profile" className="hover:text-blue-500">Profile</Link>
-        <Link to="/reports" className="hover:text-blue-500">Reports</Link>
-        <Link to="/feedback" className="hover:text-blue-500">Feedback</Link>
-      </nav>
 
       {/* Right Section: Dark Mode & Profile */}
       <div className="flex items-center gap-4">
-         {/* dark mode component */}
-          <DarkMode/>
-         
+        {/* dark mode component */}
+        <DarkMode />
+
         {/* User Profile Dropdown */}
         <div className="relative">
           <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          {ThisUser&&ThisUser!==''&& <AvatarComponent ThisUser={ThisUser}/>}
-             </button>
+            {ThisUser && ThisUser !== "" && (
+              <AvatarComponent ThisUser={ThisUser} />
+            )}
+          </button>
         </div>
       </div>
     </header>

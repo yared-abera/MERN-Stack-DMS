@@ -8,6 +8,7 @@ const initialState = {
 export const InsertFeedBack = createAsyncThunk(
   "feedBack/insert",
   async ({ userName, description, sex }) => {
+    console.log(userName, description ,sex, "userName description ,sex");
     try {
       console.log(userName, description, sex, "userName,description,sex");
       const response = await axios.post(

@@ -19,12 +19,12 @@ export const registerBlock=createAsyncThunk("block/register",
 
       console.log(formData,"formData");
       
-    //     console.log("registerBlock formData from blockASyncThunk",formData);
-    // const result= await axios.post("http://localhost:9000/api/block/register",formData,{
-    //     withCredentials:true
-    // });
+        console.log("registerBlock formData from blockASyncThunk",formData);
+    const result= await axios.post("http://localhost:9000/api/block/register",formData,{
+        withCredentials:true
+    });
 
-    // return result.data
+    return result.data
     } catch (error) {
        console.log(error,'error from registerBlock');
         

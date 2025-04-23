@@ -4,7 +4,7 @@ const roleRoutes = {
   admin: "/admin/home",
   studentDean: "/dean/home",
   Student:"/student/home",
-  proctorManager: "/proctor-manager/RegisterBlock",
+  proctorManager: "/proctor-manager/home",
   proctor: "/proctor/home",
 };
 
@@ -31,7 +31,9 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
   }
 
   // 2. Handle authenticated users
-  const userRole = user?.role;
+  
+  const userRole = user?.role=== "proctor manager"?'proctorManager': user?.role;
+   
   const allowedBasePath = roleBasePaths[userRole];
 
   // Redirect to unauth-page if user role is not recognized

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProctorBlocks } from '@/store/blockSlice/index';
-import { getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
+import { getAllocatedStudent, getStudentForProctor } from "../../store/studentAllocation/allocateSlice";
 import { FaUserGraduate, FaUserCheck, FaUserClock, FaHistory, FaTimes, FaBuilding } from 'react-icons/fa';
 import FloorCard from '@/components/proctor/FloorCard';
 
@@ -35,13 +35,11 @@ export default function ProctorHomePage() {
       if (blocks.length === 0) return;
       
       try {
-        const response = await dispatch(getAllocatedStudent()).unwrap();
+        const response = await dispatch(getStudentForProctor(user.id)).unwrap();
         console.log("Raw API Response:", response.data); // Debug log
         
         if (response.data) {
-          const proctorStudents = response.data.filter((student) =>
-            blocks.some((block) => block.blockNum === student.blockNum)
-          );
+          const proctorStudents = response.data 
           
           console.log("Proctor Students:", proctorStudents); // Debug log
           
@@ -101,7 +99,7 @@ export default function ProctorHomePage() {
   const StatCard = ({ icon: Icon, title, value, color }) => (
     <div className={`bg-white rounded-lg shadow-lg p-6 ${color} transform hover:scale-105 transition-transform duration-200`}>
       <div className="flex items-center justify-between">
-        <div>
+        <div> 
           <p className="text-gray-500 text-sm font-medium">{title}</p>
           <p className="text-2xl font-bold mt-2">{value}</p>
         </div>
@@ -153,6 +151,9 @@ export default function ProctorHomePage() {
       </div>
     );
   }
+
+  console.log("Blocks:", blocks); // Debug log
+  console.log("Students:", students); // Debug log
 
   return (
     <div 
@@ -222,7 +223,7 @@ export default function ProctorHomePage() {
               {[...block.floors]
                 .sort((a, b) => a.floorNumber - b.floorNumber)
                 .map((floor) => (
-                  <FloorCard key={floor.floorNumber} floor={floor} />
+                  <FloorCard key={floor.floorNumber} floor={floor} blockId={block._id}/>
                 ))}
             </div>
           </div>

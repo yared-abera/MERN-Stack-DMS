@@ -5,16 +5,18 @@ import axios from 'axios';
 export const registerDorm = createAsyncThunk(
   'dorm/registerDorm',
   async (formData, { rejectWithValue }) => {
+    console.log('Form Data from the slice:', formData);
+    
     try {
       // Extract the required fields
-      const { blockId, floorNumber, dormNumber, capacity } = formData;
+      const { blockId, floorNumber, dormNumber, capacity,status ,description,registerBy } = formData;
       
       console.log('Registering dorm:', { blockId, floorNumber, dormNumber, capacity });
       
       const response = await axios.patch(
         `http://localhost:9000/api/dorm/${blockId}/floors/${floorNumber}/dorms`,
         // Send only the required fields
-        { dormNumber, capacity },
+        { dormNumber, capacity,status,description,registerBy },
         {
           withCredentials: true,
           headers: {
@@ -36,10 +38,27 @@ export const registerDorm = createAsyncThunk(
 export const updateDormStatus = createAsyncThunk(
   "dorm/updateStatus",
   async ({ blockId, floorNumber, dormNumber, status }) => {
+
+    console.log("Updating dorm status:", { blockId, floorNumber, dormNumber, status });
     try {
       const response = await axios.patch(
-        `${process.env.REACT_APP_API_URL}/api/dorm/${blockId}/floors/${floorNumber}/dorms/${dormNumber}/status`,
+        `http://localhost:9000/api/dorm/${blockId}/floors/${floorNumber}/dorms/${dormNumber}/status`,
         { status }
+      );
+      console.log("Dorm status updated successfully:", response.data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+);
+
+export const getMaintenanceIssueDormsSubmmitedByProctor = createAsyncThunk(
+  "dorm/getMaintenanceIssueDormsSubmmitedByProctor",
+  async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:9000/api/dorm/getIssueDorms/'
       );
       return response.data;
     } catch (error) {
