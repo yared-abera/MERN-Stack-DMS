@@ -154,6 +154,7 @@ const updateStudent = async (req, res) => {
       "sex",
       "studCategory",
       "userName",
+
     ];
     const updates = {};
     updatableFields.forEach((field) => {
@@ -272,6 +273,65 @@ const updateStudent = async (req, res) => {
   }
 };
 
+
+
+
+ 
+const updateByStudent = async (req, res) => {
+  const { id } = req.params;
+  const formData = req.body;
+
+  try {
+    // Validate ID format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid student ID format",
+      });
+    }
+
+    // Find and update the student with proper update syntax
+    const updatedStudent = await Student.findByIdAndUpdate(
+      id,
+      { ...formData }, // Spread the form data into the update object
+      { new: true, runValidators: true } // Options: return updated doc and run validators
+    );
+
+    // Handle case where student not found
+    if (!updatedStudent) {
+      return res.status(404).json({
+        success: false,
+        message: "Student not found",
+      });
+    }
+
+    // Send successful response
+    res.status(200).json({
+      success: true,
+      message: 'Student updated successfully',
+      data: updatedStudent
+    });
+
+  } catch (error) {
+    // Handle different error types
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: "Validation Error",
+        error: error.message
+      });
+    }
+
+    // Handle server errors
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};
+ 
+ 
 const DeleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -357,107 +417,8 @@ const DeleteStudent = async (req, res) => {
   }
 };
 
-// const DeleteAllStudent = async (req, res) => {
-//   try {
-//     const studentData = req.body;
-//     console.log(studentData, "studentData");
-//     const deletedStudents = [];
-//     const failedStudents = [];
+ 
 
-//     if (studentData.length === 0) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "No student to delete",
-//       });
-//     }
-
-//     // Process students sequentially to avoid race conditions
-//     for (const studentItem of studentData) {
-//       try {
-//         // Find the student by ID
-//         const student = await Student.findById(studentItem._id);
-//         if (!student) {
-//           failedStudents.push(studentItem._id);
-//           continue;
-//         }
-
-//         const { blockNum, dormId, sex } = student;
-//         const blockLocation = sex === "Male" ? "maleArea" : "femaleArea";
-
-//         // Load the block document
-//         const block = await Block.findOne({
-//           blockNum,
-//           location: blockLocation,
-//         });
-//         if (!block) {
-//           failedStudents.push(studentItem._id);
-//           continue;
-//         }
-
-//         // Find the dorm inside any floor and decrement its counter
-//         let dormFound = false;
-//         for (const floor of block.floors) {
-//           const dorm = floor.dorms.find(
-//             (d) => d.dormNumber.toString() === dormId.toString()
-//           );
-//           if (dorm) {
-//             dormFound = true;
-//             // Never go below zero
-//             dorm.studentsAllocated = Math.max(0, dorm.studentsAllocated - 1);
-//             break;
-//           }
-//         }
-
-//         if (!dormFound) {
-//           failedStudents.push(studentItem._id);
-//           continue;
-//         }
-
-//         // Persist the updated block
-//         await block.save();
-
-//         // 6) Delete the student record from the recently searched student
-//         const deletedRecentlySearchedStudent = await SearchHistory.findOne({
-//           userId: id,
-//           role: "Student",
-//         });
-//         if (deletedRecentlySearchedStudent) {
-//           await deletedRecentlySearchedStudent.findByIdAndDelete(
-//             deletedRecentlySearchedStudent._id
-//           );
-//         }
-//         // Finally, delete the student record
-//         const deleted = await Student.findByIdAndDelete(studentItem._id);
-//         if (deleted) {
-//           deletedStudents.push(deleted);
-//         } else {
-//           failedStudents.push(studentItem._id);
-//         }
-//       } catch (error) {
-//         // If any individual student deletion fails, add to failed list and continue
-//         failedStudents.push(studentItem._id);
-//         console.error(`Error deleting student ${studentItem._id}:`, error);
-//       }
-//     }
-
-//     // Return the final response after processing all students
-//     return res.status(200).json({
-//       success: true,
-//       message: "Student deletion process completed",
-//       data: {
-//         deletedStudents,
-//         failedStudents,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Error in DeleteAllStudent:", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: "Server error while deleting students",
-//       error: error.message,
-//     });
-//   }
-// };
 const DeleteAllStudent = async (req, res) => {
   try {
     const studentData = req.body;
@@ -568,8 +529,7 @@ const fetchStuentForProctor = async (req, res) => {
       success: true,
       data: students
     });
-
-    console.log(students,"students")
+ 
 
   } catch (error) {
     console.error("Error fetching students for proctor:", error);
@@ -590,5 +550,6 @@ module.exports = {
   updateStudent,
   DeleteStudent,
   DeleteAllStudent,
-  fetchStuentForProctor
+  fetchStuentForProctor,
+  updateByStudent
 };

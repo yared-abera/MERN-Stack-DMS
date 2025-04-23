@@ -13,6 +13,7 @@ const recentuser_Route = require('./router/recentlySearchedUser/recentuser-route
 const passwordReset_Route = require('./router/passwordReset/passwordResetRoutes');
 const feedBack_Route=require('./router/FeedBack-route/feedBack-rout')
 const attendance_Route=require('./router/attendance-router/attendance-route')
+const controle_Route=require('./router/controleRoute/control-Route')
 //"mongodb://localhost:27017/DMS"
 mongoose
   .connect("mongodb://localhost:27017/DMS", 
@@ -56,6 +57,7 @@ app.use('/api/recentuser', recentuser_Route);
 app.use('/api/user', passwordReset_Route);
 app.use('/api/feedBack',feedBack_Route); 
 app.use('/api/attendance',attendance_Route);
+app.use('/api/control',controle_Route);
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

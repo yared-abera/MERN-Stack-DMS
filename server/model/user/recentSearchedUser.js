@@ -5,7 +5,6 @@ const SearchHistorySchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     required: true,
-    // Dynamically reference either the 'Student' or 'User' model
     refPath: 'role'
   },
   role: {
@@ -16,7 +15,9 @@ const SearchHistorySchema = new Schema({
   timestamp: {
     type: Date,
     default: Date.now
-  }
+  },
+  searchedBy:{type: Schema.Types.ObjectId,refPath:'role', required: true}, // The user who performed the search
+
 });
 
 // ─── INDEX FOR FAST ROLE+TIMESTAMP QUERIES ────────────────────────────
@@ -30,7 +31,7 @@ SearchHistorySchema.pre('save', async function(next) {
     const MAX_ENTRIES_PER_ROLE = 5;
 
     // Count existing entries for this role
-    const count = await Model.countDocuments({ role: this.role });
+    const count = await Model.countDocuments({ role: this.role, searchedBy:this.searchedBy });
 
     if (count >= MAX_ENTRIES_PER_ROLE) {
       // Delete the oldest entry for this role

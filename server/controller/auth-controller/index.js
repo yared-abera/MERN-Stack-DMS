@@ -19,9 +19,7 @@ const logInUser = async (req, res) => {
         break;
       } 
     }
-console.log(foundUser)
-    //const foundUser = await User.findOne({ userName });
-
+ 
     // Check if user exists
     if (!foundUser) {
       return res.json({
