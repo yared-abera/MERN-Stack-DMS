@@ -3,6 +3,7 @@ const bcryptjs = require("bcryptjs");
 const mongoose = require("mongoose");
 const Block = require("../../model/block/index");
 const SearchHistory = require("../../model/user/recentSearchedUser");
+const bcrypt=require('bcryptjs')
 const InsertStudent = async (req, res) => {
   try {
     const {
@@ -541,6 +542,49 @@ const fetchStuentForProctor = async (req, res) => {
   }
 };
 
+const ChangePassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const pass = req.body;
+
+    const user = await Student.findById(id);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User Not found",
+      });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(
+      pass.currentPassword,
+      user.password
+    );
+
+    if (!isPasswordMatch) {
+      return res.json({
+        success: false,
+        message: "Password Not Match",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(pass.newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later.",
+      error: error.message,
+    });
+  }
+};
  
 
 module.exports = {
@@ -551,5 +595,6 @@ module.exports = {
   DeleteStudent,
   DeleteAllStudent,
   fetchStuentForProctor,
-  updateByStudent
+  updateByStudent,
+  ChangePassword
 };
