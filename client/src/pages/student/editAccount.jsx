@@ -51,6 +51,7 @@ export default function EditAccount({ ThisUser, HandleEdit, editDialog }) {
         if (data.payload.success) {
           toast.success(data.payload.message);
           dispatch(getSingleStudent({id:student._id}))
+          HandleEdit()
         } else {
           toast.error(data.payload.message);
         }
