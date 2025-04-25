@@ -73,7 +73,7 @@ const chatController = {
           $set: { lastMessage: new Date() }
         },
         { new: true }
-      ).populate('messages.sender messages.receiver', 'Fname Lname userName profileImage');
+      ).populate('messages.sender messages.receiver', 'fName lName userName profileImage _id');
 
       res.status(200).json({
         success: true,
