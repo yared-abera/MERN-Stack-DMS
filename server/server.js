@@ -21,7 +21,7 @@ const socketIo = require('socket.io');
 
 //"mongodb://localhost:27017/DMS"
 mongoose
-  .connect("mongodb://localhost:27017/DMS", 
+  .connect("mongodb://localhost:27017/", 
     {serverSelectionTimeoutMS: 30000}
   )
   .then(() => {
