@@ -189,7 +189,7 @@ export default function DormAllocation() {
     // Map various potential input keys (lowercase) to the standard keys used internally (e.g., Fname, Mname, Lname)
     const keyMappings = {
         // Fname variations (add more as needed)
-        'fName': 'Fname',
+        'fname': 'Fname',
         'firstname': 'Fname',
         'first name': 'Fname',
         'First Name': 'Fname',

@@ -15,72 +15,10 @@ import {
   Ratio,
   LucideHome,
 } from "lucide-react";
-// import {
-//   Sidebar,
-//   SidebarContent,
-//   SidebarGroup,
-//   SidebarGroupContent,
-//   SidebarGroupLabel,
-//   SidebarMenu,
-//   SidebarMenuButton,
-//   SidebarMenuItem,
-// } from "../ui/sidebar";
+ 
 
-// import { Link, useLocation } from "react-router-dom"; // React Router imports
 
-// import { useSelector, useDispatch } from "react-redux";
-
-// const promSide = [
-//   { id: "registerBlock", label: "Register Block", icon: LayoutDashboard, url:"/proctor-manager/registerBlock" },
-//   { id: "updateAllocation", label: "Update Allocation", icon: Users , url:"/proctor-manager/registerStudent"},
-//   { id: "viewFeedback", label: "View Feedback", icon: MessageSquare , url:"/proctor-manager/viewFeedback"},
-//   { id: "viewMaintenance", label: "View Maintenance", icon: Wrench , url:"/proctor-manager/viewMaintenance"},
-//   { id: "generateReport", label: "Generate Report", icon: FileText , url:"/proctor-manager/generateReport"},
-//   { id: "Attendance", label: "Attendance Report", icon:OctagonPauseIcon , url:"/proctor-manager/attendance"},
-//   { id: "Control", label: "control", icon: LucideTowerControl , url:"/proctor-manager/Control"},
-//   { id: "Account", label: "Account", icon: User , url:"/proctor-manager/Account"},
-// ];
-
-// export default function SideBarComponent() {
-//   // const isOpen = useSelector((state) => state.sidebar.isOpen);
-//   //  const dispatch = useDispatch();
-//   // const navigate = useNavigate();
-//   const location = useLocation(); // Get current location
-
-//   return (
-//     <Sidebar variant="floating" collapsible="icon">
-//       <SidebarContent>
-//         <SidebarGroup>
-//           <SidebarGroupLabel className="sm:text-lg sm:font-semibold md:text-2xl pt-6 font-bold mb-2 justify-center">
-//           Proctor Manager
-//           </SidebarGroupLabel>
-//           <SidebarGroupContent className='mt-4'>
-//             <SidebarMenu>
-//               {promSide.map((item) => (
-//                 <SidebarMenuItem className="py-4" key={item.label}>
-//                   <SidebarMenuButton asChild>
-//                     <Link
-//                       to={item.url}
-//                       className={`text-lg font-semibold hover:bg-slate-400 dark:hover:bg-blue-400 ${
-//                         location.pathname === item.url ? "bg-blue-500 text-white" : ""
-//                       }`}
-//                     >
-//                       <item.icon />
-//                       <span className="text-xl ">{item.label}</span>
-//                     </Link>
-//                   </SidebarMenuButton>
-//                 </SidebarMenuItem>
-//               ))}
-//             </SidebarMenu>
-//           </SidebarGroupContent>
-//         </SidebarGroup>
-//       </SidebarContent>
-//     </Sidebar>
-//   );
-// }
-
-//import { ChartNoAxesColumn, ChevronUp, ContainerIcon, FilePen, Hammer, Home, LayoutDashboard, LayoutGrid, Loader, LogOut, LucideTowerControl, TowerControl, UserRoundPen, View } from "lucide-react";
-import {
+ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,

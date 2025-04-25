@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Moon, Sun, UserCircle, Menu, LucideHome } from "lucide-react";
+import { Moon, Sun, UserCircle, Menu, LucideHome, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "../common/avatar";
@@ -32,18 +32,14 @@ export default function Header() {
       {/* Logo & Name */}
       <div className="flex gap-3 items-center    w-1/3">
         <SidebarTrigger size="icon" className="p-4" />
-        {/* <div className="flex mx-auto">
-        <nav
-          className={cn(
-            "hidden lg:flex gap-6 text-gray-700 dark:text-gray-300"
-          )}
-        >
-          <Link to="/proctor-manager/dashboard" className="hover:text-blue-500 text-base font-semibold flex gap-1">
-           <LucideHome/> Home
-          </Link>
-         
-        </nav>
-        </div> */}
+        <div className="flex mx-auto">
+        <div>
+            <Link to={'/proctor-manager/chat'}>
+            <MessageCircle/>
+            </Link>
+            
+          </div>
+        </div>
        
       </div>
 

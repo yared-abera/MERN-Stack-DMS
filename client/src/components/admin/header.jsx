@@ -1,7 +1,7 @@
  
 
 import { SidebarTrigger } from "../ui/sidebar";
-import { CalendarX, Search } from "lucide-react";
+import { CalendarX, MessageCircle, Search } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
@@ -10,6 +10,7 @@ import AvatarComponent from "../common/avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { SearchedUsers } from "@/store/common/data";
 import { getSingleUser } from "@/store/user-slice/userSlice";
+import { Link } from "react-router-dom";
  
 export default function Header() {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -138,6 +139,13 @@ export default function Header() {
               )}
             </div>
             <span className="font-sans text-lg font-bold">{time}</span>
+          </div>
+
+          <div>
+            <Link to={'/admin/chat'}>
+            <MessageCircle/>
+            </Link>
+            
           </div>
         </div>
 
