@@ -4,38 +4,57 @@ const messageSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   receiver: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   message: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   timestamp: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: true
   },
   read: {
     type: Boolean,
-    default: false
+    default: false,
+    index: true
   }
 });
 
 const chatRoomSchema = new mongoose.Schema({
   participants: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   }],
   messages: [messageSchema],
   lastMessage: {
     type: Date,
+    default: Date.now,
+    index: true
+  },
+  createdAt: {
+    type: Date,
     default: Date.now
   }
 });
+
+// Add compound index for participants to optimize room lookup
+chatRoomSchema.index({ participants: 1 });
+
+// Add instance method to get latest messages
+chatRoomSchema.methods.getLatestMessages = function(limit = 50) {
+  return this.messages.slice(-limit);
+};
 
 const Message = mongoose.model('Message', messageSchema);
 const ChatRoom = mongoose.model('ChatRoom', chatRoomSchema);

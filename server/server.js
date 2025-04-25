@@ -69,56 +69,97 @@ app.use('/api/chat', chat_Routes);
 // Create HTTP server
 const server = http.createServer(app);
 
-// Initialize Socket.IO
+ 
 const io = socketIo(server, {
   cors: {
     origin: ["http://localhost:5174", "http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: true,
-    allowedHeaders: ["content-type"]
+     
   },
-  transports: ['websocket', 'polling'],
-  path: '/socket.io'
+  transports: ['websocket', 'polling']
 });
 
-// Track online users
+// Track online users and their rooms
 const onlineUsers = new Map();
+const userRooms = new Map();
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
+   
+  // Add user to online users when they connect with their userId
+  const userId = socket.handshake.auth?.userId;
+  if (userId) {
+    onlineUsers.set(userId, socket.id);
+    io.emit('onlineUsers', Array.from(onlineUsers.keys()));
+    console.log('User connected:', userId);
+    console.log('Online users:', Array.from(onlineUsers.entries()));
+  }
 
-  // Add user to online users when they connect
-  socket.on('connect', () => {
-    if (socket.handshake.auth?.userId) {
-      onlineUsers.set(socket.handshake.auth.userId, socket.id);
-      io.emit('onlineUsers', Array.from(onlineUsers.keys()));
-    }
-  });
-
+  // Handle joining chat rooms
   socket.on('join', ({ userId, receiverId }) => {
-    const room = [userId, receiverId].sort().join('-');
-    socket.join(room);
-    console.log(`User ${userId} joined room ${room}`);
+    if (!userId || !receiverId) {
+      socket.emit('error', { message: 'Invalid user IDs for room joining' });
+      return;
+    }
+    
+    // Create a unique room ID by sorting and joining user IDs
+    const roomId = [userId, receiverId].sort().join('-');
+    
+    // Leave previous rooms
+    if (userRooms.has(socket.id)) {
+      const previousRooms = userRooms.get(socket.id);
+      previousRooms.forEach(room => socket.leave(room));
+    }
+    
+    // Join new room
+    socket.join(roomId);
+    
+    // Store room for this socket
+    if (!userRooms.has(socket.id)) {
+      userRooms.set(socket.id, new Set());
+    }
+    userRooms.get(socket.id).add(roomId);
+    
+    console.log(`User ${userId} joined room ${roomId}`);
   });
 
+  // Handle sending messages
   socket.on('sendMessage', (messageData) => {
-    const room = [messageData.senderId, messageData.receiverId].sort().join('-');
-    console.log(`Sending message to room ${room}:`, messageData);
-    io.to(room).emit('message', messageData);
+    const { senderId, receiverId, message, roomId } = messageData;
+    if (!senderId || !receiverId || !message || !roomId) {
+      socket.emit('error', { message: 'Invalid message data' });
+      return;
+    }
+    
+    const chatRoomId = [senderId, receiverId].sort().join('-');
+    console.log(`Sending message to room ${chatRoomId}:`, messageData);
+    
+    // Emit to the specific room
+    io.to(chatRoomId).emit('message', messageData);
   });
 
+  // Handle errors
   socket.on('error', (error) => {
     console.error('Socket error:', error);
+    socket.emit('error', { message: 'Internal socket error' });
   });
 
+  // Handle disconnection
   socket.on('disconnect', () => {
-    // Remove user from online users when they disconnect
-    if (socket.handshake.auth?.userId) {
-      onlineUsers.delete(socket.handshake.auth.userId);
+    if (userId) {
+      onlineUsers.delete(userId);
       io.emit('onlineUsers', Array.from(onlineUsers.keys()));
+      
+      // Clean up rooms
+      if (userRooms.has(socket.id)) {
+        userRooms.delete(socket.id);
+      }
+      
+      console.log('User disconnected:', userId);
+      console.log('Remaining online users:', Array.from(onlineUsers.entries()));
     }
-    console.log('Client disconnected:', socket.id);
   });
 });
 
