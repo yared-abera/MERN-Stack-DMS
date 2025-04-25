@@ -37,7 +37,7 @@ import {
 import { motion } from "framer-motion";
 
 // Configuration for Dorm Registration form - Kept as it helps structure options logic
-const RegisterDorm = [
+ const RegisterDorm = [
   { label: "Select Block", name: "blockId", componentType: "select", options: [] },
   { label: "Select Floor", name: "floorNumber", componentType: "select", options: [] },
   { label: "Start Dorm Number", name: "startDormNumber", placeholder: "Enter Starting Dorm Number", type: "number", componentType: "input" },
@@ -49,15 +49,15 @@ const RegisterDorm = [
 const initialFormData = { blockId: "", floorNumber: "", startDormNumber: "", endDormNumber: "", capacity: "" };
 
 const RegisterDormComp = () => {
-  const dispatch = useDispatch();
-  const [formData, setFormData] = useState(initialFormData);
-  const [formConfig, setFormConfig] = useState(RegisterDorm);
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState(initialFormData);
+  const [formConfig, setFormConfig] = useState(RegisterDorm);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [maintenanceDorms, setMaintenanceDorms] = useState(new Set());
   const [usedDorms, setUsedDorms] = useState(new Set());
   // Removed: const [registeredFloors, setRegisteredFloors] = useState(new Set());
-  const { list: blocks } = useSelector((state) => state.block);
+  const { list: blocks } = useSelector((state) => state.block);
   // Removed: const [selectedBlockId, setSelectedBlockId] = useState(""); // Not strictly needed now formData handles this
   // Removed: const [selectedFloorNumber, setSelectedFloorNumber] = useState(""); // Not strictly needed now formData handles this
   const { user } = useSelector((state) => state.auth);
@@ -71,26 +71,26 @@ const RegisterDormComp = () => {
   // Removed: const[unRegisterdDorms,setUnRegisteredDorms]=useState([])
   // Removed: const [registeredDorms, setRegisteredDorms] = useState([]); // Removed: State to track registered dorms
 
-  useEffect(() => {
-    dispatch(fetchProctorBlocks());
-  }, [dispatch]);
+  useEffect(() => {
+      dispatch(fetchProctorBlocks());
+  }, [dispatch]);
 
   // Effect to update Block options when blocks data changes
-  useEffect(() => {
+useEffect(() => {
     const updatedConfig = formConfig.map((field) => {
       if (field.name === "blockId") {
-        return {
-          ...field,
+      return {
+        ...field,
           options: blocks.map((block) => ({ id: block._id, label: `Block ${block.blockNum} (${block.location})`, value: block._id })),
-        };
-      }
-      return field;
-    });
-    setFormConfig(updatedConfig);
+      };
+    }
+    return field;
+  });
+  setFormConfig(updatedConfig);
   }, [blocks]); // Depend on blocks
 
   // Effect to update Floor options when blockId changes in formData
-  useEffect(() => {
+useEffect(() => {
     const selectedBlock = blocks.find((b) => b._id === formData.blockId);
     const floorOptions = selectedBlock?.floors?.map((floor) => ({ id: floor.floorNumber.toString(), label: `Floor ${floor.floorNumber}`, value: floor.floorNumber.toString() })) || [];
 
@@ -98,8 +98,8 @@ const RegisterDormComp = () => {
       prevConfig.map((field) => {
         if (field.name === "floorNumber") {
           return { ...field, options: floorOptions };
-        }
-        return field;
+    }
+    return field;
       })
     );
   }, [formData.blockId, blocks]); // Depend on formData.blockId and blocks
@@ -118,7 +118,7 @@ const RegisterDormComp = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const isFormValid = () => {
+  const isFormValid = () => {
     const requiredFields = ["blockId", "floorNumber", "startDormNumber", "endDormNumber", "capacity"];
     const allFieldsFilled = requiredFields.every((fieldName) => formData[fieldName] !== "");
 
@@ -204,17 +204,17 @@ const RegisterDormComp = () => {
 
  
   const onSubmit = async (e) => {
-        e.preventDefault();
-
-        if (!isFormValid()) {
+      e.preventDefault();
+      
+      if (!isFormValid()) {
           toast.error("Please fill all fields correctly before registering.");
           return;
         }
 
         if (!userId) {
            toast.error("User not authenticated. Cannot register dorms.");
-           return;
-        }
+        return;
+      }
 
         setLoading(true); // Start loading
 
@@ -438,7 +438,7 @@ const RegisterDormComp = () => {
               const isDisabled = currentStatus && currentStatus !== (selectedStatus === "maintenance" ? "Under Maintenance" : "Used By Other People");
               const isChecked = (selectedStatus === "maintenance" && maintenanceDorms.has(dormNum)) || (selectedStatus === "used" && usedDorms.has(dormNum));
 
-              return (
+  return (
                 <div key={dormNum} className={`border p-2 rounded-md shadow-sm ${isDisabled ? 'bg-gray-100' : ''}`}> {/* Added disabled styling */}
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -463,8 +463,8 @@ const RegisterDormComp = () => {
                         placeholder="Enter issue (max 50 chars)"
                         maxLength={50}
                         className="mt-1"
-                      />
-                    </div>
+      />
+    </div>
                   )}
                 </div>
               );
@@ -482,7 +482,7 @@ const RegisterDormComp = () => {
         </DialogContent>
       </Dialog>
     </>
-  );
+  );
 };
 
 export default RegisterDormComp;

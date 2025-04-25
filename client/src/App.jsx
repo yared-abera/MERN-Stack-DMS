@@ -54,6 +54,8 @@ import ProctorControl from "./pages/proctor/control";
 import ManagerControl from "./pages/proctorManager/control";
 import DeanIssueContol from "./pages/studentDean/viewControlIssues";
 import ManagerDashBoard from "./pages/proctorManager/dashborad";
+import StudentDeanGenerateReport from "./pages/studentDean/generateReport";
+
 function App() {
   const theme = useSelector((state) => state.theme.mode);
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -187,7 +189,7 @@ function App() {
           <Route path="info" element={<StudentInfo />} />
           <Route path="block" element={<BlockInfo />} />
           <Route path="account" element={<StudDeanAccount />} />
-         
+          <Route path="report" element={<StudentDeanGenerateReport />} />
           <Route path="issue" element={<DeanMaintenanceIssue />} />
           <Route path="control" element={<DeanIssueContol />} />
         </Route>

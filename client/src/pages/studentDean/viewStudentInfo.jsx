@@ -8,7 +8,9 @@ import {
   DeleteStudent,
   DeleteAllStudent,
 } from "../../store/studentAllocation/allocateSlice";
-import { FaArrowLeft, FaSearch } from "react-icons/fa";
+import { FaArrowLeft, FaSearch, FaFilePdf, FaFileExcel, FaPrint } from "react-icons/fa";
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import {
   Dialog,
   DialogContent,
@@ -41,6 +43,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { read, utils, writeFile } from 'xlsx';
 
 const customStyles = {
   headCells: {
@@ -176,6 +179,208 @@ const StudentInfo = () => {
     }
   };
 
+  const downloadStudentInfo = (students) => {
+    // If single student is passed, convert to array
+    const studentsArray = Array.isArray(students) ? students : [students];
+    
+    const doc = new jsPDF();
+    let yOffset = 15;
+    
+    // Add title with university logo or name
+    doc.setFontSize(16);
+    doc.text("Student Information Details", 14, yOffset);
+    
+    // Add timestamp
+    doc.setFontSize(10);
+    yOffset += 10;
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, yOffset);
+    yOffset += 10;
+
+    studentsArray.forEach((student, index) => {
+      if (index > 0) {
+        // Add a page break for each new student except the first one
+        doc.addPage();
+        yOffset = 15;
+        
+        // Add header for new page
+        doc.setFontSize(16);
+        doc.text("Student Information Details", 14, yOffset);
+        yOffset += 10;
+        
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, yOffset);
+        yOffset += 10;
+      }
+
+      // Student header
+      doc.setFontSize(14);
+      doc.text(`Student #${index + 1}: ${student.userName}`, 14, yOffset);
+      yOffset += 10;
+
+      // Personal Information section
+      const personalInfo = [
+        ["Student ID", student.userName || "N/A"],
+        ["First Name", student.Fname || "N/A"],
+        ["Middle Name", student.Mname || "N/A"],
+        ["Last Name", student.Lname || "N/A"],
+        ["Email", student.email || "N/A"],
+        ["Phone", student.phoneNum || "N/A"],
+        ["Gender", student.sex || "N/A"],
+        ["Batch", student.batch || "N/A"],
+        ["College", student.collage || "N/A"],
+        ["Department", student.department || "N/A"],
+        ["Stream", student.stream || "N/A"],
+        ["Student Type", student.studCategory || "N/A"],
+      ];
+
+      // Academic Information section
+      const accommodationInfo = [
+        ["Block Number", student.blockNum || "N/A"],
+        ["Dorm Number", student.dormId || "N/A"],
+        ["Address", student.address || "N/A"],
+        ["Disability Status", student.disabilityStatus || "N/A"],
+        ["Special Needs", student.isSpecial || "N/A"],
+      ];
+
+      // System Information section
+      const systemInfo = [
+        ["Role", student.role || "N/A"],
+        ["Created At", new Date(student.createdAt).toLocaleString()],
+        ["Updated At", new Date(student.updatedAt).toLocaleString()],
+      ];
+
+      // Generate tables
+      doc.setFontSize(12);
+      doc.text("Personal Information", 14, yOffset);
+      
+      autoTable(doc, {
+        startY: yOffset + 5,
+        head: [["Field", "Value"]],
+        body: personalInfo,
+        theme: 'striped',
+        headStyles: { fillColor: [66, 139, 202] },
+        styles: { fontSize: 10 },
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+      doc.text("Accommodation Information", 14, yOffset);
+      
+      autoTable(doc, {
+        startY: yOffset + 5,
+        head: [["Field", "Value"]],
+        body: accommodationInfo,
+        theme: 'striped',
+        headStyles: { fillColor: [66, 139, 202] },
+        styles: { fontSize: 10 },
+      });
+
+      yOffset = doc.lastAutoTable.finalY + 10;
+      doc.text("System Information", 14, yOffset);
+      
+      autoTable(doc, {
+        startY: yOffset + 5,
+        head: [["Field", "Value"]],
+        body: systemInfo,
+        theme: 'striped',
+        headStyles: { fillColor: [66, 139, 202] },
+        styles: { fontSize: 10 },
+      });
+    });
+
+    // Save the PDF
+    try {
+      doc.save(`all_students_info_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Error saving PDF:', error);
+      toast.error('Error generating PDF. Please try again.');
+    }
+  };
+
+  const generateExcel = (students) => {
+    try {
+      // If single student is passed, convert to array
+      const studentsArray = Array.isArray(students) ? students : [students];
+      
+      // Prepare the data in a complete format
+      const data = studentsArray.map(student => ({
+        'Student ID': student.userName || 'N/A',
+        'First Name': student.Fname || 'N/A',
+        'Middle Name': student.Mname || 'N/A',
+        'Last Name': student.Lname || 'N/A',
+        'Email': student.email || 'N/A',
+        'Phone': student.phoneNum || 'N/A',
+        'Gender': student.sex || 'N/A',
+        'Batch': student.batch || 'N/A',
+        'College': student.collage || 'N/A',
+        'Department': student.department || 'N/A',
+        'Stream': student.stream || 'N/A',
+        'Student Type': student.studCategory || 'N/A',
+        'Block Number': student.blockNum || 'N/A',
+        'Dorm Number': student.dormId || 'N/A',
+        'Address': student.address || 'N/A',
+        'Disability Status': student.disabilityStatus ? 'Yes' : 'No',
+        'Special Needs': student.isSpecial ? 'Yes' : 'No',
+        'Role': student.role || 'N/A',
+        'Created At': new Date(student.createdAt).toLocaleString(),
+        'Updated At': new Date(student.updatedAt).toLocaleString()
+      }));
+
+      // Create worksheet from data
+      const ws = utils.json_to_sheet(data);
+
+      // Set column widths
+      const colWidths = [
+        { wch: 15 },  // Student ID
+        { wch: 15 },  // First Name
+        { wch: 15 },  // Middle Name
+        { wch: 15 },  // Last Name
+        { wch: 25 },  // Email
+        { wch: 15 },  // Phone
+        { wch: 10 },  // Gender
+        { wch: 10 },  // Batch
+        { wch: 20 },  // College
+        { wch: 20 },  // Department
+        { wch: 15 },  // Stream
+        { wch: 15 },  // Student Type
+        { wch: 10 },  // Block Number
+        { wch: 10 },  // Dorm Number
+        { wch: 30 },  // Address
+        { wch: 15 },  // Disability Status
+        { wch: 15 },  // Special Needs
+        { wch: 10 },  // Role
+        { wch: 20 },  // Created At
+        { wch: 20 }   // Updated At
+      ];
+      ws['!cols'] = colWidths;
+
+      // Add some style to the header row
+      const headerRange = utils.decode_range(ws['!ref']);
+      for (let C = headerRange.s.c; C <= headerRange.e.c; ++C) {
+        const address = utils.encode_cell({ r: 0, c: C });
+        if (!ws[address]) continue;
+        ws[address].s = {
+          font: { bold: true },
+          fill: { fgColor: { rgb: "CCE5FF" } }
+        };
+      }
+
+      // Create workbook and append worksheet
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, 'Student Information');
+
+      // Generate file name with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const fileName = `student_information_${timestamp}.xlsx`;
+      
+      // Write file
+      writeFile(wb, fileName);
+      toast.success('Student information exported successfully!');
+    } catch (error) {
+      console.error('Excel generation error:', error);
+      toast.error(`Failed to generate Excel file: ${error.message}`);
+    }
+  };
+
   // Define Table Columns using useMemo for performance optimization
   const columns = useMemo(
     () => [
@@ -198,46 +403,46 @@ const StudentInfo = () => {
         cell: (row) => (
           <>
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <ArrowBigDownDashIcon />
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <ArrowBigDownDashIcon className="h-4 w-4" />
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel className="text-center">
-                  Actions
-                </DropdownMenuLabel>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedStudent(row);
+                    setIsViewDialogOpen(true);
+                  }}
+                >
+                  View Details
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedStudent(row);
+                    setEditData(row);
+                    setSexValue(row.sex);
+                    setIsEditDialogOpen(true);
+                  }}
+                >
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => downloadStudentInfo(row)}
+                  className="text-blue-600"
+                >
+                  Download PDF
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <button
-                    onClick={() => {
-                      setSelectedStudent(row);
-                      setIsViewDialogOpen(true);
-                    }}
-                    className="w-full text-left focus:outline-none px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700" // Added focus outline removal and made button fill item
-                  >
-                    View
-                  </button>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <button
-                    onClick={() => {
-                      setSelectedStudent(row);
-                      setIsEditDialogOpen(true);
-                    }}
-                    className="w-full text-left focus:outline-none px-3 py-1 bg-green-600 text-white rounded-md hover:bg-blue-700" // Added focus outline removal and made button fill item
-                  >
-                    edit
-                  </button>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <button
-                    onClick={() => {
-                      setDeleteUserConfirmation(true);
-                      setDeleteStudentId(row);
-                    }}
-                    className="w-full text-left focus:outline-none px-3 py-1 bg-red-600 text-white rounded-md hover:bg-blue-700" // Added focus outline removal and made button fill item
-                  >
-                    delete
-                  </button>
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={() => {
+                    setDeleteStudentId(row);
+                    setDeleteUserConfirmation(true);
+                  }}
+                >
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -245,7 +450,7 @@ const StudentInfo = () => {
         ),
       },
     ],
-    [] // Removed unnecessary dependency
+    []
   );
   function handleDeleteAll(filteredIncidents) {
     console.log("filteredIncidents on delete all", filteredIncidents);
@@ -343,10 +548,37 @@ const StudentInfo = () => {
           </div>
 
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {" "}
-              Student List
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Student List
+              </h2>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                  onClick={() => downloadStudentInfo(filteredIncidents)}
+                >
+                  <FaFilePdf className="h-4 w-4" />
+                  Download All PDF
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="flex items-center gap-2 text-green-600 hover:text-green-700"
+                  onClick={() => generateExcel(filteredIncidents)}
+                >
+                  <FaFileExcel className="h-4 w-4" />
+                  Download All Excel
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-700"
+                  onClick={() => window.print()}
+                >
+                  <FaPrint className="h-4 w-4" />
+                  Print All
+                </Button>
+              </div>
+            </div>
 
             {/* Filter Buttons placed above the table */}
             <div className="flex justify-end space-x-2 mb-4 w-[95%]">
@@ -422,13 +654,41 @@ const StudentInfo = () => {
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-3xl rounded-lg h-screen overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">
-              Student Details
+            <DialogTitle className="text-xl font-semibold flex justify-between items-center">
+              <span>Student Details</span>
+              {selectedStudent && (
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                    onClick={() => downloadStudentInfo(selectedStudent)}
+                  >
+                    <FaFilePdf className="h-4 w-4" />
+                    PDF
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2 text-green-600 hover:text-green-700"
+                    onClick={() => generateExcel([selectedStudent])}
+                  >
+                    <FaFileExcel className="h-4 w-4" />
+                    Excel
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-700"
+                    onClick={() => window.print()}
+                  >
+                    <FaPrint className="h-4 w-4" />
+                    Print
+                  </Button>
+                </div>
+              )}
             </DialogTitle>
           </DialogHeader>
 
           {selectedStudent && (
-            <dl className="mt-4 border-t border-gray-200 divide-y divide-gray-200 ">
+            <dl className="mt-4 border-t border-gray-200 divide-y divide-gray-200">
               {/* Student ID */}
               <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
                 <dt className="text-sm font-medium text-gray-500">

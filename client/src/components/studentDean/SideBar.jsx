@@ -1,4 +1,4 @@
-import { BugIcon, CircleSlash2, Cuboid, Home, LayoutGrid, LogOut, TowerControlIcon, UserRoundPen, View } from "lucide-react";
+import { BugIcon, CircleSlash2, Cuboid, Home, LayoutGrid, LogOut, TowerControlIcon, UserRoundPen, View, FileText } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,6 +26,7 @@ const menuItems = [
   { title: "View Block Info", url: "/dean/block", icon: Cuboid },
   { title: "Maintenance Issue", url: "/dean/issue", icon: BugIcon },
   { title: "Control", url: "/dean/control", icon: CircleSlash2 },
+  { title: "Generate Report", url: "/dean/report", icon: FileText },
   { title: "Account", url: "/dean/account", icon: UserRoundPen },
 ];
 
