@@ -7,6 +7,7 @@ import { typeOfIssue } from "@/config/data";
 import {
   GetMaintenanceIssueForAuser,
   SubmitMaintainanceIssue,
+  VerificationIssue,
 } from "@/store/maintenanceIssue/maintenanceIssue";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -85,7 +86,7 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
         setIssueTriggered(data.payload.data);
       }
     });
-  }, [user, dispatch]);
+  }, [dispatch]);
 
   // Handlers
   const handleCheckboxChange = (idx, checked) =>
@@ -137,15 +138,72 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
     setOpenDialog(false);
     setStatusChange({});
   };
+  {
+    /**{id: '680bc19e8929f29c417e27eb', issue: 'electric', status: 'verified'} */
+  }
+  // const handleContinue = () => {
+  //       // TODO: dispatch status update to backend
+  //       console.log(statusChange);
+
+  //       // Destructure status, issue, and _id directly from statusChange
+  //       const { status, issue, _id } = statusChange;
+
+  //       // Create the verified object as requested
+  //       const verified = {
+  //          status:'Resolved', // or status: status
+  //           issue,  // or issue: issue
+  //           id:_id     // or _id: _id
+  //       };
+
+  //       // You can optionally log the 'verified' object if needed
+  //       console.log("Verified object:", verified);
+
+  //       // Dispatch the action using the destructured values
+  //       dispatch(VerificationIssue(verified)).then(data=>{
+  //     if(data.payload.success){
+  //       toast.success("Status updated to Verified");
+  //     }
+  //   })
+
+  //       setOpenDialog(false);
+
+  //       setStatusChange({});
+
+  //       // Changed toast message based on context of "verified object"
+  //     };
 
   const handleContinue = () => {
-    // TODO: dispatch status update to backend
-    console.log(statusChange)
+    if (!statusChange._id) {
+      toast.error("No issue selected");
+      return;
+    }
+
+    const verificationData = {
+      issue: statusChange.issue,
+      status: "Resolved", // Use lowercase for consistency
+      id: statusChange._id,
+    };
+
+    dispatch(VerificationIssue(verificationData))
+      .then((result) => {
+        if (result.payload?.success) {
+          toast.success(`Status updated to Resolved`);
+          // Refresh issues list
+          dispatch(
+            GetMaintenanceIssueForAuser({
+              id: user.id,
+              Model: capitalizeFirstLetter(user.role),
+            })
+          );
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message || "Update failed");
+      });
+
     setOpenDialog(false);
     setStatusChange({});
-    toast.success("Status updated to Resolved");
   };
-
   return (
     <div className="min-h-screen mt-20 bg-gradient-to-br from-gray-50 to-gray-100 py-8">
       {/* Confirmation Dialog */}
@@ -157,10 +215,7 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
           <DialogDescription>
             <p className="mb-4">
               Are you sure you want to mark issue{" "}
-              <strong>
-                { statusChange.issue}
-              </strong>{" "}
-              as Resolved?
+              <strong>{statusChange.issue}</strong> as Resolved?
             </p>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={handleCancel}>
@@ -219,14 +274,27 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
                     {list.status}
                   </span>
                   <Separator className="my-4" />
-                  <div className="flex items-center space-x-2">
-                    <Label>Mark as Resolved:</Label>
-                    <input
-                      type="radio"
-                      name={`resolve-${idx}`}
-                      onChange={() => handleStatusChange(list)}
-                      className="h-4 w-4"
-                    />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Label>Mark as Resolved:</Label>
+                      <input
+                        type="radio"
+                        name={`resolve-${idx}`}
+                        checked={statusChange._id === list._id}
+                        onChange={() => handleStatusChange(list)}
+                        className="h-4 w-4"
+                      />
+                    </div>
+                    {Object.keys(statusChange).length > 0 &&
+                      statusChange._id === list._id && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => setStatusChange({})}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          Clear selection
+                        </Button>
+                      )}
                   </div>
                 </div>
               ))
@@ -275,7 +343,10 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
                   onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      userInfo: { ...prev.userInfo, phoneNumber: e.target.value },
+                      userInfo: {
+                        ...prev.userInfo,
+                        phoneNumber: e.target.value,
+                      },
                     }))
                   }
                 />
@@ -293,8 +364,12 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
             </h2>
             <div className="space-y-4">
               {formData.issueTypes.map((item, idx) => {
-                const label = typeOfIssue.find((t) => t.name === item.name)?.label;
-                const desc = typeOfIssue.find((t) => t.name === item.name)?.description;
+                const label = typeOfIssue.find(
+                  (t) => t.name === item.name
+                )?.label;
+                const desc = typeOfIssue.find(
+                  (t) => t.name === item.name
+                )?.description;
                 return (
                   <div
                     key={idx}
@@ -350,7 +425,10 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
                 <Input
                   value={formData.otherIssue}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, otherIssue: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      otherIssue: e.target.value,
+                    }))
                   }
                   placeholder="Custom issue (max 12 chars)"
                   maxLength={12}
@@ -363,7 +441,10 @@ export default function MaintenanceIssueSubmit({ ThisUser }) {
                 <Textarea
                   value={formData.description}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, description: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
                   }
                   placeholder="Details (max 30 chars)"
                   rows={3}

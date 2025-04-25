@@ -19,6 +19,7 @@ import {
   LogOut,
   MessageCircleReply,
   MessageSquareShare,
+  User2Icon,
   UserCog,
   View,
 } from "lucide-react";
@@ -34,6 +35,12 @@ const headerComponent = [
     url: "/student/commentHover",
     icon: MessageSquareShare,
   },
+
+  
+ {label: "Account",
+  url: "/student/account",
+  icon:User2Icon,
+},
 ];
 import {
   DropdownMenu,
