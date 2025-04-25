@@ -30,20 +30,20 @@ import AdminDashboard from "./pages/Admin/dashbord";
 import { checkAuthorization } from "./store/auth-slice";
 import Notfound from "./components/common/notFound";
 import UnauthPage from "./components/common/unAuth-page";
-import ProctorHomePage from "./pages/proctor/homePage"
-import RegisterDormComp from "./pages/proctor/registerDorm"
-import RegisterStudentPage from "./pages/proctor/RegisterStudentPage"
-import ProctorViewInfo from "./pages/proctor/viewStudentInfo"
-import ProctorGenerateReport from "./pages/proctor/generateReport"
-import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage"
+import ProctorHomePage from "./pages/proctor/homePage";
+import RegisterDormComp from "./pages/proctor/registerDorm";
+import RegisterStudentPage from "./pages/proctor/RegisterStudentPage";
+import ProctorViewInfo from "./pages/proctor/viewStudentInfo";
+import ProctorGenerateReport from "./pages/proctor/generateReport";
+import MaintenanceIssuePage from "./pages/proctor/MaintenanceIssuePage";
 import BlockInfo from "./pages/studentDean/BlockInfo";
 import { GetAvaiableBlocks } from "./store/blockSlice";
 import { getAllocatedStudent } from "./store/studentAllocation/allocateSlice";
 import { getAllUser } from "./store/user-slice/userSlice";
 import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
 import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
-import ResetPassword from './components/ResetPassword';
-import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from "./components/ResetPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 import CommentHover from "./pages/student/myCommnt";
 import ProctorAccount from "./pages/proctor/account";
@@ -51,22 +51,22 @@ import ProctorControleComponent from "./components/proctor/attendanceControl";
 import ProctorAttendance from "./pages/proctor/Attendance";
 import ManagerAttendance from "./pages/proctorManager/attendance";
 import ProctorControl from "./pages/proctor/control";
+import ManagerControl from "./pages/proctorManager/control";
+import DeanIssueContol from "./pages/studentDean/viewControlIssues";
+import ManagerDashBoard from "./pages/proctorManager/dashborad";
 function App() {
-  
   const theme = useSelector((state) => state.theme.mode);
-  const  { user, isAuthenticated, isLoading } = useSelector(
+  const { user, isAuthenticated, isLoading } = useSelector(
     (state) => state.auth
   );
- 
- 
-//  const user={
-//   role:'Admin',
-//   userName:'abdi'
-//  }
-//  const isAuthenticated=true
-//  const isLoading=true
 
-    
+  //  const user={
+  //   role:'Admin',
+  //   userName:'abdi'
+  //  }
+  //  const isAuthenticated=true
+  //  const isLoading=true
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(checkAuthorization());
@@ -75,8 +75,10 @@ function App() {
     // dispatch(getAllUser())
   }, [dispatch]);
 
-
-
+  {
+    /**
+  this part is sensitive part so ,don't change any functional or structural thing just the layout modify the tailwind css and framer motion  */
+  }
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -85,16 +87,17 @@ function App() {
     }
   }, [theme]);
 
-  if (isLoading){
-    console.log(isLoading,"isLoading");
-    
+  if (isLoading) {
+    console.log(isLoading, "isLoading");
+
     return (
       <div>
-        <h1 className="w-[100px] h-[20px] rounded-full text-center bg-black">Loading...</h1>
+        <h1 className="w-[100px] h-[20px] rounded-full text-center bg-black">
+          Loading...
+        </h1>
       </div>
     );
-
-  } 
+  }
 
   return (
     <div className={`dark:bg-gray-800  ${theme === "dark" ? "dark" : ""}`}>
@@ -122,12 +125,10 @@ function App() {
 
         <Route
           path="/admin"
-          element={  
-            
-           <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
-             <AdminLayout />
-              </CheckAuthComponent>
-            
+          element={
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+              <AdminLayout />
+            </CheckAuthComponent>
           }
         >
           <Route path="home" element={<AdminDashboard />} />
@@ -148,24 +149,29 @@ function App() {
           <Route path="ViewFeedback" element={<ViewFeedback />} />
           <Route path="ViewMaintenance" element={<ViewMaintenance />} />
           <Route path="GenerateReport" element={<GenerateReport />} />
-          <Route path="Attendance" element={<ManagerAttendance/>} />
-          <Route path="Account" element={<ProfileManagement/>} />
+          <Route path="Attendance" element={<ManagerAttendance />} />
+          <Route path="Control" element={<ManagerControl />} />
+          <Route path="home" element={<ManagerDashBoard/>} />
+          <Route path="Account" element={<ProfileManagement />} />
         </Route>
 
-        <Route path="/proctor" 
-        element={
-          <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+        <Route
+          path="/proctor"
+          element={
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
               <ProctorLayout />
-            </CheckAuthComponent>}>
-           <Route path="home" element={<ProctorHomePage/>} />
-          <Route path="dorm" element={<RegisterDormComp/>} />
-          <Route path="register" element={<RegisterStudentPage/>} />
-          <Route path="info" element={<ProctorViewInfo/>} />
-          <Route path="report" element={<ProctorGenerateReport/>} />  
-          <Route path="issue" element={<MaintenanceIssuePage/>} /> 
-          <Route path="account" element={<ProctorAccount/>}/>
-          <Route path="attendance" element={<ProctorAttendance/>}/>
-          <Route path="control" element={<ProctorControl/>}/>
+            </CheckAuthComponent>
+          }
+        >
+          <Route path="home" element={<ProctorHomePage />} />
+          <Route path="dorm" element={<RegisterDormComp />} />
+          <Route path="register" element={<RegisterStudentPage />} />
+          <Route path="info" element={<ProctorViewInfo />} />
+          <Route path="report" element={<ProctorGenerateReport />} />
+          <Route path="issue" element={<MaintenanceIssuePage />} />
+          <Route path="account" element={<ProctorAccount />} />
+          <Route path="attendance" element={<ProctorAttendance />} />
+          <Route path="control" element={<ProctorControl />} />
         </Route>
 
         <Route
@@ -179,9 +185,11 @@ function App() {
           <Route path="home" element={<StudentDeanHome />} />
           <Route path="dorm" element={<DormAllocation />} />
           <Route path="info" element={<StudentInfo />} />
-          <Route path="block" element={<BlockInfo/>} />
+          <Route path="block" element={<BlockInfo />} />
           <Route path="account" element={<StudDeanAccount />} />
-          <Route path="issue" element={<DeanMaintenanceIssue/>} />
+         
+          <Route path="issue" element={<DeanMaintenanceIssue />} />
+          <Route path="control" element={<DeanIssueContol />} />
         </Route>
 
         <Route
@@ -197,9 +205,9 @@ function App() {
           <Route path="issue" element={<ReportMaintenace />} />
           <Route path="account" element={<StudentAccount />} />
           <Route path="comment" element={<Comment />} />
-          <Route path="commentHover" element={<CommentHover/>} />
+          <Route path="commentHover" element={<CommentHover />} />
         </Route>
-        <Route path="/unauth-page" element={<UnauthPage/>} />
+        <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
         <Route path="*" element={<Notfound />} />

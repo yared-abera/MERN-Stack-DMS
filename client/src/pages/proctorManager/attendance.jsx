@@ -18,23 +18,7 @@ export default function ManagerAttendance() {
     });
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   dispatch(getAllocatedStudent());
-  // }, [dispatch]);
-
-  // useEffect(() => {
-  //   if (AllocatedStudent && AllocatedStudent.length > 0) {
-  //     const selectedStudent = AllocatedStudent.filter((stud) =>{
-  //       categoryAbsentStudent.some((s) => s.student.userName === stud.userName)
-  //     }
-
-
-       
-  //     );
-
-  //     setStudents(selectedStudent);
-  //   }
-  // }, [AllocatedStudent]);
+  
 
   useEffect(() => {
     if (
@@ -53,7 +37,7 @@ export default function ManagerAttendance() {
   console.log(categoryAbsentStudent,'categoryAbsentStudent');
   
   return (
-    <div className="w-full h-full overflow-hidden bg-green-800 p-3 ">
+    <div className="w-full h-full overflow-hidden bg-sky-100/35 p-3 ">
       <AttendanceCard
         absentStudent={categoryAbsentStudent}
        

@@ -4,8 +4,11 @@ import StudentHeader from "./header";
 
 export default function StudentLayout() {
   return (
-    <div className="overflow-hidden ">
+    <div className="overflow-hidden w-full ">
+    
       <StudentHeader />
+       
+   
       <Outlet />
     </div>
   );

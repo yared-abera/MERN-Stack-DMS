@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import DarkMode from "../common/darkMode";
 import AvatarComponent from "../common/avatar";
 import { useDispatch, useSelector } from "react-redux";
-import { SearchedUsers } from "../../store/common/data";
-import { getSingleUser } from "../../store/user-slice/userSlice";
+import { SearchedUsers } from "@/store/common/data";
+import { getSingleUser } from "@/store/user-slice/userSlice";
  
 export default function Header() {
   const [showCalendar, setShowCalendar] = useState(false);

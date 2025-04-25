@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "../ui/sidebar";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
   Bug,
@@ -55,9 +55,11 @@ export default function StudentSideBar() {
   const dispatch=useDispatch()
   const [selectedNavigation, setNavigation] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigete=useNavigate()
   function HandleRemoveDialog() {
     setIsDialogOpen(false);
     setNavigation("");
+    navigete("/student/home");
   }
 
   function HandleLogOut(){

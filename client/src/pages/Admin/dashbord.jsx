@@ -23,6 +23,8 @@ import { motion } from "framer-motion";
 export default function AdminDashboard() {
   const dispatch = useDispatch();
   const { isLoading, AllUser } = useSelector((state) => state.allUser);
+  const{user}=useSelector((state)=>state.auth)
+
   const [recentUsers, setRecentUsers] = useState([]);
   const [recentSearchedUsers, setRecentSearchedUsers] = useState('');
   const [isUserFound,setIsUserFound]=useState(false)
@@ -32,7 +34,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     // Fetch all users when the component mounts
     dispatch(getAllUser());
-    dispatch(getRecentlySearchedUser('User'))
+    const role = "User";
+    const id=user.id
+    dispatch(getRecentlySearchedUser({role,id}))
   }, [dispatch]);
 
 
@@ -105,14 +109,14 @@ export default function AdminDashboard() {
         dispatch(SearchedUsers(""));
       } else {
         const role = 'User';
-        console.log(role, 'role');
-        console.log(SearchUsers, 'SearchUsers on else');
-        dispatch(AddRecentlySearchedUser({ userName: SearchUsers, role })).then((res) => {
+         const id=user.id
+     
+        dispatch(AddRecentlySearchedUser({ userName: SearchUsers, role,id })).then((res) => {
           if (res.payload && res.payload.success) {
             console.log(res.payload.data, 'res.payload.data');
             setIsUserFound(true);
             setRecentSearchedUsers(res.payload.data);
-            dispatch(getRecentlySearchedUser(role));
+            dispatch(getRecentlySearchedUser({role,id}));
           }
         });
       }

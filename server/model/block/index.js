@@ -7,9 +7,18 @@ const dormSchema = new mongoose.Schema({
   studentsAllocated: { type: Number, default: 0 },
   dormStatus: { 
     type: String, 
-    enum: ["Available", "Full","Under Construction"], 
-    default: "Available" 
+    enum: ["Available", "Full","MaintenanceIssue",'UnAvailable'], 
+    default: "Available" ,
+
   },
+
+  description: { type: String, default: "" },
+  registerBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
+  },
+  registerDate: { type: Date, default: Date.now },
+  
   totalAvailable: { type: Number, default: 0 }
 });
 
@@ -67,6 +76,11 @@ const blockSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User' 
   }],
+  registerBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
+  },
+  registerDate: { type: Date, default: Date.now },
 });
 
 blockSchema.pre("save", function(next) {

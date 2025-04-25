@@ -4,7 +4,7 @@ const { getSearchHistory,addSearchHistory } = require("../../controller/recently
 const route = express.Router();
 
 route.post("/add",addSearchHistory);
-route.get("/SearchStudent/:role",getSearchHistory)
+route.get("/SearchStudent/:role/:id",getSearchHistory)
  
 
 module.exports = route;

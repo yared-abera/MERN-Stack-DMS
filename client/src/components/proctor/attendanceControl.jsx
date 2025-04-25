@@ -18,10 +18,8 @@ export default function ProctorAttendanceControleComponent({ students }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  // State to manage the UI selection of radio buttons
-  const [attendance, setAttendance] = useState({});
-  // State to manage the data to be submitted
-  const [formData, setFormData] = useState([]);
+  const [attendance, setAttendance] = useState({}); // State for UI radio selection
+  const [formData, setFormData] = useState([]); // State for data to be submitted
 
   // Initialize attendance and formData when students prop changes
   useEffect(() => {
@@ -29,21 +27,19 @@ export default function ProctorAttendanceControleComponent({ students }) {
     if (students && students.length > 0) {
       const initialAttendanceUI = {};
       const initialFormData = [];
-      const proctorId = user?.id; // Use optional chaining just in case user is null
+      const proctorId = user?.id;
 
       students.forEach((student) => {
-        const studentId = student._id; // Prefer _id
+        const studentId = student._id; // Use _id
         const Block = student.blockNum;
         if (studentId && proctorId) {
-          // Set default UI selection to "present"
-          initialAttendanceUI[studentId] = "present";
+          initialAttendanceUI[studentId] = "present"; // Default UI selection
 
-          // Add entry to formData, default isPresent to true
-          initialFormData.push({
+          initialFormData.push({ // Default data state
             student: studentId,
             proctor: proctorId,
             block: Block,
-            isPresent: true, // Default data state to true (present)
+            isPresent: true,
           });
         } else {
           console.warn(
@@ -55,31 +51,28 @@ export default function ProctorAttendanceControleComponent({ students }) {
         }
       });
 
-      // --- FIX: Update state with the initialized values ---
       setAttendance(initialAttendanceUI);
       setFormData(initialFormData);
-      // --- END FIX ---
 
     } else if (students && students.length === 0) {
-       // If students becomes empty, reset the states
-       setAttendance({});
-       setFormData([]);
+        setAttendance({});
+        setFormData([]);
     }
-  }, [students, user]); // Added user to dependencies as proctorId comes from there
+  }, [students, user]); // Added user to dependencies
 
   const handleAttendanceChange = (studentId, status) => {
-    // 1. Update the UI state for radio buttons
+    // Update UI state
     setAttendance((prevAttendance) => ({
       ...prevAttendance,
-      [studentId]: status, // status is "present" or "absent"
+      [studentId]: status,
     }));
 
-    // 2. Update the formData state with the boolean isPresent value
+    // Update formData state
     setFormData((prevFormData) => {
-      const isPresentValue = status === "present"; // Convert "present"/"absent" to true/false
+      const isPresentValue = status === "present";
       return prevFormData.map((item) =>
         item.student === studentId
-          ? { ...item, isPresent: isPresentValue } // Update the specific student's record
+          ? { ...item, isPresent: isPresentValue }
           : item
       );
     });
@@ -88,105 +81,116 @@ export default function ProctorAttendanceControleComponent({ students }) {
   const handleSubmit = (event) => {
     event.preventDefault(); // Prevent default form submission
 
-    // Filter formData to ONLY include absent students
-    // The backend only needs to know who was NOT present.
+    // Filter for ONLY absent students
     const finalAttendanceData = formData.filter(
       (item) => item.isPresent === false
     );
 
     console.log("Submitting Absent Students Data:", finalAttendanceData);
 
-    // Dispatch the filtered list (only absent students) to the backend action
-    // Only dispatch if there are actually absent students to report,
-    // unless your backend requires an empty array submission if everyone is present.
+    // Dispatch if there are absent students
     if (finalAttendanceData.length > 0) {
       dispatch(addAttendance(finalAttendanceData)).then((data) => {
         if (data?.payload?.success) {
           toast.success(`${data?.payload?.message || 'Attendance submitted successfully!'}`);
         } else {
-           // Handle potential backend errors even if payload.success is false
            toast.error(`Failed to submit attendance: ${data?.payload?.message || 'An error occurred.'}`);
         }
-         // Optional: Reset form or provide further feedback after submission attempt
       });
     } else {
-      // Optional: Inform the user that everyone was present and nothing needs to be submitted
       toast.info(
         "All students are marked as present. No absence data submitted."
       );
-       // If your backend requires an empty array when all are present, uncomment the next line:
-       // dispatch(addAttendance([])); // Dispatch empty array if required
     }
- 
   };
 
   return (
-    <div>
-      <Table>
-        <TableCaption>
+    // Added padding, background, and rounded corners to the main container
+    <div className="p-4 md:p-6 bg-card rounded-lg shadow-lg max-w-screen-lg mx-auto my-4 md:my-8 border border-border/50"> {/* Adjusted padding/margin for mobile */}
+      {/* Added styling to the Table component */}
+      <Table className="w-full border-collapse border border-border rounded-md overflow-hidden">
+        {/* Added margin top and text color to the Caption */}
+        <TableCaption className="mt-4 md:mt-6 text-muted-foreground text-sm md:text-base"> {/* Adjusted margin/text size */}
           Fill the attendance for assigned students. Default is Present.
         </TableCaption>
-        <TableHeader>
+        {/* Added styling to the TableHeader */}
+        <TableHeader className="bg-muted/80">
           <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>First Name</TableHead>
-            <TableHead>Middle Name</TableHead>
-            <TableHead>Last Name</TableHead>
-            <TableHead>Block</TableHead>
-            <TableHead>Dorm Number</TableHead>
-            <TableHead className="text-center">Present</TableHead>
-            <TableHead className="text-center">Absent</TableHead>
+            {/* ID (userName) - Always visible */}
+            <TableHead className="px-4 py-3 text-left font-semibold text-muted-foreground">ID</TableHead>
+            {/* First Name - Hidden on small, visible on medium+ */}
+            <TableHead className="hidden md:table-cell px-4 py-3 text-left font-semibold text-muted-foreground">First Name</TableHead>
+            {/* Middle Name - Hidden on small, visible on medium+ */}
+            <TableHead className="hidden md:table-cell px-4 py-3 text-left font-semibold text-muted-foreground">Middle Name</TableHead>
+            {/* Last Name - Hidden on small, visible on medium+ */}
+            <TableHead className="hidden md:table-cell px-4 py-3 text-left font-semibold text-muted-foreground">Last Name</TableHead>
+            {/* Block - Always visible */}
+            <TableHead className="px-4 py-3 text-left font-semibold text-muted-foreground">Block</TableHead>
+            {/* Dorm Number - Always visible */}
+            <TableHead className="px-4 py-3 text-left font-semibold text-muted-foreground">Dorm Number</TableHead>
+            {/* Present (Action) - Always visible, centered */}
+            <TableHead className="px-4 py-3 text-center font-semibold text-muted-foreground">Present</TableHead>
+            {/* Absent (Action) - Always visible, centered */}
+            <TableHead className="px-4 py-3 text-center font-semibold text-muted-foreground">Absent</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
+          {/* Styled the 'no students' row */}
           {(!students || students.length === 0) && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center">
+              {/* Adjusted colspan for small screens (4 visible columns + 4 hidden = 8) */}
+              <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
                 No students assigned or loading...
               </TableCell>
             </TableRow>
           )}
+          {/* Styled the student rows and cells */}
           {students && students.map((stud) => {
-            const studentId = stud._id; // Use _id consistently
-             // Ensure attendance state for this student is initialized before rendering
-             // This is primarily handled by the useEffect, but a fallback check can be added
-            const currentAttendanceStatus = attendance[studentId] || 'present'; // Default to 'present' for rendering if state is not yet set
+            const studentId = stud._id;
+            const currentAttendanceStatus = attendance[studentId] || 'present'; // Default for rendering
 
             if (!studentId) {
-                 console.warn("Student object missing ID, skipping row:", stud);
-                 return null; // Skip rendering if no ID
+                console.warn("Student object missing ID, skipping row:", stud);
+                return null;
             }
 
             return (
-              <TableRow key={studentId}>
-                <TableCell className="font-medium">{stud.userName}</TableCell>
-                <TableCell>{stud.Fname || "N/A"}</TableCell>
-                <TableCell>{stud.Mname || "N/A"}</TableCell>
-                <TableCell>{stud.Lname || "N/A"}</TableCell>
-                <TableCell>{stud.blockNum || "N/A"}</TableCell>
-                <TableCell>{stud.dormId || "N/A"}</TableCell>
-                <TableCell className="text-center">
+              // Added hover effect and subtle alternating row background
+              <TableRow key={studentId} className="border-b border-border/70 hover:bg-muted/30 even:bg-muted/10">
+                {/* ID (userName) Cell - Always visible */}
+                <TableCell className="px-4 py-3 font-medium text-foreground">{stud.userName}</TableCell>
+                {/* First Name Cell - Hidden on small, visible on medium+ */}
+                <TableCell className="hidden md:table-cell px-4 py-3 text-muted-foreground">{stud.Fname || "N/A"}</TableCell>
+                {/* Middle Name Cell - Hidden on small, visible on medium+ */}
+                <TableCell className="hidden md:table-cell px-4 py-3 text-muted-foreground">{stud.Mname || "N/A"}</TableCell>
+                {/* Last Name Cell - Hidden on small, visible on medium+ */}
+                <TableCell className="hidden md:table-cell px-4 py-3 text-muted-foreground">{stud.Lname || "N/A"}</TableCell>
+                {/* Block Cell - Always visible */}
+                <TableCell className="px-4 py-3 text-muted-foreground">{stud.blockNum || "N/A"}</TableCell>
+                {/* Dorm Number Cell - Always visible */}
+                <TableCell className="px-4 py-3 text-muted-foreground">{stud.dormId || "N/A"}</TableCell>
+                {/* Present (Action) Cell - Always visible, centered */}
+                <TableCell className="px-4 py-3 text-center">
                   <input
                     type="radio"
-                    name={`attendance-${studentId}`} // Group radios per student
+                    name={`attendance-${studentId}`}
                     value="present"
-                    // Checked based on the 'attendance' UI state
                     checked={currentAttendanceStatus === "present"}
-                    onChange={() =>
-                      handleAttendanceChange(studentId, "present")
-                    }
+                    onChange={() => handleAttendanceChange(studentId, "present")}
                     aria-label={`Mark ${stud.Fname || "student"} present`}
+                    className="form-radio h-4 w-4 text-primary border-border focus:ring-primary"
                   />
                 </TableCell>
-                <TableCell className="text-center">
+                {/* Absent (Action) Cell - Always visible, centered */}
+                <TableCell className="px-4 py-3 text-center">
                   <input
                     type="radio"
-                    name={`attendance-${studentId}`} // Group radios per student
+                    name={`attendance-${studentId}`}
                     value="absent"
-                    // Checked based on the 'attendance' UI state
                     checked={currentAttendanceStatus === "absent"}
                     onChange={() => handleAttendanceChange(studentId, "absent")}
                     aria-label={`Mark ${stud.Fname || "student"} absent`}
+                    className="form-radio h-4 w-4 text-red-500 border-border focus:ring-red-500"
                   />
                 </TableCell>
               </TableRow>
@@ -194,8 +198,9 @@ export default function ProctorAttendanceControleComponent({ students }) {
           })}
         </TableBody>
       </Table>
-      {students && students.length > 0 && ( // Only show submit button if there are students
-        <div className="mt-4 flex justify-end">
+      {/* Styled the button container */}
+      {students && students.length > 0 && (
+        <div className="mt-4 md:mt-6 flex justify-end"> {/* Adjusted margin top */}
           <Button onClick={handleSubmit}>Submit Attendance</Button>
         </div>
       )}

@@ -9,7 +9,7 @@ const studentSchema = new mongoose.Schema({
   batch: { type: Number,  },
   password: { type: String, },
   department: { type: String },
-  address: { type: String },
+   
   phoneNum: { type: String },
   sex: { type: String, required: true },
   stream: { type: String, required: true },
@@ -28,7 +28,18 @@ const studentSchema = new mongoose.Schema({
     type:Number, // the _id of the dorm subdocument
      
   },
-  absenceDates:  [{ type: Date }]  
+  absenceDates:  [{ type: Date }],
+  address:{
+    country: { type: String, default: 'Ethiopia' },
+    city: { type: String, default: '' },
+  },
+
+  socialLinks: {
+      facebook: { type: String, default: '' },
+      twitter: { type: String, default: '' },
+      telegram: { type: String, default: '' },
+      linkedin: { type: String, default: '' }
+  }
   // floorNumber: { type: Number, } 
 },{ timestamps: true });
 
