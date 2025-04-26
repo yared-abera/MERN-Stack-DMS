@@ -168,6 +168,10 @@ const chatSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action) => {
+      // Ensure messages is an array
+      if (!Array.isArray(state.messages)) {
+        state.messages = [];
+      }
       // If message with same ID exists and is pending, replace it
       const index = state.messages.findIndex(msg => msg._id === action.payload._id);
       if (index !== -1) {
@@ -177,10 +181,19 @@ const chatSlice = createSlice({
       }
     },
     removeMessage: (state, action) => {
+      // Ensure messages is an array
+      if (!Array.isArray(state.messages)) {
+        state.messages = [];
+        return;
+      }
       state.messages = state.messages.filter(msg => msg._id !== action.payload);
     },
     setCurrentRoom: (state, action) => {
       state.currentRoom = action.payload;
+      // Ensure messages array is initialized when setting room
+      if (!Array.isArray(state.messages)) {
+        state.messages = [];
+      }
     },
     clearError: (state) => {
       state.error = null;
@@ -204,15 +217,19 @@ const chatSlice = createSlice({
       .addCase(getChatRoom.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.messages = []; // Initialize messages array
       })
       .addCase(getChatRoom.fulfilled, (state, action) => {
         state.loading = false;
         if (action.payload.success) {
           state.currentRoom = action.payload.data;
-          state.messages = action.payload.data.messages || [];
+          state.messages = Array.isArray(action.payload.data.messages) 
+            ? action.payload.data.messages 
+            : [];
           state.error = null;
         } else {
           state.error = action.payload.message;
+          state.messages = [];
         }
       })
       .addCase(getChatRoom.rejected, (state, action) => {
@@ -251,7 +268,7 @@ const chatSlice = createSlice({
       })
       // getMessages
       .addCase(getMessages.fulfilled, (state, action) => {
-        state.messages = action.payload;
+        state.messages = Array.isArray(action.payload) ? action.payload : [];
       })
       // markAsRead
       .addCase(markAsRead.fulfilled, (state, action) => {

@@ -122,26 +122,9 @@ const ChatInput = ({ receiverId }) => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (limit to 20MB)
-      if (file.size > 20 * 1024 * 1024) {
-        toast.error('File size must be less than 20MB');
-        e.target.value = '';
-        return;
-      }
-
-      // Check file type
-      const allowedTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'text/plain'
-      ];
-
-      if (!allowedTypes.includes(file.type)) {
-        toast.error('Invalid file type. Only images, PDFs, and documents are allowed.');
+      // Check file size (limit to 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
         e.target.value = '';
         return;
       }
@@ -171,7 +154,6 @@ const ChatInput = ({ receiverId }) => {
         ref={fileInputRef}
         onChange={handleFileSelect}
         className="hidden"
-        accept="image/*,.pdf,.doc,.docx,.txt"
       />
       
       {/* File attachment button */}
@@ -181,7 +163,7 @@ const ChatInput = ({ receiverId }) => {
         size="icon"
         onClick={triggerFileInput}
         className="hover:bg-gray-100 dark:hover:bg-gray-800"
-        title="Attach file (max 20MB)"
+        title="Attach file (max 10MB)"
       >
         <Paperclip className="h-5 w-5" />
       </Button>
