@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const auth_route = require("./router/auth-router/auth-router");
 const block_route = require("./router/blockRouter/index");
 const dorm_route = require("./router/dormRouter/index");
@@ -35,6 +36,15 @@ const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
+
+// Serve static files from the uploads directory with CORS
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 9000;
 
