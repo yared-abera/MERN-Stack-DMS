@@ -281,6 +281,7 @@ export default function StudentAccount() {
       </div>
     );
   }
+console.log(ThisStudent,"ThisStudent");
 
   return (
     <motion.div
@@ -732,111 +733,193 @@ export default function StudentAccount() {
       </div>{" "}
     
       <AnimatePresence>
-        {viewDetail && (
-          <Dialog open={viewDetail} onOpenChange={setViewDetail}>
-            <DialogContent className="sm:max-w-lg dark:bg-gray-800 dark:border-gray-700">
-              <DialogHeader className="mb-4">
-                <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-gray-800 dark:text-gray-100">
-                  <Info size={24} className="text-primary" /> Student Details
-                </DialogTitle>
+       
 
-                <DialogDescription className="text-gray-500 dark:text-gray-400">
-                  Comprehensive overview of personal and contact information.
-                </DialogDescription>
-              </DialogHeader>
 
-              <Separator className="mb-5 bg-gray-200 dark:bg-gray-600" />
+      <Dialog open={viewDetail} onOpenChange={setViewDetail}>
+      <DialogContent className="sm:max-w-lg dark:bg-gray-800 dark:border-gray-700 p-6 h-screen overflow-y-auto"> {/* Added padding */}
+        <DialogHeader className="mb-4">
+          <DialogTitle className="text-2xl font-semibold flex items-center gap-2 text-gray-800 dark:text-gray-100">
+            <Info size={24} className="text-blue-500" /> {/* Used a more specific primary color */}
+            Student Details
+          </DialogTitle>
+          <DialogDescription className="text-gray-500 dark:text-gray-400 mt-1"> {/* Adjusted margin-top */}
+            Comprehensive overview of personal and contact information.
+          </DialogDescription>
+        </DialogHeader>
 
-              <div className="space-y-3 text-sm md:text-base">
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    First Name:
-                  </span>
+        <Separator className="mb-5 bg-gray-200 dark:bg-gray-600" />
 
-                  <span className="text-gray-800 dark:text-gray-100">
-                    {ThisStudent.fName || "N/A"}
-                  </span>
-                </div>
+        {ThisStudent ? (
+          <div className="grid grid-cols-1 gap-3 text-sm md:text-base"> {/* Use grid for better structure */}
+            {/* Personal Information */}
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                First Name:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.Fname || "N/A"}
+              </span>
+            </div>
 
-                {ThisStudent.mName && (
-                  <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <span className="font-medium text-gray-600 dark:text-gray-300">
-                      Middle Name:
-                    </span>
-
-                    <span className="text-gray-800 dark:text-gray-100">
-                      {ThisStudent.mName}
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    Last Name:
-                  </span>
-
-                  <span className="text-gray-800 dark:text-gray-100">
-                    {ThisStudent.lName || "N/A"}
-                  </span>
-                </div>
-
-                <Separator className="bg-gray-200 dark:bg-gray-700 my-2" />
-
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    Email:
-                  </span>
-
-                  <span className="text-gray-800 dark:text-gray-100 truncate">
-                    {ThisStudent.email || "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    Username:
-                  </span>
-
-                  <span className="text-gray-800 dark:text-gray-100">
-                    {ThisStudent.userName || "N/A"}
-                  </span>
-                </div>
-
-                <Separator className="bg-gray-200 dark:bg-gray-700 my-2" />
-
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    Sex:
-                  </span>
-
-                  <span className="text-gray-800 dark:text-gray-100">
-                    {ThisStudent.gender || "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    Role:
-                  </span>
-
-                  <span className="text-gray-800 dark:text-gray-100 capitalize">
-                    {ThisStudent.role || "N/A"}
-                  </span>
-                </div>
-
-                <div className="flex justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <span className="font-medium text-gray-600 dark:text-gray-300">
-                    Phone:
-                  </span>
-
-                  <span className="text-gray-800 dark:text-gray-100">
-                    {ThisStudent.phoneNum || "N/A"}
-                  </span>
-                </div>
+            {ThisStudent.mName && (
+              <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <span className="font-medium text-gray-600 dark:text-gray-300">
+                  Middle Name:
+                </span>
+                <span className="text-gray-800 dark:text-gray-100">
+                  {ThisStudent.Mname}
+                </span>
               </div>
-            </DialogContent>
-          </Dialog>
+            )}
+
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Last Name:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.Lname || "N/A"}
+              </span>
+            </div>
+
+            <Separator className="bg-gray-200 dark:bg-gray-700 my-2" /> {/* Separator for Contact/Account Info */}
+
+            {/* Contact/Account Information */}
+             <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Username: {/* Moved username up */}
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.userName || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Email:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100 truncate max-w-[60%] text-right"> {/* Added truncate and max-w for long emails */}
+                {ThisStudent.email || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Phone: {/* Assuming a phone field exists */}
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                 {ThisStudent.phone || "N/A"} {/* Use a property like 'phone' if it exists */}
+              </span>
+            </div>
+
+
+            <Separator className="bg-gray-200 dark:bg-gray-700 my-2" /> {/* Separator for Other Details */}
+
+            {/* Other Details */}
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Sex:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.sex || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Role:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100 capitalize">
+                {ThisStudent.role || "N/A"}
+              </span>
+            </div>
+
+             {/* Dormitory Information */}
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Block:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.blockNum || "N/A"}
+              </span>
+            </div>
+             <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Dorm:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.dormId || "N/A"}
+              </span>
+            </div>
+
+             <Separator className="bg-gray-200 dark:bg-gray-700 my-2" /> {/* Separator for Academic Info */}
+
+             {/* Academic Information */}
+             <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                College: {/* Corrected spelling */}
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.collage || "N/A"} {/* Assuming 'collage' is the correct property name */}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Stream:
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.stream || "N/A"}
+              </span>
+            </div>
+
+             <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Batch: {/* Assuming 'bacth' was a typo for 'batch' */}
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.batch || "N/A"} {/* Use 'batch' property if that's correct */}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Category: {/* Shortened for clarity */}
+              </span>
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.studCategory || "N/A"}
+              </span>
+            </div>
+
+             <Separator className="bg-gray-200 dark:bg-gray-700 my-2" /> {/* Separator for Timestamps */}
+
+             {/* Timestamps */}
+             <div className="flex justify-between items-center py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span className="font-medium text-gray-600 dark:text-gray-300">
+                Joined: {/* More descriptive label for createdAt */}
+              </span>
+               {/* Check if createdAt is a valid date before formatting */}
+              <span className="text-gray-800 dark:text-gray-100">
+                {ThisStudent.createdAt ? new Date(ThisStudent.createdAt).toLocaleString() : "N/A"} {/* Use toLocaleString for date and time */}
+              </span>
+            </div>
+
+            {/* You can add more fields here following the same pattern */}
+
+          </div>
+        ) : (
+           <div className="flex items-center justify-center h-40 text-gray-500 dark:text-gray-400">
+              No student details available.
+           </div>
         )}
+
+        {/* Dialog Footer (Optional - add buttons here if needed) */}
+        {/* <DialogFooter>
+          <Button onClick={() => setViewDetail(false)}>Close</Button>
+        </DialogFooter> */}
+      </DialogContent>
+    </Dialog>
+ 
       </AnimatePresence>
       {/* --- Edit Account Component/Dialog --- */}
       <AnimatePresence>

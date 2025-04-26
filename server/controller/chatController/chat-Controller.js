@@ -6,20 +6,36 @@ const chatController = {
     try {
       const { userId, receiverId } = req.body;
       
+      if (!userId || !receiverId) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Both userId and receiverId are required' 
+        });
+      }
+
       let chatRoom = await ChatRoom.findOne({
         participants: { $all: [userId, receiverId] }
-      }).populate('participants messages.sender messages.receiver');
+      }).populate('participants messages.sender messages.receiver', 'Fname Lname userName profileImage');
 
       if (!chatRoom) {
         chatRoom = await ChatRoom.create({
           participants: [userId, receiverId],
           messages: []
         });
+        chatRoom = await chatRoom.populate('participants', 'Fname Lname userName profileImage');
       }
 
-      res.status(200).json(chatRoom);
+      res.status(200).json({
+        success: true,
+        data: chatRoom
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error in getChatRoom:', error);
+      res.status(500).json({ 
+        success: false,
+        message: 'Internal server error',
+        error: error.message 
+      });
     }
   },
 
@@ -28,10 +44,25 @@ const chatController = {
     try {
       const { roomId, senderId, receiverId, message } = req.body;
 
+      if (!roomId || !senderId || !receiverId || !message) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields'
+        });
+      }
+
+      const chatRoom = await ChatRoom.findById(roomId);
+      if (!chatRoom) {
+        return res.status(404).json({
+          success: false,
+          message: 'Chat room not found'
+        });
+      }
+
       const newMessage = {
         sender: senderId,
         receiver: receiverId,
-        message,
+        message: message.trim(),
         timestamp: new Date()
       };
 
@@ -42,11 +73,19 @@ const chatController = {
           $set: { lastMessage: new Date() }
         },
         { new: true }
-      ).populate('messages.sender messages.receiver');
+      ).populate('messages.sender messages.receiver', 'fName lName userName profileImage _id');
 
-      res.status(200).json(updatedRoom);
+      res.status(200).json({
+        success: true,
+        data: updatedRoom
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error in sendMessage:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   },
 
@@ -54,13 +93,36 @@ const chatController = {
   getMessages: async (req, res) => {
     try {
       const { roomId } = req.params;
+      
+      if (!roomId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Room ID is required'
+        });
+      }
+
       const chatRoom = await ChatRoom.findById(roomId)
-        .populate('messages.sender messages.receiver')
+        .populate('messages.sender messages.receiver', 'Fname Lname userName profileImage')
         .sort({ 'messages.timestamp': -1 });
 
-      res.status(200).json(chatRoom.messages);
+      if (!chatRoom) {
+        return res.status(404).json({
+          success: false,
+          message: 'Chat room not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: chatRoom.getLatestMessages(50)
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error in getMessages:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   },
 
@@ -69,15 +131,34 @@ const chatController = {
     try {
       const { roomId, userId } = req.body;
       
-      await ChatRoom.updateMany(
+      if (!roomId || !userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Both roomId and userId are required'
+        });
+      }
+
+      const result = await ChatRoom.updateMany(
         { _id: roomId, 'messages.receiver': userId },
         { $set: { 'messages.$[elem].read': true } },
-        { arrayFilters: [{ 'elem.read': false }] }
+        { 
+          arrayFilters: [{ 'elem.read': false }],
+          new: true
+        }
       );
 
-      res.status(200).json({ message: 'Messages marked as read' });
+      res.status(200).json({
+        success: true,
+        message: 'Messages marked as read',
+        data: result
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Error in markAsRead:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   }
 };

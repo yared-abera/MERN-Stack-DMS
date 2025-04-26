@@ -54,7 +54,8 @@ console.log(AllUser,"all user");
   const handleSelectUser = (user) => {
     setSelectedUser(user);
   };
-console.log('here we are');
+ console.log(selectedUser,"selected user");
+ 
 
   return (
     <div className="flex h-[calc(100vh-64px)]">
