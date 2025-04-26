@@ -1,17 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { formatDistanceToNow } from 'date-fns';
 
 const UserList = ({ users, onSelectUser, selectedUserId, onlineUsers = [] }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter users based on userName
+  const filteredUsers = users?.filter(user => {
+    const userName = (user.userName || '').toLowerCase();
+    return userName.includes(searchQuery.toLowerCase());
+  });
+
   return (
     <div className="w-80 h-full border-r bg-gray-50">
-      <div className="p-4 border-b">
+      <div className="p-4 border-b space-y-3">
         <h2 className="text-xl font-semibold">Chats</h2>
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by username..."
+            className="w-full p-2 pr-8 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <svg
+            className="absolute right-2 top-2.5 h-5 w-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
       </div>
       <div className="overflow-y-auto h-[calc(100vh-180px)]">
-        {/* Check if users array is not empty before mapping */}
-        {users && users.length > 0 ? (
-          users.map((user) => {
+        {/* Check if filtered users array is not empty before mapping */}
+        {filteredUsers && filteredUsers.length > 0 ? (
+          filteredUsers.map((user) => {
             const isOnline = onlineUsers.includes(user._id);
             const lastMessage = user.lastMessage || null;
 

@@ -1,67 +1,135 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
 import {
   getChatRoom,
   sendMessage,
   markAsRead,
   addMessage,
+  incrementUnreadCount,
+  resetUnreadCount,
+  getUnreadCount,
+  getMessages,
 } from '../../store/chat/chatSlice';
 import { toast } from 'sonner';
-
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000';
+import { format, isToday, isYesterday } from 'date-fns';
+import Message from '../common/Message';
+import ChatInput from '../common/ChatInput';
+import { SocketContext } from '../../context/SocketContext';
 
 const ChatComponent = ({ currentUserId, receiverId }) => {
   const [message, setMessage] = useState('');
   const [socketError, setSocketError] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
   const dispatch = useDispatch();
-  const socketRef = useRef();
   const messagesEndRef = useRef(null);
+  const socket = useContext(SocketContext);
 
   const { currentRoom, messages, loading } = useSelector((state) => state.chat);
 
-  // Initialize socket and chat room
+  // Initialize chat room and socket event handlers
   useEffect(() => {
+    // Get initial unread count
+    if (currentUserId) {
+      dispatch(getUnreadCount(currentUserId));
+    }
+
+    // Get or create chat room
     dispatch(getChatRoom({ userId: currentUserId, receiverId }))
       .unwrap()
+      .then((data) => {
+        if (data.success) {
+          dispatch(markAsRead({ 
+            roomId: data.data._id, 
+            userId: currentUserId
+          }));
+        }
+      })
       .catch((err) => {
         toast.error(err?.message || 'Failed to load chat room');
       });
 
-    socketRef.current = io(SOCKET_URL, {
-      transports: ['websocket'],
-      auth: {
-        userId: currentUserId,
-        token: localStorage.getItem('token'),
-      },
-    });
+    // Join chat room when socket is available
+    if (socket) {
+      socket.emit('join', { 
+        userId: currentUserId, 
+        receiverId 
+      });
 
-    socketRef.current.on('connect', () => {
-      setIsConnected(true);
-      socketRef.current.emit('join-room', { userId: currentUserId, receiverId });
-    });
+      // Handle incoming messages
+      const handleNewMessage = (newMessage) => {
+        console.log('Received message:', newMessage);
+        if (newMessage?.message || newMessage?.fileUrl) {
+          dispatch(addMessage(newMessage));
+          
+          // Update unread count for new messages
+          if (newMessage.sender !== currentUserId) {
+            if (document.hidden) {
+              dispatch(incrementUnreadCount());
+            } else {
+              dispatch(markAsRead({ 
+                roomId: currentRoom?._id, 
+                userId: currentUserId 
+              }));
+            }
+          }
+          // Scroll to bottom on new message
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
 
-    socketRef.current.on('connect_error', () => {
-      setIsConnected(false);
-      toast.error('Connection error. Please check your network.');
-    });
+      socket.on('message', handleNewMessage);
 
-    socketRef.current.on('new-message', (newMessage) => {
-      if (newMessage?.message) {
-        // Replace optimistic message with server response
-        dispatch(removeOptimisticMessage(`temp-${newMessage.tempId}`));
-        dispatch(addMessage(newMessage));
+      // Cleanup socket event listeners
+      return () => {
+        socket.off('message', handleNewMessage);
+      };
+    }
+  }, [currentUserId, receiverId, dispatch, currentRoom?._id, socket]);
+
+  // Handle visibility change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && currentRoom?._id) {
+        dispatch(markAsRead({ 
+          roomId: currentRoom._id, 
+          userId: currentUserId 
+        }));
       }
-    });
+    };
 
-    return () => socketRef.current?.disconnect();
-  }, [currentUserId, receiverId, dispatch]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [currentRoom?._id, currentUserId, dispatch]);
 
   // Scroll handling
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Periodically update unread count
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentUserId) {
+        dispatch(getUnreadCount(currentUserId));
+      }
+    }, 30000); // Every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [currentUserId, dispatch]);
+
+  // Fetch messages periodically to ensure sync
+  useEffect(() => {
+    if (currentRoom?._id) {
+      const interval = setInterval(() => {
+        dispatch(getMessages(currentRoom._id));
+        // Update unread count
+        dispatch(getUnreadCount(currentUserId));
+      }, 30000); // Every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [currentRoom?._id, currentUserId, dispatch]);
 
   // Message sending handler
   const handleSendMessage = async (e) => {
@@ -69,39 +137,110 @@ const ChatComponent = ({ currentUserId, receiverId }) => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || !currentRoom?._id) return;
 
-    // Generate temporary ID and timestamp
-    const tempId = Date.now();
-    const tempMessage = {
-      _id: `temp-${tempId}`,
-      message: trimmedMessage,
-      sender: currentUserId,
-      timestamp: new Date().toISOString(),
-      tempId, // For server correlation
+    // Create message object
+    const messageData = {
+      roomId: currentRoom._id,
+      senderId: currentUserId,
+      receiverId,
+      message: trimmedMessage
     };
 
     // Optimistic update
+    const tempMessage = {
+      _id: `temp-${Date.now()}`,
+      message: trimmedMessage,
+      sender: currentUserId,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Add message locally
     dispatch(addMessage(tempMessage));
     setMessage('');
 
     try {
+      // Send via Socket.IO
+      socket.emit('sendMessage', messageData);
+
+      // Also send via HTTP for persistence
       const result = await dispatch(
-        sendMessage({
-          roomId: currentRoom._id,
-          senderId: currentUserId,
-          receiverId,
-          message: trimmedMessage,
-          tempId, // Send temporary ID to server
-        })
+        sendMessage(messageData)
       ).unwrap();
 
       if (!result.success) {
-        dispatch(removeOptimisticMessage(tempMessage._id));
         toast.error(result.message || 'Failed to send message');
       }
     } catch (err) {
-      dispatch(removeOptimisticMessage(tempMessage._id));
       toast.error(err?.message || 'Failed to send message');
     }
+  };
+
+  // Function to format date for separator
+  const formatDateSeparator = (timestamp) => {
+    try {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return '';
+
+      if (isToday(date)) {
+        return 'Today';
+      } else if (isYesterday(date)) {
+        return 'Yesterday';
+      }
+      return format(date, 'MMMM d, yyyy');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  };
+
+  // Group messages by date
+  const renderMessages = () => {
+    if (!messages?.length) {
+      return (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          No messages yet
+        </div>
+      );
+    }
+
+    let currentDate = null;
+    const messageGroups = [];
+    
+    messages.forEach((msg, index) => {
+      try {
+        if (!msg.timestamp) return;
+        
+        const messageDate = new Date(msg.timestamp);
+        if (isNaN(messageDate.getTime())) return;
+        
+        const messageDateString = messageDate.toDateString();
+
+        // Only add date separator if it's a new date
+        if (currentDate !== messageDateString) {
+          currentDate = messageDateString;
+          messageGroups.push(
+            <div key={`date-${msg.timestamp}`} className="flex justify-center my-4">
+              <span className="bg-gray-200 dark:bg-gray-700 px-4 py-1 rounded-full text-sm">
+                {formatDateSeparator(msg.timestamp)}
+              </span>
+            </div>
+          );
+        }
+
+        // Add the message
+        messageGroups.push(
+          <Message 
+            key={msg._id || `msg-${index}`} 
+            message={msg} 
+            currentUserId={currentUserId} 
+          />
+        );
+      } catch (error) {
+        console.error('Error rendering message:', error);
+      }
+    });
+
+    return messageGroups;
   };
 
   if (loading) {
@@ -113,73 +252,23 @@ const ChatComponent = ({ currentUserId, receiverId }) => {
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-lg">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Chat</h2>
-        {!isConnected && <p className="text-sm text-yellow-500">Connecting...</p>}
-        {socketError && <p className="text-sm text-red-500">{socketError}</p>}
-      </div>
-
-      <div className="flex-1 p-4 overflow-y-auto">
-        {messages?.length > 0 ? (
-          messages.map((msg) => {
-            const senderId = msg.sender?._id || msg.sender;
-            const isCurrentUser = senderId === currentUserId;
-
-            return (
-              <div
-                key={msg._id}
-                className={`mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`inline-block p-3 rounded-lg max-w-[75%] ${
-                    isCurrentUser
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-800'
-                  } ${msg._id.startsWith('temp-') ? 'opacity-75' : ''}`}
-                >
-                  <p className="break-words text-sm">{msg.message}</p>
-                  <div className={`mt-1 text-xs ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            No messages yet
+    <div className="flex flex-col h-full">
+      {/* Messages container */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <span>Loading messages...</span>
           </div>
+        ) : (
+          <>
+            {renderMessages()}
+            <div ref={messagesEndRef} />
+          </>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="p-4 border-t">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={!isConnected}
-          />
-          <button
-            type="submit"
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              isConnected && message.trim()
-                ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!isConnected || !message.trim()}
-          >
-            Send
-          </button>
-        </div>
-      </form>
+      {/* Chat input */}
+      <ChatInput receiverId={receiverId} />
     </div>
   );
 };

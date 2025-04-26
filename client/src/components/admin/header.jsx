@@ -1,5 +1,3 @@
- 
-
 import { SidebarTrigger } from "../ui/sidebar";
 import { CalendarX, MessageCircle, Search } from "lucide-react";
 import { Button } from "../ui/button";
@@ -11,7 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { SearchedUsers } from "@/store/common/data";
 import { getSingleUser } from "@/store/user-slice/userSlice";
 import { Link } from "react-router-dom";
- 
+import ChatIcon from "../common/ChatIcon";
+
 export default function Header() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -142,10 +141,7 @@ export default function Header() {
           </div>
 
           <div>
-            <Link to={'/admin/chat'}>
-            <MessageCircle/>
-            </Link>
-            
+            <ChatIcon userRole="admin" />
           </div>
         </div>
 

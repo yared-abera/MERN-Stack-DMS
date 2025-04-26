@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Moon, Sun, UserCircle, Menu, LucideHome, MessageCircle } from "lucide-react";
+import { Moon, Sun, UserCircle, Menu, LucideHome, MessageCircle, CalendarX, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DarkMode from "@/components/common/darkMode";
 import AvatarComponent from "../common/avatar";
 import { SidebarTrigger } from "../ui/sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleUser } from "@/store/user-slice/userSlice";
+import ChatIcon from "../common/ChatIcon";
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   // Initial fetch
@@ -28,47 +30,26 @@ export default function Header() {
   }, [user]);
 
   return (
-    <header className="w-full bg-white  dark:bg-gray-900 shadow-md px-3 py-5 flex justify-between items-center">
-      {/* Logo & Name */}
-      <div className="flex gap-3 items-center    w-1/3">
-        <SidebarTrigger size="icon" className="p-4" />
-        <div className="flex mx-auto">
-        <div>
-            <Link to={'/proctor-manager/chat'}>
-            <MessageCircle/>
-            </Link>
-            
+    <header className="sticky top-0 w-full overflow-auto px-4 py-6 z-10 border-b shadow-md dark:bg-black bg-white mb-2">
+      <div className="flex items-center justify-between w-full">
+        {/* Left Section: Sidebar */}
+        <div className="flex items-center">
+          <SidebarTrigger />
+        </div>
+
+        {/* Center Section: Search, Calendar, and Time */}
+        <div className="flex items-center flex-grow mx-4 gap-4">
+          {/* ... existing code ... */}
+
+          <div>
+            <ChatIcon userRole="proctorManager" />
           </div>
         </div>
-       
-      </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          className="lg:hidden p-2 rounded-md text-gray-700 dark:text-gray-300"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <Menu size={24} />
-        </button>
-        {/* <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          Proctor Manager
-        </h1> */}
-      </div>
-
-      {/* Navigation Links */}
-
-      {/* Right Section: Dark Mode & Profile */}
-      <div className="flex items-center gap-4">
-        {/* dark mode component */}
-        <DarkMode />
-
-        {/* User Profile Dropdown */}
-        <div className="relative">
-          <button className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-            {ThisUser && ThisUser !== "" && (
-              <AvatarComponent ThisUser={ThisUser} />
-            )}
-          </button>
+        {/* Right Section: Dark Mode & Avatar */}
+        <div className="flex items-center justify-evenly gap-4">
+          <DarkMode />
+          {ThisUser && ThisUser !== '' ? <AvatarComponent ThisUser={ThisUser} /> : null}
         </div>
       </div>
     </header>
