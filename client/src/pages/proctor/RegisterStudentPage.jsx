@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { setUpdateAllocation } from "../../store/common/sidebarSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllocatedStudent, updateStudent} from "../../store/studentAllocation/allocateSlice";
+import { getAllocatedStudent,UpdateStudentByStudent} from "../../store/studentAllocation/allocateSlice";
 import { fetchProctorBlocks } from '@/store/blockSlice/index';
-
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner";
 
 const RegisterStudentPage = () => { 
   const dispatch = useDispatch();
@@ -19,32 +21,38 @@ const RegisterStudentPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { list: blocks } = useSelector((state) => state.block);
+  const {user}=useSelector((state)=>state.auth);
+  const [isPreviouslyRegistered, setIsPreviouslyRegistered] = useState(false);
+ 
   const [registrationForm, setRegistrationForm] = useState({
-    phone: "",
+    phoneNum: "",
     email: "",
     emergencyContact: "",
-    parentName: "",
+    parentFirstName: "",
+    parentLastName: "",
     parentPhone: "",
-    address: "",
-    additionalInfo: "",
-    roomNumber: ""
+    parentAddress: "",
+    keyHolder: false,
+    arrivalDate: "",
+    dormNumber: ""
   });
 
   useEffect(() => {
     dispatch(fetchProctorBlocks());
   }, [dispatch]);
 
-    useEffect(() => {
-      setIsOpen(openDialog);
-    }, [openDialog]);
+  useEffect(() => {
+    setIsOpen(openDialog);
+  }, [openDialog]);
   
-    const handleOpenChange = (newOpenState) => {
-      setIsOpen(newOpenState);
-      if (!newOpenState) {
-        dispatch(setUpdateAllocation(false)); 
+  const handleOpenChange = (newOpenState) => {
+    setIsOpen(newOpenState);
+    if (!newOpenState) {
+      dispatch(setUpdateAllocation(false)); 
       setSelectedStudent(null);
       setSearchId("");
       setError("");
+      setIsPreviouslyRegistered(false);
     }
   };
 
@@ -63,24 +71,35 @@ const RegisterStudentPage = () => {
         (s) => s.userName.toLowerCase() === searchId.toLowerCase() &&
         blocks.some(block => block.blockNum === s.blockNum)
       );
-
+      
       if (student) {
         setSelectedStudent(student);
+        // Format date if it exists
+        const formattedDate = student.arrivalDate ? 
+          new Date(student.arrivalDate).toISOString().split('T')[0] : 
+          "";
+          
+        // Check if student has been registered before
+        const hasParentInfo = !!(student.parentFirstName || student.parentLastName || student.parentPhone);
+        const hasBeenRegistered = student.status === true || hasParentInfo;
+        setIsPreviouslyRegistered(hasBeenRegistered);
+        
         setRegistrationForm({
-          phone: student.phone || "",
+          phoneNum: student.phoneNum || "",
           email: student.email || "",
-          emergencyContact: student.emergencyContact || "",
-          parentName: student.parentName || "",
+          emergencyContact: student.emergencyContactNumber || "",
+          parentFirstName: student.parentFirstName || "",
+          parentLastName: student.parentLastName || "",
           parentPhone: student.parentPhone || "",
-          address: student.address || "",
-          additionalInfo: student.additionalInfo || "",
-          arrivalDate: new Date().toISOString().split('T')[0],
-          roomNumber: student.dormId || ""
+          parentAddress: student.parentAddress || "",
+          keyHolder: student.keyHolder === true,
+          arrivalDate: formattedDate,
+          dormNumber: student.dormId || ""
         });
-        console.log("Student data:", response.data);
       } else {
         setError("Student not found in your blocks");
         setSelectedStudent(null);
+        setIsPreviouslyRegistered(false);
       }
     } catch (error) {
       setError("Failed to search for student");
@@ -91,25 +110,57 @@ const RegisterStudentPage = () => {
   };
 
   const handleRegistration = async () => {
+    setLoading(true);
     try {
+      if (!selectedStudent) {
+        setError("No student selected");
+        return;
+      }
+      
       const updatedStudent = {
         ...selectedStudent,
-        ...registrationForm,
-        status: 'Registered',
-        registrationDate: new Date().toISOString(),
-        dormId: registrationForm.roomNumber,
-        registeredBy: "proctor",
+        phoneNum: registrationForm.phoneNum,
+        email: registrationForm.email,
+        emergencyContactNumber: registrationForm.emergencyContact,
+        parentFirstName: registrationForm.parentFirstName,
+        parentLastName: registrationForm.parentLastName,
+        parentPhone: registrationForm.parentPhone,
+        parentAddress: registrationForm.parentAddress,
+        keyHolder: registrationForm.keyHolder,
+        arrivalDate: registrationForm.arrivalDate,
+        dormId: registrationForm.dormNumber,
+        status: true,
+        registeredBy: user.firstName + " " + user.lastName,
         lastUpdated: new Date().toISOString()
       };
       
-      await dispatch(updateStudent(updatedStudent)).unwrap();
-      alert("Student registered successfully!");
+      const result = await dispatch(UpdateStudentByStudent({ 
+        id: selectedStudent._id, 
+        formData: updatedStudent 
+      }));
+      
+      if (result.error) {
+        throw new Error(result.error.message || "Failed to update student");
+      }
+      
+      toast.success(`Student ${isPreviouslyRegistered ? 'updated' : 'registered'} successfully!`);
       handleOpenChange(false);
     } catch (error) {
       console.error("Registration error:", error);
-      alert("Failed to register student. Please try again.");
-      }
-    };
+      toast.error(`Failed to ${isPreviouslyRegistered ? 'update' : 'register'} student: ${error.message}`);
+      setError(`Failed to ${isPreviouslyRegistered ? 'update' : 'register'} student: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyHolderChange = (value) => {
+    console.log("RadioGroup value changed to:", value);
+    setRegistrationForm({
+      ...registrationForm,
+      keyHolder: value === "true"
+    });
+  };
   
   return (
     <AnimatePresence mode="wait">
@@ -124,7 +175,9 @@ const RegisterStudentPage = () => {
               className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full"
             >        
               <DialogHeader className="px-6 py-4 border-b">
-                <DialogTitle className="text-2xl font-bold text-center">Register Student</DialogTitle>
+                <DialogTitle className="text-2xl font-bold text-center">
+                  {isPreviouslyRegistered ? "Update Student" : "Register Student"}
+                </DialogTitle>
               </DialogHeader>
 
               <div className="p-6 max-h-[80vh] overflow-y-auto">
@@ -175,12 +228,21 @@ const RegisterStudentPage = () => {
                           <p className="font-semibold text-gray-600">Student Type</p>
                           <p className="text-gray-900">{selectedStudent.studCategory}</p>
                         </div>
+                        {isPreviouslyRegistered && (
+                          <div className="col-span-2">
+                            <p className="font-semibold text-green-700 bg-green-50 px-2 py-1 rounded border border-green-200 text-center">
+                              This student has been registered previously
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Registration Form */}
                     <div className="space-y-6">
-                      <h3 className="text-lg font-semibold text-gray-900">Registration Details</h3>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {isPreviouslyRegistered ? "Update Details" : "Registration Details"}
+                      </h3>
                       
                       {/* Primary Information */}
                       <div className="bg-gray-50 p-6 rounded-lg space-y-6">
@@ -198,13 +260,13 @@ const RegisterStudentPage = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="font-semibold text-gray-600">Room Number</label>
+                            <label className="font-semibold text-gray-600">Dorm Number</label>
                             <Input
                               type="text"
-                              value={registrationForm.roomNumber}
+                              value={registrationForm.dormNumber}
                               onChange={(e) => setRegistrationForm({
                                 ...registrationForm,
-                                roomNumber: e.target.value
+                                dormNumber: e.target.value
                               })}
                             />
                           </div>
@@ -219,10 +281,10 @@ const RegisterStudentPage = () => {
                             <label className="font-semibold text-gray-600">Phone Number</label>
                             <Input
                               type="tel"
-                              value={registrationForm.phone}
+                              value={registrationForm.phoneNum}
                               onChange={(e) => setRegistrationForm({
                                 ...registrationForm,
-                                phone: e.target.value
+                                phoneNum: e.target.value
                               })}
                             />
                           </div>
@@ -242,7 +304,7 @@ const RegisterStudentPage = () => {
 
                       {/* Emergency Contact */}
                       <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-                        <h4 className="font-medium text-gray-700">Emergency Contact</h4>
+                        <h4 className="font-medium text-gray-700">Emergency Contact Information</h4>
                         <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-2">
                             <label className="font-semibold text-gray-600">Emergency Contact</label>
@@ -256,13 +318,24 @@ const RegisterStudentPage = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="font-semibold text-gray-600">Parent Name</label>
+                            <label className="font-semibold text-gray-600">Parent First Name</label>
                             <Input
                               type="text"
-                              value={registrationForm.parentName}
+                              value={registrationForm.parentFirstName}
                               onChange={(e) => setRegistrationForm({
                                 ...registrationForm,
-                                parentName: e.target.value
+                                parentFirstName: e.target.value
+                              })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="font-semibold text-gray-600">Parent Last Name</label>
+                            <Input
+                              type="text"
+                              value={registrationForm.parentLastName}
+                              onChange={(e) => setRegistrationForm({
+                                ...registrationForm,
+                                parentLastName: e.target.value
                               })}
                             />
                           </div>
@@ -278,52 +351,59 @@ const RegisterStudentPage = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="font-semibold text-gray-600">Address</label>
+                            <label className="font-semibold text-gray-600">Parent Address</label>
                             <Input
                               type="text"
-                              value={registrationForm.address}
+                              value={registrationForm.parentAddress}
                               onChange={(e) => setRegistrationForm({
                                 ...registrationForm,
-                                address: e.target.value
+                                parentAddress: e.target.value
                               })}
                             />
+                          </div> 
+                          <div className="space-y-2">
+                            <Label className="font-semibold text-gray-600">
+                              Will he/she take the key?
+                            </Label>
+                            
+                            <RadioGroup
+                              value={registrationForm.keyHolder ? "true" : "false"}
+                              onValueChange={handleKeyHolderChange}
+                              className="flex space-x-4"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="true" id="yes" />
+                                <Label htmlFor="yes">Yes</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="false" id="no" />
+                                <Label htmlFor="no">No</Label>
+                              </div>
+                            </RadioGroup>
                           </div>
                         </div>
                       </div>
 
-                      {/* Additional Information */}
-                      <div className="bg-gray-50 p-6 rounded-lg space-y-4">
-                        <h4 className="font-medium text-gray-700">Additional Information</h4>
-                        <div className="space-y-2">
-                          <label className="font-semibold text-gray-600">Notes</label>
-                          <textarea
-                            className="w-full p-3 border rounded-md min-h-[100px]"
-                            value={registrationForm.additionalInfo}
-                            onChange={(e) => setRegistrationForm({
-                              ...registrationForm,
-                              additionalInfo: e.target.value
-                            })}
-                            placeholder="Enter any additional information..."
-                          />
-                        </div>
+                      {/* Action Buttons */}
+                      <div className="flex justify-end gap-4 pt-4 border-t">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleOpenChange(false)}
+                          className="min-w-[100px]"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleRegistration}
+                          disabled={loading}
+                          className={`min-w-[100px] ${isPreviouslyRegistered ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'}`}
+                        >
+                          {loading 
+                            ? (isPreviouslyRegistered ? "Updating..." : "Registering...") 
+                            : (isPreviouslyRegistered ? "Update" : "Register")
+                          }
+                        </Button>
                       </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex justify-end gap-4 pt-4 border-t">
-                      <Button
-                        variant="outline"
-                        onClick={() => handleOpenChange(false)}
-                        className="min-w-[100px]"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleRegistration}
-                        className="min-w-[100px] bg-green-600 hover:bg-green-700"
-                      >
-                        Register
-                      </Button>
                     </div>
                   </div>
                 )}
