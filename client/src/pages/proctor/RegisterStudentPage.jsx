@@ -11,9 +11,12 @@ import { fetchProctorBlocks } from '@/store/blockSlice/index';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const RegisterStudentPage = () => { 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const openDialog = useSelector((state) => state.sidebar.updateAllocation);
   const [isOpen, setIsOpen] = useState(openDialog);
   const [searchId, setSearchId] = useState("");
@@ -23,6 +26,7 @@ const RegisterStudentPage = () => {
   const { list: blocks } = useSelector((state) => state.block);
   const {user}=useSelector((state)=>state.auth);
   const [isPreviouslyRegistered, setIsPreviouslyRegistered] = useState(false);
+  const [previousPath, setPreviousPath] = useState("/proctor/home");
  
   const [registrationForm, setRegistrationForm] = useState({
     phoneNum: "",
@@ -39,7 +43,12 @@ const RegisterStudentPage = () => {
 
   useEffect(() => {
     dispatch(fetchProctorBlocks());
-  }, [dispatch]);
+    
+    // Store the current path when the dialog opens
+    if (openDialog && location.pathname !== "/proctor/register") {
+      setPreviousPath(location.pathname);
+    }
+  }, [dispatch, openDialog, location.pathname]);
 
   useEffect(() => {
     setIsOpen(openDialog);
@@ -53,6 +62,11 @@ const RegisterStudentPage = () => {
       setSearchId("");
       setError("");
       setIsPreviouslyRegistered(false);
+      
+      // Navigate back to the previous path when closing the dialog
+      if (location.pathname === "/proctor/register") {
+        navigate(previousPath);
+      }
     }
   };
 
