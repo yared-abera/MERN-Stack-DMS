@@ -1,0 +1,13 @@
+Fname,Mname,Lname,email,userName,phoneNum,password,sex,batch,isSpecial,isDisable,address,stream,studCategory,department,collage
+John,Michael,Doe,johndoe@example.com,NSR/1234/12,1234567890,password123,Male,2023,No,No,123 Main Street,natural,Regular,Physics,XYZ College
+Jane,Emma,Smith,janesmith@example.com,SSR/1123/32,9876543210,securePass456,Female,2024,Yes,No,456 Elm Street,social,Part-Time,Accounting,ABC University
+Robert,James,Brown,Unknown,NSR/2234/22,Unknown,Unknown,Male,2025,No,No,789 Maple Avenue,natural,Regular,History,Unknown
+Alice,Marie,Johnson,alicejohnson@example.com,SSR/3321/43,4567891230,Unknown,Female,2023,No,Yes,Unknown,social,Regular,Civil Engineering,XYZ Institute
+David,Lee,Clark,Unknown,NSR/1245/11,1357924680,davidPass321,Male,2024,No,No,123 Oak Drive,natural,Regular,Biology,LMN College
+Emily,Rose,Taylor,emilytaylor@example.com,SSR/2234/54,Unknown,Unknown,Female,2025,No,No,456 Pine Street,social,Regular,Economics,Unknown
+Daniel,Edward,Williams,danielw@example.com,NSR/3345/23,9876543211,danielPass987,Male,2023,No,No,789 Cedar Lane,natural,Regular,Mechanical Engineering,DEF University
+Sophia,Grace,Miller,sophiam@example.com,SSR/5543/21,7894561230,secureSophia123,Female,2024,No,No,123 Birch Rd,social,Part-Time,Philosophy,XYZ College
+Liam,Oliver,Martinez,Unknown,NSR/4432/33,Unknown,liamPass001,Male,2023,Yes,No,789 Willow St,natural,Regular,Chemistry,ABC Institute
+Evelyn,Marie,Garcia,evelyn.g@example.com,SSR/6678/12,7896541230,Unknown,Female,2025,No,No,456 Aspen Ave,social,Regular,Finance,DEF College
+Oliver,James,Hernandez,oliverh@example.com,NSR/7789/34,Unknown,oliverPass543,Male,2024,No,Yes,321 Palm Blvd,natural,Regular,Computer Science,XYZ Institute
+Mia,Rose,Taylor,Unknown,SSR/3342/11,1234567899,Unknown,Female,2023,No,No,123 Maple Ave,social,Part-Time,History,LMN University
