@@ -272,16 +272,21 @@ const chatController = {
       const {userId} = req.params;
       
       if (!userId) {
-        return res.json({
+        console.log('Missing userId in request');
+        return res.status(400).json({
           success: false,
           message: 'User ID is required'
         });
       }
 
+      console.log('Fetching unread count for user:', userId);
+
       // Find all chat rooms where the user is a participant
       const chatRooms = await ChatRoom.find({
         participants: userId
       });
+
+      console.log('Found', chatRooms.length, 'chat rooms for user');
 
       // Count unread messages across all chat rooms
       let totalUnread = 0;
@@ -291,6 +296,8 @@ const chatController = {
         );
         totalUnread += unreadMessages.length;
       });
+
+      console.log('Total unread messages:', totalUnread);
 
       res.status(200).json({
         success: true,
