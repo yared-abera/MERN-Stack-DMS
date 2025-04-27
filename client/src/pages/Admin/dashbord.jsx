@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import FooterPage from "@/components/common/FooterPage";
 import { AddRecentlySearchedUser, getRecentlySearchedUser, SearchedUsers } from "@/store/common/data";
 import { Badge, CalendarIcon, Mail, MailIcon, User2Icon, UserIcon, Building2, Wrench, Users2, Percent } from "lucide-react";
-import { getDormStatistics } from "@/store/dormSlice";
+ 
 import {
   Dialog,
   DialogClose,
@@ -25,8 +25,7 @@ export default function AdminDashboard() {
   const dispatch = useDispatch();
   const { isLoading, AllUser } = useSelector((state) => state.allUser);
   const { user } = useSelector((state) => state.auth);
-  const { statistics } = useSelector((state) => state.dorm);
-
+   
   const [recentUsers, setRecentUsers] = useState([]);
   const [recentSearchedUsers, setRecentSearchedUsers] = useState('');
   const [isUserFound,setIsUserFound]=useState(false)
@@ -39,7 +38,7 @@ export default function AdminDashboard() {
     const role = "User";
     const id=user.id
     dispatch(getRecentlySearchedUser({role,id}))
-    dispatch(getDormStatistics());
+  
   }, [dispatch]);
 
 
@@ -129,77 +128,7 @@ export default function AdminDashboard() {
   
         <div className="px-6 sm:px-10 pb-10">
           
-          {/* Statistics Cards */}
-          <section className="mb-12">
-            <h2 className="text-lg md:text-xl font-semibold text-gray-700 dark:text-gray-200 mb-6 text-center">
-              Dorm Statistics
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Total Dorms Card */}
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-medium">Total Dorms</CardTitle>
-                    <Building2 className="h-5 w-5 opacity-75" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{statistics?.totalDorms || 0}</div>
-                  <p className="text-blue-100 text-sm mt-1">
-                    {statistics?.availableDorms || 0} Available
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Maintenance Issues Card */}
-              <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-medium">Under Maintenance</CardTitle>
-                    <Wrench className="h-5 w-5 opacity-75" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{statistics?.maintenanceDorms || 0}</div>
-                  <p className="text-orange-100 text-sm mt-1">
-                    {statistics?.maintenanceRate}% of total dorms
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Occupancy Card */}
-              <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-medium">Occupancy</CardTitle>
-                    <Users2 className="h-5 w-5 opacity-75" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{statistics?.totalOccupied || 0}</div>
-                  <p className="text-green-100 text-sm mt-1">
-                    of {statistics?.totalCapacity || 0} total capacity
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Used By Others Card */}
-              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-medium">Used By Others</CardTitle>
-                    <Percent className="h-5 w-5 opacity-75" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{statistics?.usedDorms || 0}</div>
-                  <p className="text-purple-100 text-sm mt-1">
-                    {((statistics?.usedDorms / statistics?.totalDorms) * 100).toFixed(1)}% of total dorms
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
+    
   
           {/* Recently Searched Users */}
           <section className="mb-12">

@@ -30,15 +30,16 @@ const items = [
     icon: Inbox,
   },
   {
-    title: "My Account",
-    url: "/admin/account",
-    icon: Settings,
-  },
-  {
     title: "Database Backup",
     url: "/admin/backup",
     icon: Database,
   },
+  {
+    title: "My Account",
+    url: "/admin/account",
+    icon: Settings,
+  },
+
 ]
 
 export default function SideBarComponent() {
