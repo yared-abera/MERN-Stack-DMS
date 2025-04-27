@@ -480,9 +480,68 @@ const checkDormExists = async (req, res) => {
   }
 };
 
+const getDormStatistics = async (req, res) => {
+  try {
+    const blocks = await Block.find({});
+    
+    // Initialize statistics
+    const statistics = {
+      totalDorms: 0,
+      availableDorms: 0,
+      maintenanceDorms: 0,
+      usedDorms: 0,
+      totalCapacity: 0,
+      totalOccupied: 0,
+      occupancyRate: 0,
+      maintenanceRate: 0
+    };
+
+    // Calculate statistics
+    blocks.forEach(block => {
+      block.floors.forEach(floor => {
+        floor.dorms.forEach(dorm => {
+          statistics.totalDorms++;
+          statistics.totalCapacity += dorm.capacity;
+          statistics.totalOccupied += dorm.studentsAllocated;
+
+          switch (dorm.dormStatus) {
+            case 'Available':
+              statistics.availableDorms++;
+              break;
+            case 'MaintenanceIssue':
+              statistics.maintenanceDorms++;
+              break;
+            case 'UnAvailable':
+              statistics.usedDorms++;
+              break;
+          }
+        });
+      });
+    });
+
+    // Calculate rates
+    statistics.occupancyRate = statistics.totalDorms > 0 
+      ? ((statistics.totalOccupied / statistics.totalCapacity) * 100).toFixed(1)
+      : 0;
+    
+    statistics.maintenanceRate = statistics.totalDorms > 0
+      ? ((statistics.maintenanceDorms / statistics.totalDorms) * 100).toFixed(1)
+      : 0;
+
+    res.status(200).json({
+      success: true,
+      data: statistics
+    });
+  } catch (err) {
+    console.error("Server error:", err);
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
 module.exports = {
   registerDorm,
   updateDormStatus,
   checkDormExists,
   getIssueGroupDorm,
+  getDormStatistics
 };

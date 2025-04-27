@@ -172,8 +172,8 @@ export default function SideBarComponent() {
                 {ProSideBar.map((item) => {
                   const isActive = location.pathname === item.url;
                   return (
-                    // Wrap SidebarMenuItem with motion.li for animation
-                    <motion.li key={item.label} variants={menuItemVariants}>
+                    // Use motion.div instead of motion.li to avoid nesting li elements
+                    <motion.div key={item.label} variants={menuItemVariants}>
                       <SidebarMenuItem className="p-0 ">
                         {" "}
                         {/* Remove padding from item wrapper */}
@@ -195,8 +195,7 @@ export default function SideBarComponent() {
                                 dispatch(setUpdateAllocation(updateAllocation)); // Keep original logic
                               }
                             }}
-                            // Framer Motion hover effect (only if not active)
-                            whileHover={!isActive ? { scale: 1.03, x: 4 } : {}}
+                            // Remove whileHover from Link component
                             transition={{
                               type: "spring",
                               stiffness: 400,
@@ -224,7 +223,7 @@ export default function SideBarComponent() {
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
-                    </motion.li>
+                    </motion.div>
                   );
                 })}
               </SidebarMenu>

@@ -3,6 +3,7 @@ import axios from "axios";
 const initialState = {
   isLoading: false,
   AllFeedBack: [],
+  AllFeedBackAll: [],
 };
 
 export const InsertFeedBack = createAsyncThunk(
@@ -60,6 +61,21 @@ export const getFeedBackForStudent = createAsyncThunk(
   }
 );
 
+export const getAllFeedback = createAsyncThunk(
+  "feedBack/getAll",
+  async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:9000/api/feedBack/getAll",
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const feedBackSlice = createSlice({
   name: "feedBack",
   initialState,
@@ -76,6 +92,18 @@ const feedBackSlice = createSlice({
       })
       .addCase(getFeedBackForUser.rejected, (state, action) => {
         (state.isLoading = false), (state.AllFeedBack = []);
+      })
+      .addCase(getAllFeedback.pending, (state) => {
+        state.isLoading = true;
+        state.AllFeedBackAll = [];
+      })
+      .addCase(getAllFeedback.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.AllFeedBackAll = action.payload;
+      })
+      .addCase(getAllFeedback.rejected, (state, action) => {
+        state.isLoading = false;
+        state.AllFeedBackAll = [];
       });
   },
 });

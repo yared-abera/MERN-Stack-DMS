@@ -59,6 +59,8 @@ import AdminChat from "./pages/Admin/adminChat";
 import ProctorManagerChat from "./pages/proctorManager/ProctorManagerChat";
 import ProctorChat from "./pages/proctor/proctorChat/ProctorChat";
 import StudentDeanChat from "./pages/studentDean/StudentDeanChat";
+import StudentDeanGenerateReport from "./pages/studentDean/generateReport";
+
 import { SocketProvider } from "./context/SocketContext";
 
 function App() {
@@ -185,6 +187,24 @@ function App() {
             <Route path="chat" element={<ProctorChat/>} />
           </Route>
 
+        <Route
+          path="/dean"
+          element={
+            <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+              <StudentDeanLayout />
+            </CheckAuthComponent>
+          }
+        >
+          <Route path="home" element={<StudentDeanHome />} />
+          <Route path="dorm" element={<DormAllocation />} />
+          <Route path="info" element={<StudentInfo />} />
+          <Route path="block" element={<BlockInfo />} />
+          <Route path="account" element={<StudDeanAccount />} />
+          <Route path="report" element={<StudentDeanGenerateReport />} />
+          <Route path="issue" element={<DeanMaintenanceIssue />} />
+          <Route path="control" element={<DeanIssueContol />} />
+          <Route path="chat" element={<StudentDeanChat/>} />
+        </Route>
           <Route
             path="/dean"
             element={

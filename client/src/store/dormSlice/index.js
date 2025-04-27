@@ -67,6 +67,20 @@ export const getMaintenanceIssueDormsSubmmitedByProctor = createAsyncThunk(
   }
 );
 
+export const getDormStatistics = createAsyncThunk(
+  'dorm/getStatistics',
+  async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:9000/api/dorm/statistics'
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  }
+);
+
 // No other changes needed in this file
 
 const dormSlice = createSlice({
@@ -75,7 +89,8 @@ const dormSlice = createSlice({
     loading: false,
     error: null,
     success: false,
-    registeredDorm: null
+    registeredDorm: null,
+    statistics: null
   },
   reducers: {
     resetDormState: (state) => {
@@ -83,6 +98,7 @@ const dormSlice = createSlice({
       state.error = null;
       state.success = false;
       state.registeredDorm = null;
+      state.statistics = null;
     }
   },
   extraReducers: (builder) => {
@@ -121,6 +137,22 @@ const dormSlice = createSlice({
         }
       })
       .addCase(updateDormStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(getMaintenanceIssueDormsSubmmitedByProctor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getDormStatistics.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getDormStatistics.fulfilled, (state, action) => {
+        state.loading = false;
+        state.statistics = action.payload.data;
+      })
+      .addCase(getDormStatistics.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

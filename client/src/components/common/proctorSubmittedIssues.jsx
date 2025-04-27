@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "../ui/card";
 import {
   ExclamationTriangleIcon,
   BuildingOffice2Icon,
@@ -16,7 +16,7 @@ import {
   UserIcon,
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
