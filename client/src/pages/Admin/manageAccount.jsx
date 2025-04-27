@@ -79,7 +79,7 @@ export default function ManageAccount() {
   const [validationErrors, setValidationErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterRole, setFilterRole] = useState("all");
+  const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState("all");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const dispatch = useDispatch();
@@ -88,7 +88,7 @@ export default function ManageAccount() {
     // Fetch all users when component mounts
     dispatch(getAllUser());
   }, [dispatch]);
-
+console.log(AllUser,"allUser")
   useEffect(() => {
     if (selectedUser) {
       setEditFormData({
@@ -229,13 +229,15 @@ export default function ManageAccount() {
           role: "",
         });
       } else {
-        toast.error("Error Occurred ");
+        toast.error(data.payload?.message || "Error creating user");
       }
     });
   };
 
 
   console.log(formData,"formDtaa");
+  console.log(filterRole,"filterRole");
+  
   
   const handleEditSubmit = (event) => {
     event.preventDefault();
@@ -532,8 +534,8 @@ export default function ManageAccount() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="student dean">Student Dean</SelectItem>
-                              <SelectItem value="proctor manager">Proctor Manager</SelectItem>
+                              <SelectItem value="studentDean">StudentDean</SelectItem>
+                              <SelectItem value="proctorManager">ProctorManager</SelectItem>
                               <SelectItem value="proctor">Proctor</SelectItem>
                             </SelectContent>
                           </Select>
@@ -574,10 +576,10 @@ export default function ManageAccount() {
                     <SelectValue placeholder="Filter by role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
+                  
                     <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="studentDean">Student Dean</SelectItem>
-                    <SelectItem value="proctorManager">Proctor Manager</SelectItem>
+                    <SelectItem value="studentDean">StudentDean</SelectItem>
+                    <SelectItem value="proctorManager">ProctorManager</SelectItem>
                     <SelectItem value="proctor">Proctor</SelectItem>
                   </SelectContent>
                 </Select>
@@ -892,8 +894,8 @@ export default function ManageAccount() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="student dean">Student Dean</SelectItem>
-                    <SelectItem value="proctor manager">Proctor Manager</SelectItem>
+                    <SelectItem value="studentDean">StudentDean</SelectItem>
+                    <SelectItem value="proctorManager">ProctorManager</SelectItem>
                     <SelectItem value="proctor">Proctor</SelectItem>
                   </SelectContent>
                 </Select>

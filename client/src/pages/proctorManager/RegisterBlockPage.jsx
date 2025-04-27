@@ -62,6 +62,7 @@ const RegisterBlockComp = () => {
     useEffect(() => {
         dispatch(fetchAvailableProctors());
     }, [dispatch]);
+console.log(availableProctors, "availableProctors"); // Debugging line
 
     // Filter proctors based on user gender when availableProctors change
     useEffect(() => {

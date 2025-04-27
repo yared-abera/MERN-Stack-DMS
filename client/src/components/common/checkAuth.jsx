@@ -24,6 +24,8 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
 
   // Public paths that don't require authentication
   const isPublicPath = ["/", "/auth/logIn"].includes(currentPath);
+  console.log(user,"checkAuthComponent");
+  
 
   // 1. Handle unauthenticated users
   if (!isAuthenticated) {
@@ -31,8 +33,9 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
   }
 
   // 2. Handle authenticated users
+ const correctRole=user?.role.split('').join('')
   
-  const userRole =user?.role;
+  let userRole =correctRole||user?.role  
    
   const allowedBasePath = roleBasePaths[userRole];
 
