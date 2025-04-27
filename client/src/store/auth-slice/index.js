@@ -82,6 +82,8 @@ export const LogOutUser = createAsyncThunk("/auth/LogOut", async () => {
 export const CreateAccount = createAsyncThunk(
   "/auth/createUser",
   async (formData) => {
+    console.log("from CreateAccountSlice", formData);
+    
     try {
       console.log("from CreateAccountSlice", formData);
       const result = await axios.post(

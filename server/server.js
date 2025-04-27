@@ -96,15 +96,15 @@ const userRooms = new Map();
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
+ // console.log('New client connected:', socket.id);
    
   // Add user to online users when they connect with their userId
   const userId = socket.handshake.auth?.userId;
   if (userId) {
     onlineUsers.set(userId, socket.id);
     io.emit('onlineUsers', Array.from(onlineUsers.keys()));
-    console.log('User connected:', userId);
-    console.log('Online users:', Array.from(onlineUsers.entries()));
+    // console.log('User connected:', userId);
+    // console.log('Online users:', Array.from(onlineUsers.entries()));
   }
 
   // Handle joining chat rooms
@@ -132,7 +132,7 @@ io.on('connection', (socket) => {
     }
     userRooms.get(socket.id).add(roomId);
     
-    console.log(`User ${userId} joined room ${roomId}`);
+    //console.log(`User ${userId} joined room ${roomId}`);
   });
 
   // Handle sending messages
@@ -144,7 +144,7 @@ io.on('connection', (socket) => {
     }
     
     const chatRoomId = [senderId, receiverId].sort().join('-');
-    console.log(`Sending message to room ${chatRoomId}:`, messageData);
+    //console.log(`Sending message to room ${chatRoomId}:`, messageData);
     
     // Emit to the specific room
     io.to(chatRoomId).emit('message', messageData);
@@ -152,7 +152,7 @@ io.on('connection', (socket) => {
 
   // Handle errors
   socket.on('error', (error) => {
-    console.error('Socket error:', error);
+    //console.error('Socket error:', error);
     socket.emit('error', { message: 'Internal socket error' });
   });
 
@@ -167,15 +167,15 @@ io.on('connection', (socket) => {
         userRooms.delete(socket.id);
       }
       
-      console.log('User disconnected:', userId);
-      console.log('Remaining online users:', Array.from(onlineUsers.entries()));
+      // console.log('User disconnected:', userId);
+      // console.log('Remaining online users:', Array.from(onlineUsers.entries()));
     }
   });
 });
 
 // Change this to use the HTTP server instead of the Express app
 server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    //console.log(`Server is running on port ${PORT}`);
 });
 
 // Update server export
