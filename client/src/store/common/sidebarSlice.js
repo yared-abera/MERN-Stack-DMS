@@ -7,8 +7,8 @@ const sidebarSlice = createSlice({
   name: "sidebar",
   initialState ,
   reducers: {
-    setUpdateAllocation: (state) => {
-      state.updateAllocation = !state.updateAllocation
+    setUpdateAllocation: (state, action) => {
+      state.updateAllocation = action.payload;
     },
     toggleSidebar: (state) => {
       state.isOpen = !state.isOpen;

@@ -100,7 +100,7 @@ export default function GenerateReport() {
   const generatePDF = () => {
     const doc = new jsPDF();
     let y = 15;
-
+    
     doc.setFontSize(12);
     doc.text(`Block: ${selectedBlock === 'all' ? 'All Blocks' : 'Block ' + selectedBlock}`, 14, y);
     y += 10;
@@ -147,12 +147,12 @@ export default function GenerateReport() {
             ? issue.issueTypes
             : [null]
           ).map(type => [
-            issue.firstName || issue.userInfo?.fName || '',
-            issue.middleName || issue.userInfo?.mName || '',
-            issue.lastName || issue.userInfo?.lName || '',
-            issue.userName || issue.userInfo?.userName || '',
-            `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
-            issue.dormId || issue.userInfo?.roomNumber || '',
+          issue.firstName || issue.userInfo?.fName || '',
+          issue.middleName || issue.userInfo?.mName || '',
+          issue.lastName || issue.userInfo?.lName || '',
+          issue.userName || issue.userInfo?.userName || '',
+          `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
+          issue.dormId || issue.userInfo?.roomNumber || '',
             type ? type.issue : '',
             type ? type.status : '',
             type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')
@@ -272,12 +272,12 @@ export default function GenerateReport() {
           ? issue.issueTypes
           : [null]
         ).map(type => ({
-          'First Name': issue.firstName || issue.userInfo?.fName || '',
-          'Middle Name': issue.middleName || issue.userInfo?.mName || '',
-          'Last Name': issue.lastName || issue.userInfo?.lName || '',
-          'User Name': issue.userName || issue.userInfo?.userName || '',
-          'Block': `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
-          'Room': issue.dormId || issue.userInfo?.roomNumber || '',
+        'First Name': issue.firstName || issue.userInfo?.fName || '',
+        'Middle Name': issue.middleName || issue.userInfo?.mName || '',
+        'Last Name': issue.lastName || issue.userInfo?.lName || '',
+        'User Name': issue.userName || issue.userInfo?.userName || '',
+        'Block': `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
+        'Room': issue.dormId || issue.userInfo?.roomNumber || '',
           'Issue Types': type ? type.issue : '',
           'Status': type ? type.status : '',
           'Date Reported': type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')

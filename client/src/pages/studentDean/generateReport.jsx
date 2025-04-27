@@ -363,7 +363,7 @@ export default function StudentDeanGenerateReport() {
     doc.setFontSize(10);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, y);
     y += 10;
-    
+
     // Add report type
     doc.setFontSize(12);
     doc.text(`Report Type: ${selectedReport === 'all' ? 'All Students' : 
@@ -722,10 +722,10 @@ export default function StudentDeanGenerateReport() {
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium px-3 py-1">
               Generate Reports
             </Badge>
-            <p className="text-gray-600">
+          <p className="text-gray-600">
               Comprehensive analytics and statistics dashboard
-            </p>
-          </div>
+          </p>
+        </div>
         </motion.div>
 
         {/* Tabs for different views */}
@@ -908,7 +908,7 @@ export default function StudentDeanGenerateReport() {
                 <Card className="overflow-hidden border-t-4 border-purple-500 transition-all duration-300 hover:shadow-lg">
                   <CardHeader className="bg-gradient-to-r from-purple-50 to-white">
                     <CardTitle className="text-purple-700">Dorm Statistics</CardTitle>
-                  </CardHeader>
+            </CardHeader>
                   <CardContent className="pt-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-purple-50 rounded-lg">
@@ -928,15 +928,15 @@ export default function StudentDeanGenerateReport() {
                         <p className="text-2xl font-bold text-amber-600">{dormSummary.maintenance}</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+            </CardContent>
+          </Card>
               </div>
               
               {/* Block Statistics */}
               <Card className="mb-8 overflow-hidden border-t-4 border-teal-500 transition-all duration-300 hover:shadow-lg">
                 <CardHeader className="bg-gradient-to-r from-teal-50 to-white">
                   <CardTitle className="text-teal-700">Block Statistics</CardTitle>
-                </CardHeader>
+            </CardHeader>
                 <CardContent className="pt-4">
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
@@ -962,8 +962,8 @@ export default function StudentDeanGenerateReport() {
                       </tbody>
                     </table>
                   </div>
-                </CardContent>
-              </Card>
+            </CardContent>
+          </Card>
             </TabsContent>
             
             <TabsContent value="reports">
@@ -974,72 +974,72 @@ export default function StudentDeanGenerateReport() {
                   <CardDescription>
                     Select options and download your report
                   </CardDescription>
-                </CardHeader>
+            </CardHeader>
                 <CardContent className="pt-4">
-                  <div className="space-y-4">
+              <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Block</label>
-                        <Select value={selectedBlock} onValueChange={setSelectedBlock}>
+                <Select value={selectedBlock} onValueChange={setSelectedBlock}>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Block" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Blocks</SelectItem>
-                            {blocks.map((block) => (
-                              <SelectItem key={block.blockNum} value={block.blockNum}>
-                                Block {block.blockNum}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    <SelectValue placeholder="Select Block" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Blocks</SelectItem>
+                    {blocks.map((block) => (
+                      <SelectItem key={block.blockNum} value={block.blockNum}>
+                        Block {block.blockNum}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Student Type</label>
-                        <Select value={selectedReport} onValueChange={setSelectedReport}>
+                <Select value={selectedReport} onValueChange={setSelectedReport}>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Report Type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Students</SelectItem>
-                            <SelectItem value="regular">Regular Students</SelectItem>
-                            <SelectItem value="disabled">Disabled Students</SelectItem>
-                            <SelectItem value="special">Special Students</SelectItem>
-                            <SelectItem value="fresh">Fresh Students</SelectItem>
-                            <SelectItem value="senior">Senior Students</SelectItem>
-                            <SelectItem value="remedial">Remedial Students</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    <SelectValue placeholder="Select Report Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Students</SelectItem>
+                    <SelectItem value="regular">Regular Students</SelectItem>
+                    <SelectItem value="disabled">Disabled Students</SelectItem>
+                    <SelectItem value="special">Special Students</SelectItem>
+                    <SelectItem value="fresh">Fresh Students</SelectItem>
+                    <SelectItem value="senior">Senior Students</SelectItem>
+                    <SelectItem value="remedial">Remedial Students</SelectItem>
+                  </SelectContent>
+                </Select>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                      <Button 
+                  <Button 
                         className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                        onClick={generatePDF}
-                      >
-                        <FaFilePdf />
+                    onClick={generatePDF}
+                  >
+                    <FaFilePdf />
                         Download PDF
-                      </Button>
-                      <Button 
+                  </Button>
+                  <Button 
                         className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                        onClick={generateExcel}
-                      >
-                        <FaFileExcel />
+                    onClick={generateExcel}
+                  >
+                    <FaFileExcel />
                         Download Excel
-                      </Button>
-                      <Button 
+                  </Button>
+                  <Button 
                         className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                        onClick={() => window.print()}
-                      >
-                        <FaPrint />
+                    onClick={() => window.print()}
+                  >
+                    <FaPrint />
                         Print Report
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
             </TabsContent>
           </Tabs>
         </motion.div>
