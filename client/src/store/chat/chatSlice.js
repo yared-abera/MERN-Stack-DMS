@@ -290,7 +290,15 @@ const chatSlice = createSlice({
       })
       // Handle unread count fetching
       .addCase(getUnreadCount.fulfilled, (state, action) => {
-        state.unreadCount = action.payload;
+        // Check if the response has the expected structure
+        if (typeof action.payload === 'object' && 'count' in action.payload) {
+          state.unreadCount = action.payload.count;
+        } else if (typeof action.payload === 'number') {
+          state.unreadCount = action.payload;
+        } else {
+          console.error('Unexpected unread count response:', action.payload);
+          state.unreadCount = 0;
+        }
       });
   },
 });

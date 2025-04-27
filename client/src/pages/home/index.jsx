@@ -76,13 +76,13 @@ import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
         
         <main className="relative">
           {/* Parallax header */}
-          <motion.div 
+          {/* <motion.div 
             ref={parallaxRef}
             style={{ y: springY }}
             className="relative transform-gpu will-change-transform"
           >
             <HomeHeader />
-          </motion.div>
+          </motion.div> */}
           
           {/* Content sections with staggered animations */}
           <div className="relative z-10 space-y-16 py-12">
