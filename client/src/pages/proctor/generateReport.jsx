@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getAllControlIssues } from "@/store/control/controlSclice";
 import { getAttendanceNotification } from "@/store/attendance/attendance-Slice";
+import { GetWholeMaintainanceIssue } from "@/store/maintenanceIssue/maintenanceIssue";
 
 export default function GenerateReport() {
   const dispatch = useDispatch();
@@ -31,8 +32,8 @@ export default function GenerateReport() {
   });
   const [error, setError] = useState(null);
   const [students, setStudents] = useState([]);
-  const [maintenanceIssues, setMaintenanceIssues] = useState([]);
   const { list: blocks } = useSelector((state) => state.block);
+  const { wholeMaintainanceIssue } = useSelector((state) => state.issue);
   const [selectedBlock, setSelectedBlock] = useState('all');
   const [activeTab, setActiveTab] = useState('students');
   const [selectedSections, setSelectedSections] = useState({
@@ -44,6 +45,7 @@ export default function GenerateReport() {
   });
   const { allIssues } = useSelector((state) => state.control);
   const { absentStudent } = useSelector((state) => state.attendance);
+  const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,11 +54,9 @@ export default function GenerateReport() {
         await dispatch(fetchProctorBlocks()).unwrap();
         console.log('Blocks fetched successfully');
         
-        const issuesResponse = await axios.get('http://localhost:9000/api/maintainanceIssue/getWhole', {
-          withCredentials: true
-        });
+        await dispatch(GetWholeMaintainanceIssue()).unwrap();
         console.log('Maintenance issues fetched successfully');
-        setMaintenanceIssues(issuesResponse.data);
+        
         setLoading(prev => ({ ...prev, blocks: false, maintenance: false }));
       } catch (error) {
         console.error("Failed to fetch initial data:", error);
@@ -99,17 +99,13 @@ export default function GenerateReport() {
   useEffect(() => {
     const fetchControlAndAttendance = async () => {
       try {
-        console.log('Fetching control issues and attendance...');
-        const [controlResponse, attendanceResponse] = await Promise.all([
-          dispatch(getAllControlIssues()),
-          dispatch(getAttendanceNotification())
-        ]);
-        console.log('Control Response:', controlResponse);
+        setLoading(prev => ({ ...prev, control: true }));
+        console.log('Fetching attendance data...');
+        const attendanceResponse = await dispatch(getAttendanceNotification()).unwrap();
         console.log('Attendance Response:', attendanceResponse);
-        console.log('Attendance Data in Store:', absentStudent);
         setLoading(prev => ({ ...prev, control: false }));
       } catch (error) {
-        console.error("Failed to fetch control/attendance:", error);
+        console.error("Failed to fetch attendance:", error);
         setError(error.message);
         setLoading(prev => ({ ...prev, control: false }));
       }
@@ -118,9 +114,32 @@ export default function GenerateReport() {
     fetchControlAndAttendance();
   }, [dispatch]);
 
+  useEffect(() => {
+    if (selectAll) {
+      setSelectedSections({
+        students: true,
+        maintenance: true,
+        control: true,
+        dorms: true,
+        attendance: true,
+      });
+    }
+  }, [selectAll]);
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+  };
+
   // Add a new useEffect to monitor absentStudent changes
   useEffect(() => {
     console.log('Current absentStudent data:', absentStudent);
+  }, [absentStudent]);
+
+  // Add debug logging for attendance data
+  useEffect(() => {
+    if (absentStudent?.data) {
+      console.log('Current Attendance Data:', absentStudent.data);
+    }
   }, [absentStudent]);
 
   // Check if any loading state is true
@@ -133,50 +152,96 @@ export default function GenerateReport() {
     return students.filter(student => student.blockNum === selectedBlock);
   };
 
-  const getFilteredIssues = () => {
-    if (selectedBlock === 'all') {
-      return maintenanceIssues;
+  const getFilteredMaintenanceIssues = () => {
+    if (!wholeMaintainanceIssue || !Array.isArray(wholeMaintainanceIssue)) {
+      return [];
     }
-    // Filter by block number (string comparison for robustness)
-    return maintenanceIssues.filter(issue => 
-      String(issue.blockNum || issue.block) === String(selectedBlock)
-    );
+    
+    return selectedBlock === 'all' 
+      ? wholeMaintainanceIssue
+      : wholeMaintainanceIssue.filter(issue => 
+          String(issue.blockNum || issue.userInfo?.blockNumber) === String(selectedBlock)
+        );
+  };
+
+  const getFilteredAttendance = () => {
+    if (!absentStudent?.data || !Array.isArray(absentStudent.data)) {
+      console.log('No attendance data available');
+      return [];
+    }
+
+    return absentStudent.data
+      .filter(student => selectedBlock === 'all' || String(student.block) === String(selectedBlock))
+      .map(record => ({
+        firstName: record.student?.Fname || 'N/A',
+        middleName: record.student?.mName || 'N/A',
+        lastName: record.student?.Lname || 'N/A',
+        userName: record.student?.userName || 'N/A',
+        block: record.block || 'N/A',
+        room: record.student?.dormId || 'N/A',
+        absencesCount: record.absencesCount || 1,
+        absentDates: record.absentDate ? [new Date(record.absentDate).toLocaleDateString()] : [new Date().toLocaleDateString()]
+      }));
   };
 
   const generatePDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('landscape');  // Change to landscape for better fit
     let y = 15;
     
-    doc.setFontSize(12);
+    // Add title and date
+    doc.setFontSize(16);
     doc.text(`Block: ${selectedBlock === 'all' ? 'All Blocks' : 'Block ' + selectedBlock}`, 14, y);
     y += 10;
     doc.text(`Generated on: ${new Date().toLocaleString('en-US', {
       year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
     })}`, 14, y);
-    y += 10;
+    y += 20;
 
     // Students Section
     if (selectedSections.students) {
       doc.setFontSize(14);
       doc.text('Students', 14, y);
       y += 8;
+      
+      const studentsData = getFilteredStudents().map(student => [
+        `${student.userName}/${student.Fname} ${student.Lname}`,
+        `Block ${student.blockNum}`,
+        student.dormId || '3',
+        student.status ? 'Registered' : 'Not Registered',
+        student.phoneNum || 'N/A',
+        `${student.userName.toLowerCase()}@example.com`,
+        student.emergencyContactNumber || 'N/A',
+        student.parentPhone ? `${student.parentFirstName} ${student.parentLastName}\n${student.parentPhone}` : 'N/A'
+      ]);
+
       autoTable(doc, {
         startY: y,
-        head: [['Student ID Name', 'Block', 'Room', 'Status', 'Phone', 'Email', 'Emergency Contact', 'Parent Contact']],
-        body: getFilteredStudents().map(student => [
-          `${student.userName}/${student.Fname} ${student.Lname}`,
-          `Block ${student.blockNum}`,
-          student.dormId || '3',
-          student.status ? 'Registered' : 'Not Registered',
-          student.phoneNum || 'N/A',
-          `${student.userName.toLowerCase()}@example.com`,
-          student.emergencyContactNumber || 'N/A',
-          student.parentPhone ? `${student.parentFirstName} ${student.parentLastName}\n${student.parentPhone}` : 'N/A'
-        ]),
-        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 9 },
+        head: [['Student ID/Name', 'Block', 'Room', 'Status', 'Phone', 'Email', 'Emergency Contact', 'Parent Contact']],
+        body: studentsData,
+        headStyles: { 
+          fillColor: [41, 128, 185], 
+          textColor: 255, 
+          fontSize: 10, 
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 40 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 15 },
+          3: { cellWidth: 25 },
+          4: { cellWidth: 25 },
+          5: { cellWidth: 35 },
+          6: { cellWidth: 30 },
+          7: { cellWidth: 40 }
+        },
         alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { top: y }
+        margin: { top: y, left: 10, right: 10 },
+        theme: 'grid'
       });
       y = doc.lastAutoTable.finalY + 10;
     }
@@ -186,29 +251,102 @@ export default function GenerateReport() {
       doc.setFontSize(14);
       doc.text('Maintenance Issues', 14, y);
       y += 8;
-      autoTable(doc, {
-        startY: y,
-        head: [['First Name', 'Middle Name', 'Last Name', 'User Name', 'Block', 'Room', 'Issue Types', 'Status', 'Date Reported']],
-        body: getFilteredIssues().flatMap(issue =>
+
+      const maintenanceTableData = getFilteredMaintenanceIssues()
+        .flatMap(issue =>
           (issue.issueTypes && Array.isArray(issue.issueTypes) && issue.issueTypes.length > 0
             ? issue.issueTypes
             : [null]
           ).map(type => [
-          issue.firstName || issue.userInfo?.fName || '',
           issue.middleName || issue.userInfo?.mName || '',
           issue.lastName || issue.userInfo?.lName || '',
           issue.userName || issue.userInfo?.userName || '',
-          `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
+            `Block ${issue.blockNum || issue.userInfo?.blockNumber || ''}`,
           issue.dormId || issue.userInfo?.roomNumber || '',
             type ? type.issue : '',
-            type ? type.status : '',
-            type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')
+            type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : 
+                  (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : ''),
+            type ? `${type.status} (${type.dateReported ? new Date(type.dateReported).toLocaleDateString() : 'N/A'})` : ''
           ])
-        ),
-        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 9 },
+        );
+
+      autoTable(doc, {
+        startY: y,
+        head: [['MIDDLE NAME', 'LAST NAME', 'USER NAME', 'BLOCK', 'ROOM', 'ISSUE TYPES', 'DATE REPORTED', 'STATUS']],
+        body: maintenanceTableData,
+        headStyles: { 
+          fillColor: [41, 128, 185], 
+          textColor: 255, 
+          fontSize: 10, 
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 25 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 20 },
+          4: { cellWidth: 15 },
+          5: { cellWidth: 25 },
+          6: { cellWidth: 25 },
+          7: { cellWidth: 30 }
+        },
         alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { top: y }
+        margin: { top: y, left: 10, right: 10 },
+        theme: 'grid'
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    // Attendance Section
+    if (selectedSections.attendance) {
+      doc.setFontSize(14);
+      doc.text('Attendance Records', 14, y);
+      y += 8;
+
+      const attendanceData = getFilteredAttendance().map(record => [
+        record.firstName,
+        record.middleName,
+        record.lastName,
+        record.userName,
+        `Block ${record.block}`,
+        record.room,
+        record.absencesCount.toString(),
+        record.absentDates.join(', ')
+      ]);
+
+      autoTable(doc, {
+        startY: y,
+        head: [['First Name', 'Middle Name', 'Last Name', 'Student ID', 'Block', 'Room', 'Absences', 'Absent Dates']],
+        body: attendanceData,
+        headStyles: { 
+          fillColor: [41, 128, 185], 
+          textColor: 255, 
+          fontSize: 10, 
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 25 },
+          2: { cellWidth: 25 },
+          3: { cellWidth: 25 },
+          4: { cellWidth: 20 },
+          5: { cellWidth: 15 },
+          6: { cellWidth: 15 },
+          7: { cellWidth: 30 }
+        },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { top: y, left: 10, right: 10 },
+        theme: 'grid'
       });
       y = doc.lastAutoTable.finalY + 10;
     }
@@ -218,10 +356,8 @@ export default function GenerateReport() {
       doc.setFontSize(14);
       doc.text('Control Issues', 14, y);
       y += 8;
-      autoTable(doc, {
-        startY: y,
-        head: [['Student', 'Block', 'Dorm', 'Issue', 'Status', 'Date', 'Description']],
-        body: (allIssues?.data || [])
+
+      const controlData = (allIssues?.data || [])
           .filter(issue => selectedBlock === 'all' || issue.block === selectedBlock)
           .flatMap(issue =>
             (issue.Allissues || []).map(iss => [
@@ -233,11 +369,35 @@ export default function GenerateReport() {
               iss.dateReported ? new Date(iss.dateReported).toLocaleDateString() : '',
               iss.description || ''
             ])
-          ),
-        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 9 },
+        );
+
+      autoTable(doc, {
+        startY: y,
+        head: [['STUDENT', 'BLOCK', 'DORM', 'ISSUE', 'STATUS', 'DATE', 'DESCRIPTION']],
+        body: controlData,
+        headStyles: { 
+          fillColor: [41, 128, 185], 
+          textColor: 255, 
+          fontSize: 10, 
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 30 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 20 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 25 },
+          5: { cellWidth: 25 },
+          6: { cellWidth: 40 }
+        },
         alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { top: y }
+        margin: { top: y, left: 10, right: 10 },
+        theme: 'grid'
       });
       y = doc.lastAutoTable.finalY + 10;
     }
@@ -247,46 +407,40 @@ export default function GenerateReport() {
       doc.setFontSize(14);
       doc.text('Dorms', 14, y);
       y += 8;
-      autoTable(doc, {
-        startY: y,
-        head: [['Block', 'Dorm Number', 'Capacity', 'Status']],
-        body: blocks
+
+      const dormsData = blocks
           .filter(b => selectedBlock === 'all' || b.blockNum === selectedBlock)
           .flatMap(b => (b.floors || []).flatMap(f => (f.dorms || []).map(d => [
             `Block ${b.blockNum}`,
             d.dormNumber,
             d.capacity,
             d.dormStatus
-          ]))),
-        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 9 },
-        alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { top: y }
-      });
-      y = doc.lastAutoTable.finalY + 10;
-    }
+        ])));
 
-    // Attendance Section
-    if (selectedSections.attendance) {
-      doc.setFontSize(14);
-      doc.text('Attendance (Absences)', 14, y);
-      y += 8;
       autoTable(doc, {
         startY: y,
-        head: [['Student Name', 'Student ID', 'Block', 'Dorm', 'Absent Date']],
-        body: (absentStudent?.data || [])
-          .filter(student => selectedBlock === 'all' || String(student.block) === String(selectedBlock))
-          .map(student => [
-            `${student.student?.Fname || ''} ${student.student?.Lname || ''}`,
-            student.student?.userName || '',
-            `Block ${student.block || ''}`,
-            student.student?.dormId || 'N/A',
-            new Date().toLocaleDateString()
-          ]),
-        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 9 },
+        head: [['BLOCK', 'DORM NUMBER', 'CAPACITY', 'STATUS']],
+        body: dormsData,
+        headStyles: { 
+          fillColor: [41, 128, 185], 
+          textColor: 255, 
+          fontSize: 10, 
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        bodyStyles: { 
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 40 },
+          1: { cellWidth: 40 },
+          2: { cellWidth: 40 },
+          3: { cellWidth: 40 }
+        },
         alternateRowStyles: { fillColor: [245, 245, 245] },
-        margin: { top: y }
+        margin: { top: y, left: 10, right: 10 },
+        theme: 'grid'
       });
       y = doc.lastAutoTable.finalY + 10;
     }
@@ -300,39 +454,87 @@ export default function GenerateReport() {
     // Students Sheet
     if (selectedSections.students) {
       const studentsData = getFilteredStudents().map(student => ({
-        'Student ID Name': `${student.userName}/${student.Fname} ${student.Lname}`,
-        'Block': `Block ${student.blockNum}`,
-        'Room': student.dormId || '3',
-        'Status': student.status ? 'Registered' : 'Not Registered',
-        'Phone': student.phoneNum || 'N/A',
-        'Email': `${student.userName.toLowerCase()}@example.com`,
-        'Emergency Contact': student.emergencyContactNumber || 'N/A',
-        'Parent Contact': student.parentPhone ? `${student.parentFirstName} ${student.parentLastName} - ${student.parentPhone}` : 'N/A'
+        'STUDENT ID/NAME': `${student.userName}/${student.Fname} ${student.Lname}`,
+        'BLOCK': `Block ${student.blockNum}`,
+        'ROOM': student.dormId || '3',
+        'STATUS': student.status ? 'Registered' : 'Not Registered',
+        'PHONE': student.phoneNum || 'N/A',
+        'EMAIL': `${student.userName.toLowerCase()}@example.com`,
+        'EMERGENCY CONTACT': student.emergencyContactNumber || 'N/A',
+        'PARENT CONTACT': student.parentPhone ? `${student.parentFirstName} ${student.parentLastName} - ${student.parentPhone}` : 'N/A'
       }));
       const ws = utils.json_to_sheet(studentsData);
       utils.book_append_sheet(wb, ws, 'Students');
+      ws['!cols'] = [
+        { wch: 30 }, // STUDENT ID/NAME
+        { wch: 15 }, // BLOCK
+        { wch: 10 }, // ROOM
+        { wch: 15 }, // STATUS
+        { wch: 15 }, // PHONE
+        { wch: 25 }, // EMAIL
+        { wch: 20 }, // EMERGENCY CONTACT
+        { wch: 35 }  // PARENT CONTACT
+      ];
     }
 
     // Maintenance Sheet
     if (selectedSections.maintenance) {
-      const issuesData = getFilteredIssues().flatMap(issue =>
+      const maintenanceData = getFilteredMaintenanceIssues()
+        .flatMap(issue =>
         (issue.issueTypes && Array.isArray(issue.issueTypes) && issue.issueTypes.length > 0
           ? issue.issueTypes
           : [null]
         ).map(type => ({
-        'First Name': issue.firstName || issue.userInfo?.fName || '',
-        'Middle Name': issue.middleName || issue.userInfo?.mName || '',
-        'Last Name': issue.lastName || issue.userInfo?.lName || '',
-        'User Name': issue.userName || issue.userInfo?.userName || '',
-        'Block': `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
-        'Room': issue.dormId || issue.userInfo?.roomNumber || '',
-          'Issue Types': type ? type.issue : '',
-          'Status': type ? type.status : '',
-          'Date Reported': type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')
+            'MIDDLE NAME': issue.middleName || issue.userInfo?.mName || '',
+            'LAST NAME': issue.lastName || issue.userInfo?.lName || '',
+            'USER NAME': issue.userName || issue.userInfo?.userName || '',
+            'BLOCK': `Block ${issue.blockNum || issue.userInfo?.blockNumber || ''}`,
+            'ROOM': issue.dormId || issue.userInfo?.roomNumber || '',
+            'ISSUE TYPES': type ? type.issue : '',
+            'DATE REPORTED': type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : 
+                           (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : ''),
+            'STATUS': type ? `${type.status} (${type.dateReported ? new Date(type.dateReported).toLocaleDateString() : 'N/A'})` : ''
         }))
       );
-      const ws = utils.json_to_sheet(issuesData);
+      const ws = utils.json_to_sheet(maintenanceData);
       utils.book_append_sheet(wb, ws, 'Maintenance Issues');
+      ws['!cols'] = [
+        { wch: 15 }, // MIDDLE NAME
+        { wch: 15 }, // LAST NAME
+        { wch: 15 }, // USER NAME
+        { wch: 12 }, // BLOCK
+        { wch: 8 },  // ROOM
+        { wch: 20 }, // ISSUE TYPES
+        { wch: 15 }, // DATE REPORTED
+        { wch: 25 }  // STATUS
+      ];
+    }
+
+    // Attendance Sheet
+    if (selectedSections.attendance) {
+      const attendanceData = getFilteredAttendance().map(record => ({
+        'FIRST NAME': record.firstName,
+        'MIDDLE NAME': record.middleName,
+        'LAST NAME': record.lastName,
+        'STUDENT ID': record.userName,
+        'BLOCK': `Block ${record.block}`,
+        'ROOM': record.room,
+        'ABSENCES COUNT': record.absencesCount,
+        'ABSENT DATES': record.absentDates.join(', ')
+      }));
+
+      const ws = utils.json_to_sheet(attendanceData);
+      utils.book_append_sheet(wb, ws, 'Attendance');
+      ws['!cols'] = [
+        { wch: 15 }, // FIRST NAME
+        { wch: 15 }, // MIDDLE NAME
+        { wch: 15 }, // LAST NAME
+        { wch: 15 }, // STUDENT ID
+        { wch: 12 }, // BLOCK
+        { wch: 8 },  // ROOM
+        { wch: 10 }, // ABSENCES COUNT
+        { wch: 30 }  // ABSENT DATES
+      ];
     }
 
     // Control Sheet
@@ -341,17 +543,26 @@ export default function GenerateReport() {
         .filter(issue => selectedBlock === 'all' || issue.block === selectedBlock)
         .flatMap(issue =>
           (issue.Allissues || []).map(iss => ({
-            'Student': issue.student?.userName || '',
-            'Block': issue.block || '',
-            'Dorm': issue.dorm || '',
-            'Issue': iss.issue || '',
-            'Status': iss.status || '',
-            'Date': iss.dateReported ? new Date(iss.dateReported).toLocaleDateString() : '',
-            'Description': iss.description || ''
+            'STUDENT': issue.student?.userName || '',
+            'BLOCK': issue.block || '',
+            'DORM': issue.dorm || '',
+            'ISSUE': iss.issue || '',
+            'STATUS': iss.status || '',
+            'DATE': iss.dateReported ? new Date(iss.dateReported).toLocaleDateString() : '',
+            'DESCRIPTION': iss.description || ''
           }))
         );
       const ws = utils.json_to_sheet(controlData);
       utils.book_append_sheet(wb, ws, 'Control Issues');
+      ws['!cols'] = [
+        { wch: 15 }, // STUDENT
+        { wch: 12 }, // BLOCK
+        { wch: 8 },  // DORM
+        { wch: 20 }, // ISSUE
+        { wch: 15 }, // STATUS
+        { wch: 15 }, // DATE
+        { wch: 30 }  // DESCRIPTION
+      ];
     }
 
     // Dorms Sheet
@@ -359,31 +570,71 @@ export default function GenerateReport() {
       const dormsData = blocks
         .filter(b => selectedBlock === 'all' || b.blockNum === selectedBlock)
         .flatMap(b => (b.floors || []).flatMap(f => (f.dorms || []).map(d => ({
-          'Block': `Block ${b.blockNum}`,
-          'Dorm Number': d.dormNumber,
-          'Capacity': d.capacity,
-          'Status': d.dormStatus
+          'BLOCK': `Block ${b.blockNum}`,
+          'DORM NUMBER': d.dormNumber,
+          'CAPACITY': d.capacity,
+          'STATUS': d.dormStatus
         }))));
       const ws = utils.json_to_sheet(dormsData);
       utils.book_append_sheet(wb, ws, 'Dorms');
-    }
-
-    // Attendance Sheet
-    if (selectedSections.attendance) {
-      const attendanceData = (absentStudent?.data || [])
-        .filter(student => selectedBlock === 'all' || String(student.block) === String(selectedBlock))
-        .map(student => ({
-          'Student Name': `${student.student?.Fname || ''} ${student.student?.Lname || ''}`,
-          'Student ID': student.student?.userName || '',
-          'Block': `Block ${student.block || ''}`,
-          'Dorm': student.student?.dormId || 'N/A',
-          'Absent Date': new Date().toLocaleDateString()
-        }));
-      const ws = utils.json_to_sheet(attendanceData);
-      utils.book_append_sheet(wb, ws, 'Attendance');
+      ws['!cols'] = [
+        { wch: 15 }, // BLOCK
+        { wch: 15 }, // DORM NUMBER
+        { wch: 12 }, // CAPACITY
+        { wch: 15 }  // STATUS
+      ];
     }
 
     writeFile(wb, `block_report_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const renderAttendanceTable = () => {
+    const attendanceData = getFilteredAttendance();
+
+    if (loading.control) {
+      return <div className="text-center py-4">Loading attendance data...</div>;
+    }
+
+    if (error) {
+      return <div className="text-center py-4 text-red-500">Error: {error}</div>;
+    }
+
+    if (!attendanceData.length) {
+      return <div className="text-center py-4">No attendance records found</div>;
+    }
+
+    return (
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-[#2980b9] text-white">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">First Name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Middle Name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Last Name</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Student ID</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Block</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Room</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Absences Count</th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Absent Dates</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {attendanceData.map((record, index) => (
+            <tr key={`${record.userName}-${index}`} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.firstName}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.middleName}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.lastName}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.userName}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Block {record.block}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.room}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.absencesCount}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {record.absentDates.join(', ')}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
   };
 
   if (isLoading) {
@@ -426,24 +677,43 @@ export default function GenerateReport() {
             </Select>
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-4">
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className="form-checkbox h-4 w-4 text-blue-600"
+                id="selectAll"
+              />
+              <label htmlFor="selectAll" className="text-sm font-medium">
+                Select All Sections
+              </label>
+            </div>
+            
+            <div className="flex flex-wrap gap-4">
             {Object.entries(selectedSections).map(([key, value]) => (
               <label key={key} className="flex items-center gap-2 text-sm font-medium">
                 <input
                   type="checkbox"
                   checked={value}
-                  onChange={() => setSelectedSections(s => ({ ...s, [key]: !s[key] }))}
+                    onChange={() => {
+                      setSelectedSections(s => ({ ...s, [key]: !s[key] }));
+                      setSelectAll(false);
+                    }}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
                 {key.charAt(0).toUpperCase() + key.slice(1)}
               </label>
             ))}
+            </div>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="students">Students</TabsTrigger>
               <TabsTrigger value="attendance">Attendance</TabsTrigger>
+              <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
             </TabsList>
 
             <TabsContent value="students">
@@ -542,46 +812,94 @@ export default function GenerateReport() {
                   </div>
                 </div>
 
+                <div className="w-full overflow-x-auto shadow-md rounded-lg">
+                  {renderAttendanceTable()}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="maintenance">
+              <div className="bg-white rounded-lg">
+                <div className="flex justify-end mb-4">
+                  <div className="flex gap-4">
+                    <Button onClick={generatePDF} variant="destructive">
+                      <FileText className="w-4 h-4 mr-2" />
+                      PDF
+                    </Button>
+                    <Button onClick={generateExcel} variant="success" className="bg-green-600 hover:bg-green-700">
+                      <FileSpreadsheet className="w-4 h-4 mr-2" />
+                      Excel
+                    </Button>
+                    <Button onClick={() => window.print()} variant="default">
+                      <Printer className="w-4 h-4 mr-2" />
+                      Print
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="w-full overflow-x-auto shadow-md rounded-lg" style={{ minWidth: '100%', overflowX: 'auto' }}>
-                  {loading.control ? (
-                    <div className="text-center py-4">Loading attendance data...</div>
+                  {loading.maintenance ? (
+                    <div className="text-center py-4">Loading maintenance issues...</div>
                   ) : error ? (
                     <div className="text-center py-4 text-red-500">Error: {error}</div>
-                  ) : !absentStudent?.data?.length ? (
-                    <div className="text-center py-4">No attendance records found</div>
+                  ) : !getFilteredMaintenanceIssues().length ? (
+                    <div className="text-center py-4">No maintenance issues found</div>
                   ) : (
                     <table className="min-w-max w-full table-auto">
                       <thead className="bg-[#2980b9] text-white">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Student Name</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Student ID</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Block</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Dorm</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">Absent Date</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">MIDDLE NAME</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">LAST NAME</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">USER NAME</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">BLOCK</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">ROOM</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">ISSUE TYPES</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">DATE REPORTED</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">STATUS</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {(absentStudent?.data || [])
-                          .filter(student => selectedBlock === 'all' || String(student.block) === String(selectedBlock))
-                          .map((student, index) => (
-                            <tr key={student.student?._id || index} className={index % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white hover:bg-gray-50'}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                {student.student?.Fname || ''} {student.student?.Lname || ''}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                {student.student?.userName || ''}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                Block {student.block || ''}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                {student.student?.dormId || 'N/A'}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                {new Date().toLocaleDateString()}
-                              </td>
-                            </tr>
-                          ))}
+                        {getFilteredMaintenanceIssues()
+                          .flatMap(issue =>
+                            (issue.issueTypes && Array.isArray(issue.issueTypes) && issue.issueTypes.length > 0
+                              ? issue.issueTypes
+                              : [null]
+                            ).map((type, typeIndex) => (
+                              <tr key={`${issue._id}-${typeIndex}`} className={typeIndex % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100' : 'bg-white hover:bg-gray-50'}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  {issue.middleName || issue.userInfo?.mName || ''}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  {issue.lastName || issue.userInfo?.lName || ''}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  {issue.userName || issue.userInfo?.userName || ''}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  Block {issue.blockNum || issue.userInfo?.blockNumber || ''}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  {issue.dormId || issue.userInfo?.roomNumber || ''}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  {type ? type.issue : ''}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  {type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : 
+                                   (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    type?.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                    type?.status === 'resolved' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {type ? `${type.status} (${type.dateReported ? new Date(type.dateReported).toLocaleDateString() : 'N/A'})` : ''}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))
+                          )}
                       </tbody>
                     </table>
                   )}

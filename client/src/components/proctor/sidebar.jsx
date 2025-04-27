@@ -186,34 +186,34 @@ export default function ProctorSideBar() {
                             whileHover={!isActive ? { scale: 1.03, x: 4 } : {}}
                             transition={{ type: "spring", stiffness: 400, damping: 15 }}
                           >
-                            <Link
-                              to={item.url}
-                              className={`
-                                flex items-center gap-3 px-4 py-2.5 rounded-lg w-full
-                                text-sm font-medium transition-all duration-200 ease-in-out
+                          <Link
+                            to={item.url}
+                            className={`
+                              flex items-center gap-3 px-4 py-2.5 rounded-lg w-full
+                              text-sm font-medium transition-all duration-200 ease-in-out
                                 group relative
-                                ${
-                                  isActive
+                              ${
+                                isActive
                                     ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md scale-[1.02]"
                                     : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white"
-                                }
-                              `}
-                              onClick={() => {
-                                if (item.id === "registerStudent") {
+                              }
+                            `}
+                            onClick={() => {
+                              if (item.id === "registerStudent") {
                                   dispatch(setUpdateAllocation(true));
-                                }
-                              }}
-                            >
-                              {isActive && (
-                                <motion.div
-                                  className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-300 dark:bg-yellow-400 rounded-r-full"
+                              }
+                            }}
+                          >
+                            {isActive && (
+                              <motion.div
+                                className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-300 dark:bg-yellow-400 rounded-r-full"
                                   layoutId="activeIndicator"
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  exit={{ opacity: 0 }}
-                                  transition={{ duration: 0.2 }}
-                                />
-                              )}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                              />
+                            )}
 
                               {/* Update icon rendering */}
                               <div className="flex items-center justify-center w-5 h-5">
@@ -226,13 +226,13 @@ export default function ProctorSideBar() {
                                 />
                               </div>
                               <span className="truncate">
-                                {item.title}
-                              </span>
-                            </Link>
+                              {item.title}
+                            </span>
+                          </Link>
                           </motion.div>
                         </SidebarMenuButton>
                       </motion.div>
-                    </SidebarMenuItem>
+                      </SidebarMenuItem>
                   );
                 })}
               </SidebarMenu>
@@ -268,7 +268,7 @@ export default function ProctorSideBar() {
                         strokeWidth={2}
                         size={16}
                       />
-                      {/* Optional: Loader icon when logging out */}
+                     {/* Optional: Loader icon when logging out */}
                       {isLoggingOut && (
                         <Loader 
                           className="w-4 h-4 animate-spin ml-2" 

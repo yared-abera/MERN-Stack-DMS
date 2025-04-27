@@ -515,7 +515,7 @@ const scheduleAutomatedBackups = () => {
     try {
       // Get the last backup time from existing backups
       const backups = await listBackups();
-      const now = new Date();
+    const now = new Date();
       let nextBackupTime;
 
       if (backups.length > 0) {
@@ -531,16 +531,16 @@ const scheduleAutomatedBackups = () => {
         // If no previous backups, schedule for 24 hours from now
         nextBackupTime = new Date(now.getTime() + TWENTY_FOUR_HOURS);
       }
-
+    
       // Calculate time until next backup
       const timeUntilBackup = nextBackupTime - now;
-      
+    
       console.log(`Next backup scheduled for: ${nextBackupTime.toLocaleString()}`);
-      console.log(`Next backup will run in ${Math.floor(timeUntilBackup / 3600000)} hours and ${Math.floor((timeUntilBackup % 3600000) / 60000)} minutes`);
-      
+    console.log(`Next backup will run in ${Math.floor(timeUntilBackup / 3600000)} hours and ${Math.floor((timeUntilBackup % 3600000) / 60000)} minutes`);
+    
       // Schedule the next backup
       setTimeout(async () => {
-        console.log(`Running automated backup at ${new Date().toISOString()}`);
+      console.log(`Running automated backup at ${new Date().toISOString()}`);
         try {
           const result = await createAutomatedBackup();
           console.log('Automated backup completed successfully');
@@ -549,8 +549,8 @@ const scheduleAutomatedBackups = () => {
           console.error('Automated backup failed:', err);
         }
         // Schedule next backup regardless of success/failure
-        runDailyBackup();
-      }, timeUntilBackup);
+          runDailyBackup();
+    }, timeUntilBackup);
     } catch (error) {
       console.error('Error in backup scheduling:', error);
       // If there's an error, retry scheduling in 1 hour
@@ -559,7 +559,7 @@ const scheduleAutomatedBackups = () => {
   };
 
   // Start the backup schedule
-  runDailyBackup();
+        runDailyBackup();
   isBackupScheduled = true;
 };
 
