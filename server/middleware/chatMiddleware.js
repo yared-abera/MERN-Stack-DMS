@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../model/user/user');
 
+
 const chatMiddleware = async (req, res, next) => {
   try {
     // Get token from header

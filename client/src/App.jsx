@@ -62,6 +62,7 @@ import StudentDeanChat from "./pages/studentDean/StudentDeanChat";
 import StudentDeanGenerateReport from "./pages/studentDean/generateReport";
 
 import { SocketProvider } from "./context/SocketContext";
+import BackupManagement from "./components/BackupManagement";
 
 
 import { motion } from "framer-motion";
@@ -249,6 +250,7 @@ function App() {
             <Route path="manage" element={<ManageAccount />} />
             <Route path="account" element={<AdminAccount />} />
             <Route path="chat" element={<AdminChat/>} />
+            <Route path="backup" element={<BackupManagement />} />
           </Route>
 
           <Route

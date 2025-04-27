@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { setUpdateAllocation } from "../../store/common/sidebarSlice";
+import { toast } from "sonner";
 
 const customStyles = {
   headCells: {
@@ -58,17 +59,20 @@ export default function ProctorViewInfo() {
   const { list: blocks } = useSelector((state) => state.block);
   const [isRegistrationDialogOpen, setIsRegistrationDialogOpen] = useState(false);
   const [registrationForm, setRegistrationForm] = useState({
-    phone: "",
+    phoneNum: "",
     email: "",
-    emergencyContact: "",
-    parentName: "",
+    emergencyContactNumber: "",
+    parentFirstName: "",
+    parentLastName: "",
     parentPhone: "",
-    address: "",
+    parentAddress: "",
     additionalInfo: "",
     arrivalDate: "",
-    roomNumber: "",
+    dormId: "",
   });
   
+  // Add form validation state
+  const [formErrors, setFormErrors] = useState({});
   
   useEffect(() => {
      
@@ -215,20 +219,447 @@ export default function ProctorViewInfo() {
     []
   );
 
-  // Add registration handler
+  // Add validation function with improved error messages
+  const validateRegistrationForm = () => {
+    const errors = {};
+    
+    // Phone Number: Must be 10 digits, numbers only
+    if (registrationForm.phoneNum) {
+      if (!/^\d{10}$/.test(registrationForm.phoneNum.trim())) {
+        errors.phoneNum = "Phone Number must be exactly 10 digits.";
+        toast.error("Phone Number must be exactly 10 digits.");
+      }
+    }
+    
+    // Email: Must be valid email format
+    if (registrationForm.email) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registrationForm.email.trim())) {
+        errors.email = "Invalid email address.";
+        toast.error("Invalid email address.");
+      }
+    }
+    
+    // Emergency Contact: If filled, must be 10 digits
+    if (registrationForm.emergencyContactNumber) {
+      if (!/^\d{10}$/.test(registrationForm.emergencyContactNumber.trim())) {
+        errors.emergencyContactNumber = "Emergency Contact must be 10 digits.";
+        toast.error("Emergency Contact must be 10 digits.");
+      }
+    }
+    
+    // Parent First Name: Required (at least 2 letters)
+    if (!registrationForm.parentFirstName || registrationForm.parentFirstName.trim().length < 2) {
+      errors.parentFirstName = "Parent First Name is required (at least 2 letters).";
+      toast.error("Parent First Name is required.");
+    }
+    
+    // Parent Last Name: Required (at least 2 letters)
+    if (!registrationForm.parentLastName || registrationForm.parentLastName.trim().length < 2) {
+      errors.parentLastName = "Parent Last Name is required (at least 2 letters).";
+      toast.error("Parent Last Name is required.");
+    }
+    
+    // Parent Phone: Required, must be 10 digits
+    if (!registrationForm.parentPhone || !/^\d{10}$/.test(registrationForm.parentPhone.trim())) {
+      errors.parentPhone = "Parent Phone must be exactly 10 digits.";
+      toast.error("Parent Phone must be exactly 10 digits.");
+    }
+    
+    // Parent Address: Required (at least 5 characters)
+    if (!registrationForm.parentAddress || registrationForm.parentAddress.trim().length < 5) {
+      errors.parentAddress = "Parent Address is required (at least 5 characters).";
+      toast.error("Parent Address is required.");
+    }
+    
+    // Arrival Date: Required, must be a valid date
+    if (!registrationForm.arrivalDate || registrationForm.arrivalDate.trim() === "") {
+      errors.arrivalDate = "Arrival Date is required.";
+      toast.error("Arrival Date is required.");
+    }
+    
+    // Dorm Number: Required (at least 1 character)
+    if (!registrationForm.dormId || registrationForm.dormId.trim() === "") {
+      errors.dormId = "Dorm Number is required.";
+      toast.error("Dorm Number is required.");
+    }
+    
+    // Display summary notification if multiple errors
+    if (Object.keys(errors).length > 1) {
+      toast.error(`${Object.keys(errors).length} validation issues need to be fixed`);
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Improve handle input change function with better validation feedback
+  const handleInputChange = (e, field) => {
+    const value = e.target.value;
+    
+    setRegistrationForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Real-time validation with proper error messages
+    let error = null;
+    
+    switch (field) {
+      case 'phoneNum':
+        if (value && !/^\d{10}$/.test(value.trim())) {
+          error = "Phone Number must be exactly 10 digits.";
+        }
+        break;
+        
+      case 'email':
+        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+          error = "Invalid email address.";
+        }
+        break;
+        
+      case 'emergencyContactNumber':
+        if (value && !/^\d{10}$/.test(value.trim())) {
+          error = "Emergency Contact must be 10 digits.";
+        }
+        break;
+        
+      case 'parentFirstName':
+        if (!value || value.trim().length < 2) {
+          error = "Parent First Name is required (at least 2 letters).";
+        }
+        break;
+        
+      case 'parentLastName':
+        if (!value || value.trim().length < 2) {
+          error = "Parent Last Name is required (at least 2 letters).";
+        }
+        break;
+        
+      case 'parentPhone':
+        if (!value || !/^\d{10}$/.test(value.trim())) {
+          error = "Parent Phone must be exactly 10 digits.";
+        }
+        break;
+        
+      case 'parentAddress':
+        if (!value || value.trim().length < 5) {
+          error = "Parent Address is required (at least 5 characters).";
+        }
+        break;
+        
+      case 'arrivalDate':
+        if (!value || value.trim() === "") {
+          error = "Arrival Date is required.";
+        }
+        break;
+        
+      case 'dormId':
+        if (!value || value.trim() === "") {
+          error = "Dorm Number is required.";
+        }
+        break;
+        
+      default:
+        break;
+    }
+    
+    setFormErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+  
+  // Function to add error validation indicators to input fields
+  const renderInputWithValidation = (field, label, type, placeholder, required = false) => {
+    // Adjust placeholders to match specific validation requirements
+    let updatedPlaceholder = placeholder;
+    
+    if (field === 'phoneNum' || field === 'emergencyContactNumber' || field === 'parentPhone') {
+      updatedPlaceholder = "10 digits required (e.g., 0912345678)";
+    } else if (field === 'parentFirstName' || field === 'parentLastName') {
+      updatedPlaceholder = "Minimum 2 letters required";
+    } else if (field === 'parentAddress') {
+      updatedPlaceholder = "Minimum 5 characters required";
+    }
+    
+    return (
+      <div className="space-y-2">
+        <label className="font-semibold text-gray-600">
+          {label} {required || field.includes('parent') ? <span className="text-red-500">*</span> : null}
+          {field === 'phoneNum' || field === 'emergencyContactNumber' || field === 'parentPhone' ? (
+            <span className="text-xs text-gray-500 ml-1">(10 digits)</span>
+          ) : null}
+          {field === 'email' ? (
+            <span className="text-xs text-gray-500 ml-1">(example@email.com)</span>
+          ) : null}
+          {field === 'parentFirstName' || field === 'parentLastName' ? (
+            <span className="text-xs text-gray-500 ml-1">(min 2 letters)</span>
+          ) : null}
+          {field === 'parentAddress' ? (
+            <span className="text-xs text-gray-500 ml-1">(min 5 characters)</span>
+          ) : null}
+        </label>
+        <div className="relative">
+          <input
+            type={type}
+            className={`w-full p-2 border rounded-md ${formErrors[field] ? 'border-red-500 bg-red-50' : ''}`}
+            value={registrationForm[field]}
+            onChange={(e) => handleInputChange(e, field)}
+            required={required || field.includes('parent')}
+            placeholder={updatedPlaceholder}
+          />
+          {formErrors[field] && (
+            <div className="absolute right-2 top-2 text-red-500" title={formErrors[field]}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
+        </div>
+        {formErrors[field] && (
+          <div className="bg-red-50 p-2 rounded border border-red-200 mt-1">
+            <p className="text-red-600 text-xs">{formErrors[field]}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Show registration form with validation message banner at the top
+  const renderRegistrationDialog = () => {
+    // Check if there are any validation errors to show a banner
+    const hasErrors = Object.keys(formErrors).length > 0;
+    
+    return (
+      <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-xl font-bold">Student Registration</DialogTitle>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-6 p-6 overflow-y-auto">
+              {/* Validation Banner - Show at the top of the form */}
+              {hasErrors && (
+                <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-amber-800 font-medium">Please resolve the highlighted issues before submitting</p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Existing Student Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-600">Student ID</p>
+                  <p className="text-gray-900">{selectedStudent.userName}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-600">Full Name</p>
+                  <p className="text-gray-900">{`${selectedStudent.Fname} ${selectedStudent.Lname}`}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-600">Block Number</p>
+                  <p className="text-gray-900">{selectedStudent.blockNum}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-600">Student Type</p>
+                  <p className="text-gray-900">{selectedStudent.studCategory}</p>
+                </div>
+              </div>
+
+              {/* Registration Form */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {renderInputWithValidation(
+                  'arrivalDate', 
+                  'Arrival Date', 
+                  'date', 
+                  '', 
+                  true
+                )}
+                
+                {renderInputWithValidation(
+                  'dormId', 
+                  'Room Number', 
+                  'text', 
+                  'Enter room number', 
+                  true
+                )}
+                
+                {renderInputWithValidation(
+                  'phoneNum', 
+                  'Phone Number', 
+                  'tel', 
+                  'e.g. +251XXXXXXXXX or 09XXXXXXXX'
+                )}
+                
+                {renderInputWithValidation(
+                  'email', 
+                  'Email', 
+                  'email', 
+                  'example@email.com'
+                )}
+                
+                {renderInputWithValidation(
+                  'emergencyContactNumber', 
+                  'Emergency Contact', 
+                  'tel', 
+                  'e.g. +251XXXXXXXXX or 09XXXXXXXX'
+                )}
+                
+                {renderInputWithValidation(
+                  'parentFirstName', 
+                  'Parent First Name', 
+                  'text', 
+                  'First name'
+                )}
+                
+                {renderInputWithValidation(
+                  'parentLastName', 
+                  'Parent Last Name', 
+                  'text', 
+                  'Last name'
+                )}
+                
+                {renderInputWithValidation(
+                  'parentPhone', 
+                  'Parent Phone', 
+                  'tel', 
+                  'e.g. +251XXXXXXXXX or 09XXXXXXXX'
+                )}
+                
+                {renderInputWithValidation(
+                  'parentAddress', 
+                  'Parent Address', 
+                  'text', 
+                  'Address'
+                )}
+                
+                <div className="col-span-1 sm:col-span-2 space-y-2">
+                  <label className="font-semibold text-gray-600">Additional Information</label>
+                  <textarea
+                    className="w-full p-2 border rounded-md"
+                    rows="3"
+                    value={registrationForm.additionalInfo}
+                    onChange={(e) => handleInputChange(e, 'additionalInfo')}
+                    placeholder="Add any additional information here"
+                  />
+                </div>
+              </div>
+
+              {/* Error Summary (if any) - Enhance with better visibility */}
+              {Object.keys(formErrors).length > 0 && (
+                <div className="bg-red-50 p-4 rounded-md border-l-4 border-red-500 shadow-md mt-6 animate-pulse">
+                  <div className="flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h3 className="text-red-700 font-bold text-sm mb-1">Form Validation Failed</h3>
+                      <p className="text-red-700 text-xs mb-2">
+                        The following {Object.keys(formErrors).length} {Object.keys(formErrors).length === 1 ? 'error' : 'errors'} must be resolved:
+                      </p>
+                      <ul className="list-disc ml-5 space-y-1">
+                        {Object.entries(formErrors)
+                          .filter(([_, value]) => Boolean(value))
+                          .map(([field, error], index) => (
+                            <li key={index} className="text-red-600 text-xs">
+                              <span className="font-semibold">{field === 'dormId' ? 'Room Number' : 
+                                field === 'arrivalDate' ? 'Arrival Date' : 
+                                field === 'phoneNum' ? 'Phone Number' : 
+                                field === 'emergencyContactNumber' ? 'Emergency Contact' : 
+                                field === 'parentPhone' ? 'Parent Phone' : 
+                                field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span> {error}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Button - Enhanced with validation state styling */}
+              <div className="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button
+                  onClick={() => setIsRegistrationDialogOpen(false)}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md border border-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRegistration}
+                  disabled={Object.keys(formErrors).length > 0}
+                  className={`px-4 py-2 rounded-md flex items-center transition duration-200 
+                    ${Object.keys(formErrors).length > 0 
+                      ? 'bg-gray-400 text-white cursor-not-allowed' 
+                      : 'bg-green-600 text-white hover:bg-green-700'}`}
+                >
+                  {Object.keys(formErrors).length > 0 ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                      Fix Errors to Continue
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Complete Registration
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  // Modify handleRegistration function with better error handling
   const handleRegistration = async () => {
     try {
+      // Run validation before submission
+      if (!validateRegistrationForm()) {
+        return; // Stop if validation fails - toast notifications will show errors
+      }
+      
+      // Show processing state
+      toast.loading("Processing registration...");
+      
+      // Create updated student object with correct field names matching the database schema
       const updatedStudent = {
         ...selectedStudent,
-        ...registrationForm,
-        status: 'Registered',
+        phoneNum: registrationForm.phoneNum,
+        email: registrationForm.email,
+        emergencyContactNumber: registrationForm.emergencyContactNumber,
+        parentFirstName: registrationForm.parentFirstName,
+        parentLastName: registrationForm.parentLastName,
+        parentPhone: registrationForm.parentPhone,
+        parentAddress: registrationForm.parentAddress,
+        additionalInfo: registrationForm.additionalInfo,
+        arrivalDate: registrationForm.arrivalDate,
+        dormId: registrationForm.dormId,
+        status: true,
         registrationDate: new Date().toISOString(),
-        dormId: registrationForm.roomNumber, // Update room number
-        registeredBy: "proctor", // Add who registered the student
+        registeredBy: "proctor",
         lastUpdated: new Date().toISOString()
       };
       
-      await dispatch(updateStudent(updatedStudent)).unwrap();
+      console.log("Submitting student data:", updatedStudent);
+      
+      const result = await dispatch(updateStudent(updatedStudent)).unwrap();
+      
+      // Dismiss loading toast
+      toast.dismiss();
+      
+      if (result && result.success === false) {
+        throw new Error(result.message || "Registration failed");
+      }
       
       // Update local state
       const updateStudentList = (list) => list.map(student => 
@@ -240,27 +671,38 @@ export default function ProctorViewInfo() {
       
       setIsRegistrationDialogOpen(false);
       // Show success message
-      alert("Student registered successfully!");
+      toast.success("Student registered successfully!");
     } catch (error) {
       console.error("Failed to register student:", error);
-      alert("Failed to register student. Please try again.");
+      
+      // Show specific error message based on error type
+      if (error.message.includes("network") || error.message.includes("connection")) {
+        toast.error("Network error. Please check your internet connection.");
+      } else if (error.message.includes("duplicate")) {
+        toast.error("This student is already registered.");
+      } else {
+        toast.error(`Registration failed: ${error.message}`);
+      }
     }
   };
 
-  // When opening registration dialog, populate existing data
+  // When opening registration dialog, populate existing data with correct field names
   const handleOpenRegistration = (student) => {
     setSelectedStudent(student);
     setRegistrationForm({
-      phone: student.phone || "",
+      phoneNum: student.phoneNum || "",
       email: student.email || "",
-      emergencyContact: student.emergencyContact || "",
-      parentName: student.parentName || "",
+      emergencyContactNumber: student.emergencyContactNumber || "",
+      parentFirstName: student.parentFirstName || "",
+      parentLastName: student.parentLastName || "",
       parentPhone: student.parentPhone || "",
-      address: student.address || "",
+      parentAddress: student.parentAddress || "",
       additionalInfo: student.additionalInfo || "",
       arrivalDate: new Date().toISOString().split('T')[0],
-      roomNumber: student.dormId || "",
+      dormId: student.dormId || "",
     });
+    // Clear any previous form errors
+    setFormErrors({});
     setIsRegistrationDialogOpen(true);
   };
 
@@ -558,137 +1000,7 @@ export default function ProctorViewInfo() {
       </Dialog>
 
       {/* Registration Dialog */}
-      <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader className="px-6 py-4 border-b">
-            <DialogTitle className="text-xl font-bold">Student Registration</DialogTitle>
-          </DialogHeader>
-          {selectedStudent && (
-            <div className="space-y-6 p-6 overflow-y-auto">
-              {/* Existing Student Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
-                <div>
-                  <p className="font-semibold text-gray-600">Student ID</p>
-                  <p className="text-gray-900">{selectedStudent.userName}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-600">Full Name</p>
-                  <p className="text-gray-900">{`${selectedStudent.Fname} ${selectedStudent.Lname}`}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-600">Block Number</p>
-                  <p className="text-gray-900">{selectedStudent.blockNum}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-600">Student Type</p>
-                  <p className="text-gray-900">{selectedStudent.studCategory}</p>
-                </div>
-              </div>
-
-              {/* Registration Form */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Arrival Date</label>
-                  <input
-                    type="date"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.arrivalDate}
-                    onChange={(e) => setRegistrationForm({...registrationForm, arrivalDate: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Room Number</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.roomNumber}
-                    onChange={(e) => setRegistrationForm({...registrationForm, roomNumber: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Phone Number</label>
-                  <input
-                    type="tel"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.phone}
-                    onChange={(e) => setRegistrationForm({...registrationForm, phone: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Email</label>
-                  <input
-                    type="email"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.email}
-                    onChange={(e) => setRegistrationForm({...registrationForm, email: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Emergency Contact</label>
-                  <input
-                    type="tel"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.emergencyContact}
-                    onChange={(e) => setRegistrationForm({...registrationForm, emergencyContact: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Parent Name</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.parentName}
-                    onChange={(e) => setRegistrationForm({...registrationForm, parentName: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Parent Phone</label>
-                  <input
-                    type="tel"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.parentPhone}
-                    onChange={(e) => setRegistrationForm({...registrationForm, parentPhone: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-semibold text-gray-600">Address</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-md"
-                    value={registrationForm.address}
-                    onChange={(e) => setRegistrationForm({...registrationForm, address: e.target.value})}
-                  />
-                </div>
-                <div className="col-span-1 sm:col-span-2 space-y-2">
-                  <label className="font-semibold text-gray-600">Additional Information</label>
-                  <textarea
-                    className="w-full p-2 border rounded-md"
-                    rows="3"
-                    value={registrationForm.additionalInfo}
-                    onChange={(e) => setRegistrationForm({...registrationForm, additionalInfo: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setIsRegistrationDialogOpen(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleRegistration}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                >
-                  Complete Registration
-                </button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {renderRegistrationDialog()}
     </div>
   );
 }
