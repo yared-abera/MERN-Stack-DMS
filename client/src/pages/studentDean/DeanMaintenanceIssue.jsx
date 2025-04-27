@@ -55,17 +55,15 @@ const DeanMaintenanceIssue = () => {
           Array.isArray(data.payload.data) &&
           data.payload.data.length > 0
         ) {
-          // const blockLocation =
-          //   user.sex.toUpperCase() === 'MALE' ? 'maleArea' : 'femaleArea';
-  
-          // const filteredData = data.payload.data.filter(
-          //   (item) => item.location === blockLocation
-          // );
+         
   
           setProctorSubmitedIssue(data.payload.data);
         }
       });
-  }, [dispatch]);
+  },[dispatch]);
+
+  console.log(proctorSubmitedIssue, "proctorSubmitedIssue from dean");
+  
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">

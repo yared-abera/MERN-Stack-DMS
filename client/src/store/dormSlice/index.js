@@ -60,7 +60,11 @@ export const getMaintenanceIssueDormsSubmmitedByProctor = createAsyncThunk(
       const response = await axios.get(
         'http://localhost:9000/api/dorm/getIssueDorms/'
       );
+
+      console.log("Response from getMaintenanceIssueDormsSubmmitedByProctor:", response.data);
+      
       return response.data;
+
     } catch (error) {
       throw error.response?.data || error.message;
     }
