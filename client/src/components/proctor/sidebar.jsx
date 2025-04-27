@@ -128,7 +128,7 @@ export default function ProctorSideBar() {
           <SidebarGroupLabel className="px-4 pt-4 pb-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 tracking-tight justify-center sm:text-xl md:text-2xl">
             Proctor Portal {/* Changed text content for clarity */}
           </SidebarGroupLabel>
-          <SidebarGroupContent className="mt-2"> {/* Reduced margin top slightly */}
+          <SidebarGroupContent className="mt-6"> {/* Reduced margin top slightly */}
             {/* Use motion.ul for list semantics and animations */}
             <motion.ul
               className="space-y-1" // Add vertical spacing between items

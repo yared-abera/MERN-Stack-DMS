@@ -4,7 +4,7 @@ import {
     registerBlock,
     fetchAvailableProctors,
 } from "@/store/blockSlice/index"; // Assuming this path is correct
-import img from "@/assets/unique/building.jpeg"; // Assuming this path is correct
+import img from "../../assets/img/building1.jpg"; // Assuming this path is correct
 // Removed RegisterCard import as it wasn't used
 // Removed RegisterBlock import (config/data) as it wasn't used
 import { toast } from "sonner";
