@@ -22,7 +22,7 @@ const logInUser = async (req, res) => {
  
     // Check if user exists
     if (!foundUser) {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "User doesn't exist, please first register",
       });
@@ -30,7 +30,7 @@ const logInUser = async (req, res) => {
 
     // Check if user is deactivated
     if (foundUser.status === 'inactive') {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Your account has been deactivated. Please contact the administrator for assistance.",
       });
@@ -42,7 +42,7 @@ const logInUser = async (req, res) => {
       foundUser.password
     );
     if (!checkPasswordMatch) {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Incorrect password! Please try again",
       });
@@ -58,11 +58,19 @@ const logInUser = async (req, res) => {
         sex: foundUser.sex,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "30m" }
+      { expiresIn: "24h" }
     );
 
-    // Set cookie and send response
-    res.cookie("token", token, { httpOnly: true, secure: false }).json({
+    // Set cookie with proper settings
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // Set to true in production with HTTPS
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    return res.status(200).json({
       success: true,
       message: "Logged in Successfully",
       user: {
@@ -74,10 +82,10 @@ const logInUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
+    console.error('Login error:', error);
+    return res.status(500).json({
       success: false,
-      message: "Something Went Wrong",
+      message: "Something went wrong during login. Please try again.",
     });
   }
 };
@@ -126,30 +134,69 @@ const UserAccount = async (req, res) => {
   }
 };
 const LogOut = async (req, res) => {
-  res.clearCookie("token").json({
-    success: true,
-    message: "LogOut Successfully",
-  });
+  try {
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: false, // Set to true in production with HTTPS
+      sameSite: 'lax',
+      path: '/',
+      expires: new Date(0)
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged Out Successfully",
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Error during logout",
+    });
+  }
 };
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies.token; // Corrected to req.cookies
- 
+    const token = req.cookies.token;
+    
     if (!token) {
-      return res.json({
+      return res.status(401).json({
         success: false,
-        message: "Unauthorized User", // Corrected spelling
+        message: "No authentication token found",
       });
     }
-    const decode = jwt.verify(token, process.env.JWT_SECRET); // Use environment variable
 
-    req.user = decode;
-    next();
-  } catch (e) {
-    console.error("Token verification failed:"); // Log the error for debugging
-    return res.status(401).json({
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+      next();
+    } catch (tokenError) {
+      // Clear the invalid token
+      res.cookie("token", "", {
+        httpOnly: true,
+        secure: false, // Set to true in production with HTTPS
+        sameSite: 'lax',
+        path: '/',
+        expires: new Date(0)
+      });
+
+      if (tokenError.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: "Session expired. Please login again.",
+        });
+      }
+      
+      return res.status(401).json({
+        success: false,
+        message: "Invalid authentication token.",
+      });
+    }
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+    return res.status(500).json({
       success: false,
-      message: "Unauthorized User", // Corrected spelling
+      message: "Internal server error during authentication.",
     });
   }
 };

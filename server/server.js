@@ -22,20 +22,14 @@ const { scheduleAutomatedBackups } = require('./controller/backup/backupControll
 const http = require('http');
 const socketIo = require('socket.io');
 
-// Define database name in a variable for consistency across the application
-const DB_NAME = 'DMS';
-//${DB_NAME}
+ 
 // Connect to MongoDB with the database name
 mongoose
-<<<<<<< HEAD
-  .connect("mongodb://localhost:27017/DMS", 
-=======
-  .connect(`mongodb://localhost:27017/`, 
->>>>>>> bc67aa871c008cfdc247491a70bd106b82fdc56a
+  .connect('mongodb://localhost:27017/DMS', 
     {serverSelectionTimeoutMS: 30000}
   )
   .then(() => {
-    console.log(`Connected to database: ${DB_NAME}`);
+    console.log(`Connected to database: DMS`);
     // Start automated backup schedule after DB connection
     scheduleAutomatedBackups();
   })
@@ -48,29 +42,23 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-// Serve static files from the uploads directory with CORS
+// CORS configuration - must be before routes
+app.use(cors({
+  origin: 'http://localhost:5173', // Your React app URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'],
+  exposedHeaders: ['set-cookie'],
+}));
+
+// Static files serving with CORS
 app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   res.header('Access-Control-Allow-Credentials', 'true');
   next();
 }, express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 9000;
-
-app.use(cors({
-  origin: ["http://localhost:5174", "http://localhost:5173"],
-  methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
-  allowedHeaders: [
-    "content-type",
-    "Authorization",
-    "Cache-Control",
-    "Expires",
-    "Pragma",
-  ],
-  credentials: true,
-}));
 
 // Routes
 app.use("/api/auth/", auth_route);
@@ -94,10 +82,9 @@ const server = http.createServer(app);
  
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:5174", "http://localhost:5173"],
-    methods: ["GET", "POST"],
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
     credentials: true,
-     
   },
   transports: ['websocket', 'polling']
 });

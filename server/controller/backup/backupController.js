@@ -500,63 +500,67 @@ const listBackups = async () => {
 /**
  * Schedule automated backups (can be called from server startup)
  */
+let isBackupScheduled = false; // Flag to prevent multiple schedules
+
 const scheduleAutomatedBackups = () => {
-  // Set up daily backup at midnight
-  const runDailyBackup = () => {
-    const now = new Date();
-    let scheduledTime = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + 1, // Tomorrow
-      0, // Midnight (Hour: 0)
-      0, // Minute: 0
-      0  // Second: 0
-    );
-    
-    // Calculate time until next backup (in milliseconds)
-    let timeUntilBackup = scheduledTime - now;
-    
-    console.log(`Scheduling next backup at midnight: ${scheduledTime.toLocaleString()}`);
-    console.log(`Next backup will run in ${Math.floor(timeUntilBackup / 3600000)} hours and ${Math.floor((timeUntilBackup % 3600000) / 60000)} minutes`);
-    
-    // Set timeout for the next backup
-    setTimeout(() => {
-      console.log(`Running automated backup at ${new Date().toISOString()}`);
-      createAutomatedBackup()
-        .then((result) => {
+  // Prevent multiple scheduling
+  if (isBackupScheduled) {
+    console.log('Automated backup already scheduled, skipping...');
+    return;
+  }
+
+  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+  const runDailyBackup = async () => {
+    try {
+      // Get the last backup time from existing backups
+      const backups = await listBackups();
+      const now = new Date();
+      let nextBackupTime;
+
+      if (backups.length > 0) {
+        // Get the most recent backup time and add 24 hours
+        const lastBackupTime = new Date(backups[0].createdAt);
+        nextBackupTime = new Date(lastBackupTime.getTime() + TWENTY_FOUR_HOURS);
+        
+        // If the calculated next backup time is in the past, schedule for 24 hours from now
+        if (nextBackupTime < now) {
+          nextBackupTime = new Date(now.getTime() + TWENTY_FOUR_HOURS);
+        }
+      } else {
+        // If no previous backups, schedule for 24 hours from now
+        nextBackupTime = new Date(now.getTime() + TWENTY_FOUR_HOURS);
+      }
+
+      // Calculate time until next backup
+      const timeUntilBackup = nextBackupTime - now;
+      
+      console.log(`Next backup scheduled for: ${nextBackupTime.toLocaleString()}`);
+      console.log(`Next backup will run in ${Math.floor(timeUntilBackup / 3600000)} hours and ${Math.floor((timeUntilBackup % 3600000) / 60000)} minutes`);
+      
+      // Schedule the next backup
+      setTimeout(async () => {
+        console.log(`Running automated backup at ${new Date().toISOString()}`);
+        try {
+          const result = await createAutomatedBackup();
           console.log('Automated backup completed successfully');
           console.log('Backup details:', result);
-          // Schedule the next backup
-          runDailyBackup();
-        })
-        .catch(err => {
+        } catch (err) {
           console.error('Automated backup failed:', err);
-          // Still schedule the next backup even if this one failed
-          runDailyBackup();
-        });
-    }, timeUntilBackup);
+        }
+        // Schedule next backup regardless of success/failure
+        runDailyBackup();
+      }, timeUntilBackup);
+    } catch (error) {
+      console.error('Error in backup scheduling:', error);
+      // If there's an error, retry scheduling in 1 hour
+      setTimeout(runDailyBackup, 60 * 60 * 1000);
+    }
   };
 
-  // Run immediately if it's after working hours, otherwise wait until midnight
-  const now = new Date();
-  const hour = now.getHours();
-  
-  if (hour >= 20 || hour < 5) {
-    // After 8pm or before 5am, run immediately
-    console.log('Running initial backup as it is outside working hours');
-    createAutomatedBackup()
-      .then(() => {
-        runDailyBackup();
-      })
-      .catch(err => {
-        console.error('Initial backup failed:', err);
-        runDailyBackup();
-      });
-  } else {
-    // Schedule for midnight
-    console.log('Skip immediate backup during working hours, will run at midnight');
-    runDailyBackup();
-  }
+  // Start the backup schedule
+  runDailyBackup();
+  isBackupScheduled = true;
 };
 
 /**

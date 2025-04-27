@@ -176,51 +176,54 @@ export default function ProctorSideBar() {
                 {ProSideBar.map((item) => {
                   const isActive = location.pathname === item.url;
                   return (
-                    // Wrap SidebarMenuItem with motion.li for animation
-                    <motion.li key={item.title} variants={menuItemVariants}>
-                      <SidebarMenuItem className="p-0"> {/* Remove padding from item wrapper */}
+                    <SidebarMenuItem key={item.title}>
+                      <motion.div
+                        variants={menuItemVariants}
+                        className="group/menu-item relative"
+                      >
                         <SidebarMenuButton asChild>
-                          <Link
-                            to={item.url}
-                            className={`
-                              flex items-center gap-3 px-4 py-2.5 rounded-lg w-full
-                              text-sm font-medium transition-all duration-200 ease-in-out
-                              group relative {/* Added group for potential icon animations */}
-                              ${
-                                isActive
-                                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md scale-[1.02]" // Enhanced active state
-                                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white hover:scale-[1.03] hover:translate-x-1" // Enhanced hover state
-                              }
-                            `}
-                            onClick={() => {
-                              if (item.id === "registerStudent") {
-                                dispatch(setUpdateAllocation(updateAllocation)); // Keep original logic
-                              }
-                            }}
-                            // Framer Motion hover effect (only if not active)
+                          <motion.div
                             whileHover={!isActive ? { scale: 1.03, x: 4 } : {}}
                             transition={{ type: "spring", stiffness: 400, damping: 15 }}
                           >
-                            {/* Active indicator (optional, a subtle line on the left) */}
-                            {isActive && (
-                              <motion.div
-                                className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-300 dark:bg-yellow-400 rounded-r-full"
-                                layoutId="activeIndicator" // Animate layout changes smoothly
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                              />
-                            )}
+                            <Link
+                              to={item.url}
+                              className={`
+                                flex items-center gap-3 px-4 py-2.5 rounded-lg w-full
+                                text-sm font-medium transition-all duration-200 ease-in-out
+                                group relative
+                                ${
+                                  isActive
+                                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md scale-[1.02]"
+                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white"
+                                }
+                              `}
+                              onClick={() => {
+                                if (item.id === "registerStudent") {
+                                  dispatch(setUpdateAllocation(updateAllocation));
+                                }
+                              }}
+                            >
+                              {isActive && (
+                                <motion.div
+                                  className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-300 dark:bg-yellow-400 rounded-r-full"
+                                  layoutId="activeIndicator"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.2 }}
+                                />
+                              )}
 
-                            <item.icon className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110" />
-                            <span className="truncate"> {/* Use truncate if text might overflow */}
-                              {item.title}
-                            </span>
-                          </Link>
+                              <item.icon className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                              <span className="truncate">
+                                {item.title}
+                              </span>
+                            </Link>
+                          </motion.div>
                         </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </motion.li>
+                      </motion.div>
+                    </SidebarMenuItem>
                   );
                 })}
               </SidebarMenu>

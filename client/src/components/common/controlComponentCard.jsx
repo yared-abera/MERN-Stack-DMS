@@ -109,24 +109,24 @@ const dispatch =useDispatch()
                     <p className="text-gray-600 mb-2 flex gap-1">
                       <span>Full Name:</span>
                       <span>
-                        {issue.student.Fname} {issue.student.Mname}{" "}
-                        {issue.student.Lname}
-                      </span>{" "}
+                        {issue.student?.Fname || ''} {issue.student?.Mname || ''}{" "}
+                        {issue.student?.Lname || ''}
+                      </span>
                     </p>
                     <p className="text-gray-600 mb-2 flex gap-1">
-                      <span>Id:</span> <span>{issue.student.userName} </span>
+                      <span>Id:</span> <span>{issue.student?.userName || 'N/A'}</span>
                     </p>
                     <p className="text-gray-600 mb-2">
-                      Phone Number: {issue.student.phonNum}
+                      Phone Number: {issue.student?.phonNum || 'N/A'}
                     </p>
                     <p className="text-gray-600 mb-2">
-                      gender: {issue.student.sex}
+                      gender: {issue.student?.sex || 'N/A'}
                     </p>
                     <p className="text-gray-600 mb-2">
-                      Block: {issue.student.blockNum}
+                      Block: {issue.student?.blockNum || 'N/A'}
                     </p>
                     <p className="text-gray-600 mb-2">
-                      Dorm: {issue.student.dormId}
+                      Dorm: {issue.student?.dormId || 'N/A'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-3 w-full mt-4"> {/* Added margin-top for separation */}

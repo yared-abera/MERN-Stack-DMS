@@ -1,6 +1,10 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
 
@@ -22,4 +26,20 @@ if (!fs.existsSync(chatUploadsPath)) {
 app.use('/uploads', express.static(uploadsPath));
 console.log('Serving uploads from:', uploadsPath);
 
-// ... rest of your app configuration ... 
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:5173', // Your React app's URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
+
+// Routes
+app.use('/api/auth', require('./router/auth-router/auth-router'));
+// ... other routes ...
+
+module.exports = app; 
