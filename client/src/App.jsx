@@ -60,6 +60,7 @@ import ProctorManagerChat from "./pages/proctorManager/ProctorManagerChat";
 import ProctorChat from "./pages/proctor/proctorChat/ProctorChat";
 import StudentDeanChat from "./pages/studentDean/StudentDeanChat";
 import { SocketProvider } from "./context/SocketContext";
+import BackupManagement from "./components/BackupManagement";
 
 function App() {
   const theme = useSelector((state) => state.theme.mode);
@@ -143,6 +144,7 @@ function App() {
             <Route path="manage" element={<ManageAccount />} />
             <Route path="account" element={<AdminAccount />} />
             <Route path="chat" element={<AdminChat/>} />
+            <Route path="backup" element={<BackupManagement />} />
           </Route>
 
           <Route

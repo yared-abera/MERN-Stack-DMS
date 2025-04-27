@@ -1,4 +1,4 @@
-import { ChevronUp, Home, Inbox, LogOut, Settings, User2 } from "lucide-react"
+import { ChevronUp, Home, Inbox, LogOut, Settings, User2, Database } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +33,11 @@ const items = [
     title: "My Account",
     url: "/admin/account",
     icon: Settings,
+  },
+  {
+    title: "Database Backup",
+    url: "/admin/backup",
+    icon: Database,
   },
 ]
 

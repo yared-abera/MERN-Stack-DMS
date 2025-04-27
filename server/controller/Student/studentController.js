@@ -278,11 +278,72 @@ const updateStudent = async (req, res) => {
 
 
  
+// const updateByStudent = async (req, res) => {
+//   const { id } = req.params;
+  
+//   const formData = req.body;
+  
+//   try {
+//     console.log(id, "id from student update by proctor");
+//     console.log(formData, "formData from  student update by proctor");
+   
+//    // Validate ID format
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid student ID format",
+//       });
+//     }
+
+  
+//     // Find and update the student with proper update syntax
+//     const updatedStudent = await Student.findByIdAndUpdate(
+//       {_id:id},
+//       { ...formData }, // Spread the form data into the update object
+//       { new: true, runValidators: true } // Options: return updated doc and run validators
+//     );
+
+//     // Handle case where student not found
+//     if (!updatedStudent) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Student not found",
+//       });
+//     }
+
+//     // Send successful response
+//     res.status(200).json({
+//       success: true,
+//       message: 'Student updated successfully',
+//       data: updatedStudent
+//     });
+
+//   } catch (error) {
+//     // Handle different error types
+//     if (error.name === 'ValidationError') {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Validation Error",
+//         error: error.message
+//       });
+//     }
+
+//     // Handle server errors
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error",
+//       error: error.message
+//     });
+//   }
+// };
 const updateByStudent = async (req, res) => {
   const { id } = req.params;
   const formData = req.body;
 
   try {
+    console.log(id, "id from student update by proctor");
+    console.log(formData, "formData from student update by proctor");
+
     // Validate ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
@@ -291,14 +352,13 @@ const updateByStudent = async (req, res) => {
       });
     }
 
-    // Find and update the student with proper update syntax
+    // Find and update the student correctly
     const updatedStudent = await Student.findByIdAndUpdate(
-      id,
-      { ...formData }, // Spread the form data into the update object
-      { new: true, runValidators: true } // Options: return updated doc and run validators
+      id,            // ✅ Fixed here
+      { $set: { ...formData } }, // Spread the form data into the update object
+      { new: true, runValidators: true }
     );
 
-    // Handle case where student not found
     if (!updatedStudent) {
       return res.status(404).json({
         success: false,
@@ -306,7 +366,6 @@ const updateByStudent = async (req, res) => {
       });
     }
 
-    // Send successful response
     res.status(200).json({
       success: true,
       message: 'Student updated successfully',
@@ -314,7 +373,6 @@ const updateByStudent = async (req, res) => {
     });
 
   } catch (error) {
-    // Handle different error types
     if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
@@ -323,7 +381,6 @@ const updateByStudent = async (req, res) => {
       });
     }
 
-    // Handle server errors
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -331,6 +388,7 @@ const updateByStudent = async (req, res) => {
     });
   }
 };
+
  
  
 const DeleteStudent = async (req, res) => {

@@ -17,16 +17,23 @@ const attendance_Route = require('./router/attendance-router/attendance-route');
 const controle_Route = require('./router/controleRoute/control-Route');
 const chatRoutes = require('./routes/chatRouter/chatRoutes')
 const chat_Routes = require('./routes/chatRouter/chatRoutes')
+const backup_Route = require('./router/backup/backupRouter');
+const { scheduleAutomatedBackups } = require('./controller/backup/backupController');
 const http = require('http');
 const socketIo = require('socket.io');
 
-//"mongodb://localhost:27017/DMS"
+// Define database name in a variable for consistency across the application
+const DB_NAME = 'DMS';
+//${DB_NAME}
+// Connect to MongoDB with the database name
 mongoose
-  .connect("mongodb://localhost:27017/", 
+  .connect(`mongodb://localhost:27017/`, 
     {serverSelectionTimeoutMS: 30000}
   )
   .then(() => {
-    console.log("connected to database");
+    console.log(`Connected to database: ${DB_NAME}`);
+    // Start automated backup schedule after DB connection
+    scheduleAutomatedBackups();
   })
   .catch((err) => {
     console.log(err);
@@ -75,6 +82,7 @@ app.use('/api/attendance', attendance_Route);
 app.use('/api/control', controle_Route);
 app.use('/api/Groupchat', chatRoutes);
 app.use('/api/chat', chat_Routes);
+app.use('/api/backup', backup_Route);
 
 // Create HTTP server
 const server = http.createServer(app);
