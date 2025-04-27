@@ -53,7 +53,8 @@ const RegisterBlockComp = () => {
     const { availableProctors, loading, error } = useSelector((state) => state.block); // Added loading/error states if needed
     const { user } = useSelector((state) => state.auth);
     const userGender = user?.sex; // Use optional chaining
-
+     console.log(user, "user from RegisterBlockComp"); // Debugging line
+     
     const [categorizedProctor, setCategorizedProctor] = useState([]);
     const [isProctorDialogOpen, setIsProctorDialogOpen] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
@@ -63,12 +64,12 @@ const RegisterBlockComp = () => {
         dispatch(fetchAvailableProctors());
     }, [dispatch]);
 console.log(availableProctors, "availableProctors"); // Debugging line
-
+console.log(userGender, "userGender"); // Debugging line
     // Filter proctors based on user gender when availableProctors change
     useEffect(() => {
         if (availableProctors && availableProctors.length > 0 && userGender) {
             const proctors = availableProctors
-                .filter((pro) => pro.gender === userGender)
+                .filter((pro) => pro.sex.toUpperCase() === userGender.toUpperCase())
                 .map((proctor) => ({
                     id: proctor._id, // Make sure this is the correct ID field from your API
                     email: proctor.email,
@@ -207,8 +208,8 @@ console.log(availableProctors, "availableProctors"); // Debugging line
                     success: () => {
                         setFormData(initialFormData); // Reset form on success
                          // Refetch proctors if registration affects availability (optional)
-                         // dispatch(fetchAvailableProctors());
-                        return "Block registered successfully!";
+                         dispatch(fetchAvailableProctors());
+                         
                     },
                     error: (err) => err.message || "Failed to register block",
                 });

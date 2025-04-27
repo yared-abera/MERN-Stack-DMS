@@ -18,34 +18,70 @@ const getProctorBlocks = async (req, res, next) => {
   }
 };
 
+ 
 const getAvailableProctors = async (req, res) => {
   try {
-    // Find proctors not assigned to any block
-    const assignedProctors = await Block.distinct("assignedProctors");
+    // Find all unique proctor IDs that are assigned to ANY block
+    const assignedProctorIds = await Block.distinct("assignedProctors");
 
-    if (!assignedProctors) {
-      return res.status(404).json({
-        success: false,
-        message: "No assigned proctors found",
-      });
-    }
+    // Log the list of IDs that are considered 'assigned'
+    console.log("Proctor IDs currently assigned to any block:", assignedProctorIds.map(id => id.toString()));
+
+    // Find users with the role "proctor" whose IDs are NOT in the list of assigned IDs
     const availableProctors = await User.find({
-      _id: { $nin: assignedProctors },
+      _id: { $nin: assignedProctorIds },
       role: "proctor",
-    }).select("fName lName email gender");
+    }).select("fName lName email sex");
 
+    // Log the found available proctors
+    console.log(`Found ${availableProctors.length} available proctors. Details:`, availableProctors.map(p => `${p.fName} ${p.lName} (${p._id})`));
+
+    // Return the list of available proctors.
+    // A 200 status with an empty 'data' array is appropriate if no proctors are available.
     res.status(200).json({
       success: true,
       data: availableProctors,
     });
   } catch (error) {
+    console.error("Error fetching available proctors:", error); // Log the error
     res.status(500).json({
       success: false,
       message: "Error fetching proctors",
-      error: error.message,
+      error: error.message, // Include error message for debugging
     });
   }
 };
+
+// Don't forget to export the function if needed elsewhere
+// module.exports = { getAvailableProctors };
+// const getAvailableProctors = async (req, res) => {
+//   try {
+//     // Find proctors not assigned to any block
+//     const assignedProctors = await Block.distinct("assignedProctors");
+
+//     if (!assignedProctors) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "No assigned proctors found",
+//       });
+//     }
+//     const availableProctors = await User.find({
+//       _id: { $nin: assignedProctors },
+//       role: "proctor",
+//     }).select("fName lName email gender");
+
+//     res.status(200).json({
+//       success: true,
+//       data: availableProctors,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Error fetching proctors",
+//       error: error.message,
+//     });
+//   }
+// };
 const registerBlock = async (req, res) => {
   try {
     const {

@@ -11,6 +11,7 @@ const registerDorm = async (req, res) => {
       floorNumber,
       dormNumber,
       capacity,
+      status
     });
 
     // Validate ObjectId
@@ -52,7 +53,7 @@ const registerDorm = async (req, res) => {
             dormNumber: dormNumber,
             capacity: Number(capacity),
             studentsAllocated: 0,
-            dormStatus: status || "Available",
+            dormStatus: status,
             description: description || "No description provided",
             registerBy: registerBy,
             totalAvailable: Number(capacity),
@@ -193,266 +194,237 @@ const updateDormStatus = async (req, res) => {
     res.status(500).json({ error: "Server error: " + err.message });
   }
 };
-// const getIssueGroupDorm = async (req, res) => {
-//   try {
-//     const blocksWithIssueDorms = await Block.aggregate([
-//       {
-//         $match: {
-//           "floors.dorms.dormStatus": "MaintenanceIssue"
-//         }
-//       },
-//       {
-//         $addFields: {
-//           floors: {
-//             $map: {
-//               input: "$floors",
-//               as: "floor",
-//               in: {
-//                 $mergeObjects: [
-//                   "$$floor",
-//                   {
-//                     dorms: {
-//                       $filter: {
-//                         input: "$$floor.dorms",
-//                         as: "dorm",
-//                         cond: { $eq: ["$$dorm.dormStatus", "MaintenanceIssue"] }
-//                       }
-//                     }
-//                   }
-//                 ]
-//               }
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $addFields: {
-//           floors: {
-//             $filter: {
-//               input: "$floors",
-//               as: "floor",
-//               cond: { $gt: [{ $size: "$$floor.dorms" }, 0] }
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: "users",
-//           localField: "registerBy",
-//           foreignField: "_id",
-//           as: "registerBy"
-//         }
-//       },
-//       { $unwind: { path: "$registerBy", preserveNullAndEmptyArrays: true } },
-//       {
-//         $lookup: {
-//           from: "users",
-//           localField: "assignedProctors",
-//           foreignField: "_id",
-//           as: "assignedProctors"
-//         }
-//       },
-//       {
-//         $lookup: {
-//           from: "users",
-//           let: { dormsRegisterBy: "$floors.dorms.registerBy" },
-//           pipeline: [
-//             { $match: { $expr: { $in: ["$_id", "$$dormsRegisterBy"] } }
-//           ],
-//           as: "dormRegisterByUsers"
-//         }
-//       },
-//       {
-//         $addFields: {
-//           "floors": {
-//             $map: {
-//               input: "$floors",
-//               as: "floor",
-//               in: {
-//                 $mergeObjects: [
-//                   "$$floor",
-//                   {
-//                     dorms: {
-//                       $map: {
-//                         input: "$$floor.dorms",
-//                         as: "dorm",
-//                         in: {
-//                           $mergeObjects: [
-//                             "$$dorm",
-//                             {
-//                               registerBy: {
-//                                 $arrayElemAt: [
-//                                   {
-//                                     $filter: {
-//                                       input: "$dormRegisterByUsers",
-//                                       as: "user",
-//                                       cond: { $eq: ["$$user._id", "$$dorm.registerBy"] }
-//                                     }
-//                                   },
-//                                   0
-//                                 ]
-//                               }
-//                             }
-//                           ]
-//                         }
-//                       }
-//                     }
-//                   }
-//                 ]
-//               }
-//             }
-//           }
-//         }
-//       },
-//       {
-//         $project: {
-//           "dormRegisterByUsers": 0,
-//           "floors.dorms.__v": 0,
-//           "floors.__v": 0
-//         }
-//       }
-//     ]);
-
-//     if (!blocksWithIssueDorms.length) {
-//       return res.status(200).json({
-//         success: true,
-//         data: [],
-//         message: "No dorms with 'MaintenanceIssue' status found."
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       data: blocksWithIssueDorms
-//     });
-
-//   } catch (err) {
-//     console.error("Server error in getIssueGroupDorm:", err);
-//     res.status(500).json({ 
-//       success: false,
-//       error: "Server error: " + err.message 
-//     });
-//   }
-// };
+ 
 const getIssueGroupDorm = async (req, res) => {
   try {
     const blocksWithIssueDorms = await Block.aggregate([
       {
-        // Stage 1: Find blocks that contain at least one dorm with "MaintenanceIssue" status
         $match: {
-          "floors.dorms.dormStatus": "MaintenanceIssue",
-        },
+          "floors.dorms.dormStatus": "MaintenanceIssue"
+        }
       },
       {
-        // Stage 2: Reshape the document to filter the nested dorms array
         $addFields: {
           floors: {
-            $map: { // Iterate over each floor in the 'floors' array
+            $map: {
               input: "$floors",
               as: "floor",
-              in: { // Create a new floor object
-                // Keep the original floor fields
-                _id: "$$floor._id", // Important to keep the ID for potential sub-populations later
-                floorNumber: "$$floor.floorNumber",
-                floorCapacity: "$$floor.floorCapacity",
-                floorStatus: "$$floor.floorStatus",
-                totalAvailable: "$$floor.totalAvailable",
-                // Replace the 'dorms' array with a filtered version
-                dorms: {
-                  $filter: { // Filter the dorms array within the current floor
-                    input: "$$floor.dorms",
-                    as: "dorm",
-                    // Condition to keep the dorm: status is "MaintenanceIssue"
-                    cond: {
-                      $eq: ["$$dorm.dormStatus", "MaintenanceIssue"],
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      // Optional Stage (if you want to remove floors that ended up with an empty dorms array after filtering):
-      // {
-      //    $match: {
-      //        "floors.dorms": { $ne: [] } // This will only keep floors that still have dorms after the filter
-      //        // Note: This might require more complex reshaping if you need to remove the entire floor document
-      //        // If keeping the floor with an empty 'dorms' array is okay, skip this stage.
-      //    }
-      // },
-      {
-          // Optional Stage: Project to include only necessary block fields
-          // Add or remove fields as needed from the top-level block document
-          $project: {
-              _id: 1, // Keep the Block ID
-              blockNum: 1,
-              location: 1,
-              floors: 1, // Keep the processed floors array
-              isSelectedForSpecial: 1,
-              status: 1, // Note: Block status might be inaccurate after filtering nested dorms
-              totalAvailable: 1, // Note: These aggregate fields might be inaccurate
-              totalCapacity: 1,    // after filtering nested dorms. Recalculate if needed.
-              totalFloors: 1,
-              assignedProctors: 1, // Keep proctor IDs
-              registerBy: 1, // Keep registerBy ID
-              registerDate: 1,
+              in: {
+                $mergeObjects: [
+                  "$$floor",
+                  {
+                    dorms: {
+                      $filter: {
+                        input: "$$floor.dorms",
+                        as: "dorm",
+                        cond: {
+                          $eq: ["$$dorm.dormStatus", "MaintenanceIssue"]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
           }
+        }
       },
-       {
-           // Execute lean() here to return plain JavaScript objects from aggregation
-           // This is efficient before populating
-           $addFields: { __isLean: true } // Mongoose hint for populate
-       }
-    ])
-    .exec(); // Execute the aggregation pipeline
+      {
+        $addFields: {
+          floors: {
+            $filter: {
+              input: "$floors",
+              as: "floor",
+              cond: { $gt: [{ $size: "$$floor.dorms" }, 0] }
+            }
+          }
+        }
+      },
+      {
+        $match: {
+          "floors.dorms": { $exists: true, $not: { $size: 0 } }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "floors.dorms.registerBy",
+          foreignField: "_id",
+          as: "dormRegisters"
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "assignedProctors",
+          foreignField: "_id",
+          as: "proctors"
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "registerBy",
+          foreignField: "_id",
+          as: "blockRegister"
+        }
+      },
+      {
+        $project: {
+          blockNum: 1,
+          location: 1,
+          floors: 1,
+          status: 1,
+          "dormRegisters.fName": 1,
+          "dormRegisters.LName": 1,
+          "proctors.fName": 1,
+          "proctors.LName": 1,
+          "blockRegister.fName": 1,
+          "blockRegister.LName": 1
+        }
+      }
+    ]);
 
-    // Mongoose populate works on the results of aggregate.
-    // Use Model.populate(results, options) for this.
-    // Populate the 'registerBy' field on the filtered dorms
-    const populatedBlocks = await Block.populate(blocksWithIssueDorms, {
-      path: "floors.dorms.registerBy",
-      model: "User", // Specify the model
-      select: "fName mName LName userName gender email role", // Select specific user fields
-    });
-
-     // Populate the 'assignedProctors' field on the Block (if needed)
-    await Block.populate(populatedBlocks, {
-       path: 'assignedProctors',
-       model: 'User',
-       select: "fName mName LName userName gender email role", // Select specific user fields
-    });
-
-     // Populate the 'registerBy' field on the Block (if needed)
-     await Block.populate(populatedBlocks, {
-       path: 'registerBy',
-       model: 'User',
-       select: "fName mName LName userName gender email role", // Select specific user fields
-    });
-
-
-    if (!populatedBlocks || populatedBlocks.length === 0) {
-      console.log("No blocks found with dorms having MaintenanceIssue");
+    if (!blocksWithIssueDorms.length) {
       return res.status(200).json({
         success: true,
         data: [],
-        message: "No dorms with 'MaintenanceIssue' status found.",
+        message: "No dorms with maintenance issues found"
       });
     }
 
-    console.log(
-      `Found ${populatedBlocks.length} blocks containing dorms with MaintenanceIssue`
-    );
     res.status(200).json({
       success: true,
-      data: populatedBlocks,
+      data: blocksWithIssueDorms
     });
+
   } catch (err) {
-    console.error("Server error in getIssueGroupDorm:", err);
-    res.status(500).json({ error: "Server error: " + err.message });
+    console.error("Error in getIssueGroupDorm:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: err.message
+    });
   }
 };
+// const getIssueGroupDorm = async (req, res) => {
+//   try {
+//     const blocksWithIssueDorms = await Block.aggregate([
+//       {
+//         // Stage 1: Find blocks that contain at least one dorm with "MaintenanceIssue" status
+//         $match: {
+//           "floors.dorms.dormStatus": "MaintenanceIssue",
+//         },
+//       },
+//       {
+//         // Stage 2: Reshape the document to filter the nested dorms array
+//         $addFields: {
+//           floors: {
+//             $map: { // Iterate over each floor in the 'floors' array
+//               input: "$floors",
+//               as: "floor",
+//               in: { // Create a new floor object
+//                 // Keep the original floor fields
+//                 _id: "$$floor._id", // Important to keep the ID for potential sub-populations later
+//                 floorNumber: "$$floor.floorNumber",
+//                 floorCapacity: "$$floor.floorCapacity",
+//                 floorStatus: "$$floor.floorStatus",
+//                 totalAvailable: "$$floor.totalAvailable",
+//                 // Replace the 'dorms' array with a filtered version
+//                 dorms: {
+//                   $filter: { // Filter the dorms array within the current floor
+//                     input: "$$floor.dorms",
+//                     as: "dorm",
+//                     // Condition to keep the dorm: status is "MaintenanceIssue"
+//                     cond: {
+//                       $eq: ["$$dorm.dormStatus", "MaintenanceIssue"],
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//       // Optional Stage (if you want to remove floors that ended up with an empty dorms array after filtering):
+//       // {
+//       //    $match: {
+//       //        "floors.dorms": { $ne: [] } // This will only keep floors that still have dorms after the filter
+//       //        // Note: This might require more complex reshaping if you need to remove the entire floor document
+//       //        // If keeping the floor with an empty 'dorms' array is okay, skip this stage.
+//       //    }
+//       // },
+//       {
+//           // Optional Stage: Project to include only necessary block fields
+//           // Add or remove fields as needed from the top-level block document
+//           $project: {
+//               _id: 1, // Keep the Block ID
+//               blockNum: 1,
+//               location: 1,
+//               floors: 1, // Keep the processed floors array
+//               isSelectedForSpecial: 1,
+//               status: 1, // Note: Block status might be inaccurate after filtering nested dorms
+//               totalAvailable: 1, // Note: These aggregate fields might be inaccurate
+//               totalCapacity: 1,    // after filtering nested dorms. Recalculate if needed.
+//               totalFloors: 1,
+//               assignedProctors: 1, // Keep proctor IDs
+//               registerBy: 1, // Keep registerBy ID
+//               registerDate: 1,
+//           }
+//       },
+//        {
+//            // Execute lean() here to return plain JavaScript objects from aggregation
+//            // This is efficient before populating
+//            $addFields: { __isLean: true } // Mongoose hint for populate
+//        }
+//     ])
+//     .exec(); // Execute the aggregation pipeline
+
+//     // Mongoose populate works on the results of aggregate.
+//     // Use Model.populate(results, options) for this.
+//     // Populate the 'registerBy' field on the filtered dorms
+//     const populatedBlocks = await Block.populate(blocksWithIssueDorms, {
+//       path: "floors.dorms.registerBy",
+//       model: "User", // Specify the model
+//       select: "fName mName LName userName gender email role", // Select specific user fields
+//     });
+
+//      // Populate the 'assignedProctors' field on the Block (if needed)
+//     await Block.populate(populatedBlocks, {
+//        path: 'assignedProctors',
+//        model: 'User',
+//        select: "fName mName LName userName gender email role", // Select specific user fields
+//     });
+
+//      // Populate the 'registerBy' field on the Block (if needed)
+//      await Block.populate(populatedBlocks, {
+//        path: 'registerBy',
+//        model: 'User',
+//        select: "fName mName LName userName gender email role", // Select specific user fields
+//     });
+
+
+//     if (!populatedBlocks || populatedBlocks.length === 0) {
+//       console.log("No blocks found with dorms having MaintenanceIssue");
+//       return res.status(200).json({
+//         success: true,
+//         data: [],
+//         message: "No dorms with 'MaintenanceIssue' status found.",
+//       });
+//     }
+
+//     console.log(
+//       `Found ${populatedBlocks.length} blocks containing dorms with MaintenanceIssue`
+//     );
+//     res.status(200).json({
+//       success: true,
+//       data: populatedBlocks,
+//     });
+//   } catch (err) {
+//     console.error("Server error in getIssueGroupDorm:", err);
+//     res.status(500).json({ error: "Server error: " + err.message });
+//   }
+// };
 
 // Check if a dorm exists
 const checkDormExists = async (req, res) => {
