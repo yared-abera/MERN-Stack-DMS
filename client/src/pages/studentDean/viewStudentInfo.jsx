@@ -180,118 +180,123 @@ const StudentInfo = () => {
   };
 
   const downloadStudentInfo = (students) => {
-    // If single student is passed, convert to array
-    const studentsArray = Array.isArray(students) ? students : [students];
-    
-    const doc = new jsPDF();
-    let yOffset = 15;
-    
-    // Add title with university logo or name
-    doc.setFontSize(16);
-    doc.text("Student Information Details", 14, yOffset);
-    
-    // Add timestamp
-    doc.setFontSize(10);
-    yOffset += 10;
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, yOffset);
-    yOffset += 10;
-
-    studentsArray.forEach((student, index) => {
-      if (index > 0) {
-        // Add a page break for each new student except the first one
-        doc.addPage();
-        yOffset = 15;
-        
-        // Add header for new page
-        doc.setFontSize(16);
-        doc.text("Student Information Details", 14, yOffset);
-        yOffset += 10;
-        
-        doc.setFontSize(10);
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, yOffset);
-        yOffset += 10;
-      }
-
-      // Student header
-      doc.setFontSize(14);
-      doc.text(`Student #${index + 1}: ${student.userName}`, 14, yOffset);
+    try {
+      // If single student is passed, convert to array
+      const studentsArray = Array.isArray(students) ? students : [students];
+      
+      const doc = new jsPDF();
+      let yOffset = 15;
+      
+      // Add title with university logo or name
+      doc.setFontSize(16);
+      doc.text("Student Information Details", 14, yOffset);
+      
+      // Add timestamp
+      doc.setFontSize(10);
+      yOffset += 10;
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, yOffset);
       yOffset += 10;
 
-      // Personal Information section
-      const personalInfo = [
-        ["Student ID", student.userName || "N/A"],
-        ["First Name", student.Fname || "N/A"],
-        ["Middle Name", student.Mname || "N/A"],
-        ["Last Name", student.Lname || "N/A"],
-        ["Email", student.email || "N/A"],
-        ["Phone", student.phoneNum || "N/A"],
-        ["Gender", student.sex || "N/A"],
-        ["Batch", student.batch || "N/A"],
-        ["College", student.collage || "N/A"],
-        ["Department", student.department || "N/A"],
-        ["Stream", student.stream || "N/A"],
-        ["Student Type", student.studCategory || "N/A"],
-      ];
+      studentsArray.forEach((student, index) => {
+        if (index > 0) {
+          // Add a page break for each new student except the first one
+          doc.addPage();
+          yOffset = 15;
+          
+          // Add header for new page
+          doc.setFontSize(16);
+          doc.text("Student Information Details", 14, yOffset);
+          yOffset += 10;
+          
+          doc.setFontSize(10);
+          doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, yOffset);
+          yOffset += 10;
+        }
 
-      // Academic Information section
-      const accommodationInfo = [
-        ["Block Number", student.blockNum || "N/A"],
-        ["Dorm Number", student.dormId || "N/A"],
-        ["Address", student.address || "N/A"],
-        ["Disability Status", student.disabilityStatus || "N/A"],
-        ["Special Needs", student.isSpecial || "N/A"],
-      ];
+        // Student header
+        doc.setFontSize(14);
+        doc.text(`Student #${index + 1}: ${student.userName}`, 14, yOffset);
+        yOffset += 10;
 
-      // System Information section
-      const systemInfo = [
-        ["Role", student.role || "N/A"],
-        ["Created At", new Date(student.createdAt).toLocaleString()],
-        ["Updated At", new Date(student.updatedAt).toLocaleString()],
-      ];
+        // Define the columns for each table
+        const personalInfoColumns = [
+          { header: 'Field', dataKey: 'field' },
+          { header: 'Value', dataKey: 'value' }
+        ];
 
-      // Generate tables
-      doc.setFontSize(12);
-      doc.text("Personal Information", 14, yOffset);
-      
-      autoTable(doc, {
-        startY: yOffset + 5,
-        head: [["Field", "Value"]],
-        body: personalInfo,
-        theme: 'striped',
-        headStyles: { fillColor: [66, 139, 202] },
-        styles: { fontSize: 10 },
+        // Prepare the data for each table
+        const personalInfoData = [
+          { field: 'Student ID', value: student.userName || 'N/A' },
+          { field: 'First Name', value: student.Fname || 'N/A' },
+          { field: 'Middle Name', value: student.Mname || 'N/A' },
+          { field: 'Last Name', value: student.Lname || 'N/A' },
+          { field: 'Email', value: student.email || 'N/A' },
+          { field: 'Phone', value: student.phoneNum || 'N/A' },
+          { field: 'Gender', value: student.sex || 'N/A' },
+          { field: 'Batch', value: student.batch || 'N/A' },
+          { field: 'College', value: student.collage || 'N/A' },
+          { field: 'Department', value: student.department || 'N/A' },
+          { field: 'Stream', value: student.stream || 'N/A' },
+          { field: 'Student Type', value: student.studCategory || 'N/A' }
+        ];
+
+        const accommodationInfoData = [
+          { field: 'Block Number', value: student.blockNum || 'N/A' },
+          { field: 'Dorm Number', value: student.dormId || 'N/A' },
+          { field: 'Address', value: student.address || 'N/A' },
+          { field: 'Disability Status', value: student.disabilityStatus || 'N/A' },
+          { field: 'Special Needs', value: student.isSpecial || 'N/A' }
+        ];
+
+        const systemInfoData = [
+          { field: 'Role', value: student.role || 'N/A' },
+          { field: 'Created At', value: new Date(student.createdAt).toLocaleString() },
+          { field: 'Updated At', value: new Date(student.updatedAt).toLocaleString() }
+        ];
+
+        // Generate tables
+        doc.setFontSize(12);
+        doc.text("Personal Information", 14, yOffset);
+        
+        autoTable(doc, {
+          startY: yOffset + 5,
+          head: [personalInfoColumns.map(col => col.header)],
+          body: personalInfoData.map(row => [row.field, row.value]),
+          theme: 'striped',
+          headStyles: { fillColor: [66, 139, 202] },
+          styles: { fontSize: 10 },
+        });
+
+        yOffset = doc.lastAutoTable.finalY + 10;
+        doc.text("Accommodation Information", 14, yOffset);
+        
+        autoTable(doc, {
+          startY: yOffset + 5,
+          head: [personalInfoColumns.map(col => col.header)],
+          body: accommodationInfoData.map(row => [row.field, row.value]),
+          theme: 'striped',
+          headStyles: { fillColor: [66, 139, 202] },
+          styles: { fontSize: 10 },
+        });
+
+        yOffset = doc.lastAutoTable.finalY + 10;
+        doc.text("System Information", 14, yOffset);
+        
+        autoTable(doc, {
+          startY: yOffset + 5,
+          head: [personalInfoColumns.map(col => col.header)],
+          body: systemInfoData.map(row => [row.field, row.value]),
+          theme: 'striped',
+          headStyles: { fillColor: [66, 139, 202] },
+          styles: { fontSize: 10 },
+        });
       });
 
-      yOffset = doc.lastAutoTable.finalY + 10;
-      doc.text("Accommodation Information", 14, yOffset);
-      
-      autoTable(doc, {
-        startY: yOffset + 5,
-        head: [["Field", "Value"]],
-        body: accommodationInfo,
-        theme: 'striped',
-        headStyles: { fillColor: [66, 139, 202] },
-        styles: { fontSize: 10 },
-      });
-
-      yOffset = doc.lastAutoTable.finalY + 10;
-      doc.text("System Information", 14, yOffset);
-      
-      autoTable(doc, {
-        startY: yOffset + 5,
-        head: [["Field", "Value"]],
-        body: systemInfo,
-        theme: 'striped',
-        headStyles: { fillColor: [66, 139, 202] },
-        styles: { fontSize: 10 },
-      });
-    });
-
-    // Save the PDF
-    try {
+      // Save the PDF
       doc.save(`all_students_info_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('PDF generated successfully!');
     } catch (error) {
-      console.error('Error saving PDF:', error);
+      console.error('Error generating PDF:', error);
       toast.error('Error generating PDF. Please try again.');
     }
   };

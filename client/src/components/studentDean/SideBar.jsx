@@ -9,7 +9,8 @@ import {
   TowerControlIcon,
   UserRoundPen,
   View,
-  ChevronUp, // Assuming this is used for the dropdown
+  ChevronUp,
+  FileTextIcon, // Changed from FileText to FileTextIcon
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,7 +42,7 @@ const menuItems = [
   { title: "View Block Info", url: "/dean/block", icon: Cuboid },
   { title: "Maintenance Issue", url: "/dean/issue", icon: BugIcon },
   { title: "Control", url: "/dean/control", icon: CircleSlash2 },
-  { title: "Generate Report", url: "/dean/report", icon: FileText },
+  { title: "Generate Report", url: "/dean/report", icon: FileTextIcon },
   { title: "Account", url: "/dean/account", icon: UserRoundPen },
 ];
 
@@ -84,8 +85,12 @@ export default function StudentDeanSideBar() {
               {menuItems.map((item) => {
                 const isActive = location.pathname === item.url;
                 return (
-                  // Wrap MenuItem with motion for potential item animations
-                  <motion.div key={item.title} whileHover={{ x: 5 }}> {/* Simple slide on hover */}
+                  // Use motion.div as a wrapper, not directly on the Link
+                  <motion.div 
+                    key={item.title} 
+                    whileHover={{ x: 5 }}
+                    className="w-full"
+                  > 
                     <SidebarMenuItem>
                       {/* Wrap Button with motion for button animations */}
                       <motion.div

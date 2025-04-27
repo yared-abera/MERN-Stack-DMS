@@ -3,24 +3,51 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProctorBlocks } from '@/store/blockSlice/index';
 import { getAllocatedStudent } from "../../store/studentAllocation/allocateSlice";
 import { FaFileDownload, FaFilePdf, FaFileExcel, FaPrint } from 'react-icons/fa';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { utils, writeFile } from 'xlsx';
+import axios from 'axios';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { FileText, FileSpreadsheet, Printer, MoreVertical } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getAllControlIssues } from "@/store/control/controlSclice";
+import { getAttendanceNotification } from "@/store/attendance/attendance-Slice";
 
-export default function ProctorGenerateReport() {
+export default function GenerateReport() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
+  const [maintenanceIssues, setMaintenanceIssues] = useState([]);
   const { list: blocks } = useSelector((state) => state.block);
-  const [selectedReport, setSelectedReport] = useState('all');
   const [selectedBlock, setSelectedBlock] = useState('all');
+  const [activeTab, setActiveTab] = useState('students');
+  const [selectedSections, setSelectedSections] = useState({
+    students: true,
+    maintenance: false,
+    control: false,
+    dorms: false,
+    attendance: false,
+  });
+  const { allIssues } = useSelector((state) => state.control);
+  const { absentStudent } = useSelector((state) => state.attendance);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         await dispatch(fetchProctorBlocks()).unwrap();
+        // Fetch maintenance issues
+        const issuesResponse = await axios.get('/api/maintenance/issues');
+        setMaintenanceIssues(issuesResponse.data);
       } catch (error) {
-        console.error("Failed to fetch blocks:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
     fetchData();
@@ -48,111 +75,267 @@ export default function ProctorGenerateReport() {
     fetchStudents();
   }, [blocks, dispatch]);
 
+  useEffect(() => {
+    dispatch(getAllControlIssues());
+    dispatch(getAttendanceNotification());
+  }, [dispatch]);
+
   const getFilteredStudents = () => {
-    let filtered = students;
-    
-    if (selectedBlock !== 'all') {
-      filtered = filtered.filter(student => student.blockNum === selectedBlock);
+    if (selectedBlock === 'all') {
+      return students;
     }
-    
-    switch (selectedReport) {
-      case 'registered':
-        return filtered.filter(student => student.status === 'Registered');
-      case 'unregistered':
-        return filtered.filter(student => student.status !== 'Registered');
-      default:
-        return filtered;
-    }
+    return students.filter(student => student.blockNum === selectedBlock);
   };
 
-  const handleGenerateReport = (format) => {
-    const filteredStudents = getFilteredStudents();
-    const reportTitle = `Student_Report_${selectedBlock}_${selectedReport}_${new Date().toISOString().split('T')[0]}`;
-
-    switch (format) {
-      case 'pdf':
-        generatePDF(filteredStudents, reportTitle);
-        break;
-      case 'excel':
-        generateExcel(filteredStudents, reportTitle);
-        break;
-      case 'print':
-        window.print();
-        break;
-      default:
-        console.log('Invalid format');
+  const getFilteredIssues = () => {
+    if (selectedBlock === 'all') {
+      return maintenanceIssues;
     }
+    // Filter by block number (string comparison for robustness)
+    return maintenanceIssues.filter(issue => 
+      String(issue.blockNum || issue.block) === String(selectedBlock)
+    );
   };
 
-  const generatePDF = (data, title) => {
+  const generatePDF = () => {
     const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(16);
-    doc.text(title.replace(/_/g, ' '), 14, 15);
-    
-    // Add timestamp
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 25);
+    let y = 15;
 
-    // Define the columns for the table
-    const columns = [
-      { header: 'Student ID', dataKey: 'userName' },
-      { header: 'Name', dataKey: 'fullName' },
-      { header: 'Block', dataKey: 'blockNum' },
-      { header: 'Room', dataKey: 'dormId' },
-      { header: 'Status', dataKey: 'status' }
-    ];
+    doc.setFontSize(12);
+    doc.text(`Block: ${selectedBlock === 'all' ? 'All Blocks' : 'Block ' + selectedBlock}`, 14, y);
+    y += 10;
+    doc.text(`Generated on: ${new Date().toLocaleString('en-US', {
+      year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true
+    })}`, 14, y);
+    y += 10;
 
-    // Prepare the data
-    const tableData = data.map(student => ({
-      userName: student.userName,
-      fullName: `${student.Fname} ${student.Lname}`,
-      blockNum: `Block ${student.blockNum}`,
-      dormId: student.dormId || 'Not Assigned',
-      status: student.status || 'Not Registered'
-    }));
+    // Students Section
+    if (selectedSections.students) {
+      doc.setFontSize(14);
+      doc.text('Students', 14, y);
+      y += 8;
+      autoTable(doc, {
+        startY: y,
+        head: [['Student ID Name', 'Block', 'Room', 'Status', 'Phone', 'Email', 'Emergency Contact']],
+        body: getFilteredStudents().map(student => [
+          `${student.userName}/${student.Fname} ${student.Lname}`,
+          `Block ${student.blockNum}`,
+          student.dormId || '3',
+          'Not Registered',
+          'N/A',
+          `${student.userName.toLowerCase()}@example.com`,
+          'N/A'
+        ]),
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { top: y }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
 
-    // Generate the table
-    doc.autoTable({
-      columns: columns,
-      body: tableData,
-      startY: 35,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [66, 139, 202] },
-      alternateRowStyles: { fillColor: [245, 245, 245] }
-    });
+    // Maintenance Section
+    if (selectedSections.maintenance) {
+      doc.setFontSize(14);
+      doc.text('Maintenance Issues', 14, y);
+      y += 8;
+      autoTable(doc, {
+        startY: y,
+        head: [['First Name', 'Middle Name', 'Last Name', 'User Name', 'Block', 'Room', 'Issue Types', 'Status', 'Date Reported']],
+        body: getFilteredIssues().flatMap(issue =>
+          (issue.issueTypes && Array.isArray(issue.issueTypes) && issue.issueTypes.length > 0
+            ? issue.issueTypes
+            : [null]
+          ).map(type => [
+            issue.firstName || issue.userInfo?.fName || '',
+            issue.middleName || issue.userInfo?.mName || '',
+            issue.lastName || issue.userInfo?.lName || '',
+            issue.userName || issue.userInfo?.userName || '',
+            `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
+            issue.dormId || issue.userInfo?.roomNumber || '',
+            type ? type.issue : '',
+            type ? type.status : '',
+            type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')
+          ])
+        ),
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { top: y }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
 
-    // Save the PDF
-    doc.save(`${title}.pdf`);
+    // Control Section
+    if (selectedSections.control) {
+      doc.setFontSize(14);
+      doc.text('Control Issues', 14, y);
+      y += 8;
+      autoTable(doc, {
+        startY: y,
+        head: [['Student', 'Block', 'Dorm', 'Issue', 'Status', 'Date', 'Description']],
+        body: (allIssues?.data || [])
+          .filter(issue => selectedBlock === 'all' || issue.block === selectedBlock)
+          .flatMap(issue =>
+            (issue.Allissues || []).map(iss => [
+              issue.student?.userName || '',
+              issue.block || '',
+              issue.dorm || '',
+              iss.issue || '',
+              iss.status || '',
+              iss.dateReported ? new Date(iss.dateReported).toLocaleDateString() : '',
+              iss.description || ''
+            ])
+          ),
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { top: y }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    // Dorms Section
+    if (selectedSections.dorms) {
+      doc.setFontSize(14);
+      doc.text('Dorms', 14, y);
+      y += 8;
+      autoTable(doc, {
+        startY: y,
+        head: [['Block', 'Dorm Number', 'Capacity', 'Status']],
+        body: blocks
+          .filter(b => selectedBlock === 'all' || b.blockNum === selectedBlock)
+          .flatMap(b => (b.floors || []).flatMap(f => (f.dorms || []).map(d => [
+            `Block ${b.blockNum}`,
+            d.dormNumber,
+            d.capacity,
+            d.dormStatus
+          ]))),
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { top: y }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    // Attendance Section
+    if (selectedSections.attendance) {
+      doc.setFontSize(14);
+      doc.text('Attendance (Absences)', 14, y);
+      y += 8;
+      autoTable(doc, {
+        startY: y,
+        head: [['Student', 'Block', 'Absence Dates']],
+        body: (absentStudent?.data || [])
+          .filter(a => selectedBlock === 'all' || a.block === selectedBlock)
+          .map(a => [
+            a.student?.userName || '',
+            a.block || '',
+            Array.isArray(a.student?.absenceDates)
+              ? a.student.absenceDates.map(date => new Date(date).toLocaleDateString()).join(', ')
+              : ''
+          ]),
+        headStyles: { fillColor: [41, 128, 185], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        margin: { top: y }
+      });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    doc.save(`block_report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const generateExcel = (data, title) => {
-    // Prepare the data
-    const excelData = data.map(student => ({
-      'Student ID': student.userName,
-      'Name': `${student.Fname} ${student.Lname}`,
-      'Block': `Block ${student.blockNum}`,
-      'Room': student.dormId || 'Not Assigned',
-      'Status': student.status || 'Not Registered',
-      'Registration Date': student.registrationDate || 'N/A',
-      'Phone': student.phone || 'N/A',
-      'Email': student.email || 'N/A',
-      'Emergency Contact': student.emergencyContact || 'N/A',
-      'Parent Name': student.parentName || 'N/A',
-      'Parent Phone': student.parentPhone || 'N/A',
-      'Address': student.address || 'N/A'
-    }));
-
-    // Create worksheet
-    const ws = utils.json_to_sheet(excelData);
-
-    // Create workbook
+  const generateExcel = () => {
     const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, 'Students');
 
-    // Generate Excel file
-    writeFile(wb, `${title}.xlsx`);
+    // Students Sheet
+    if (selectedSections.students) {
+      const studentsData = getFilteredStudents().map(student => ({
+        'Student ID Name': `${student.userName}/${student.Fname} ${student.Lname}`,
+        'Block': `Block ${student.blockNum}`,
+        'Room': student.dormId || '3',
+        'Status': 'Not Registered',
+        'Phone': 'N/A',
+        'Email': `${student.userName.toLowerCase()}@example.com`,
+        'Emergency Contact': 'N/A'
+      }));
+      const ws = utils.json_to_sheet(studentsData);
+      utils.book_append_sheet(wb, ws, 'Students');
+    }
+
+    // Maintenance Sheet
+    if (selectedSections.maintenance) {
+      const issuesData = getFilteredIssues().flatMap(issue =>
+        (issue.issueTypes && Array.isArray(issue.issueTypes) && issue.issueTypes.length > 0
+          ? issue.issueTypes
+          : [null]
+        ).map(type => ({
+          'First Name': issue.firstName || issue.userInfo?.fName || '',
+          'Middle Name': issue.middleName || issue.userInfo?.mName || '',
+          'Last Name': issue.lastName || issue.userInfo?.lName || '',
+          'User Name': issue.userName || issue.userInfo?.userName || '',
+          'Block': `Block ${issue.blockNum || issue.userInfo?.blockNumber}`,
+          'Room': issue.dormId || issue.userInfo?.roomNumber || '',
+          'Issue Types': type ? type.issue : '',
+          'Status': type ? type.status : '',
+          'Date Reported': type ? (type.dateReported ? new Date(type.dateReported).toLocaleDateString() : '') : (issue.reportedDate ? new Date(issue.reportedDate).toLocaleDateString() : '')
+        }))
+      );
+      const ws = utils.json_to_sheet(issuesData);
+      utils.book_append_sheet(wb, ws, 'Maintenance Issues');
+    }
+
+    // Control Sheet
+    if (selectedSections.control) {
+      const controlData = (allIssues?.data || [])
+        .filter(issue => selectedBlock === 'all' || issue.block === selectedBlock)
+        .flatMap(issue =>
+          (issue.Allissues || []).map(iss => ({
+            'Student': issue.student?.userName || '',
+            'Block': issue.block || '',
+            'Dorm': issue.dorm || '',
+            'Issue': iss.issue || '',
+            'Status': iss.status || '',
+            'Date': iss.dateReported ? new Date(iss.dateReported).toLocaleDateString() : '',
+            'Description': iss.description || ''
+          }))
+        );
+      const ws = utils.json_to_sheet(controlData);
+      utils.book_append_sheet(wb, ws, 'Control Issues');
+    }
+
+    // Dorms Sheet
+    if (selectedSections.dorms) {
+      const dormsData = blocks
+        .filter(b => selectedBlock === 'all' || b.blockNum === selectedBlock)
+        .flatMap(b => (b.floors || []).flatMap(f => (f.dorms || []).map(d => ({
+          'Block': `Block ${b.blockNum}`,
+          'Dorm Number': d.dormNumber,
+          'Capacity': d.capacity,
+          'Status': d.dormStatus
+        }))));
+      const ws = utils.json_to_sheet(dormsData);
+      utils.book_append_sheet(wb, ws, 'Dorms');
+    }
+
+    // Attendance Sheet
+    if (selectedSections.attendance) {
+      const attendanceData = (absentStudent?.data || [])
+        .filter(a => selectedBlock === 'all' || a.block === selectedBlock)
+        .map(a => ({
+          'Student': a.student?.userName || '',
+          'Block': a.block || '',
+          'Absence Dates': Array.isArray(a.student?.absenceDates)
+            ? a.student.absenceDates.map(date => new Date(date).toLocaleDateString()).join(', ')
+            : ''
+        }));
+      const ws = utils.json_to_sheet(attendanceData);
+      utils.book_append_sheet(wb, ws, 'Attendance');
+    }
+
+    writeFile(wb, `block_report_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   if (loading) {
@@ -166,126 +349,107 @@ export default function ProctorGenerateReport() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Generate Reports</h1>
-          <p className="text-gray-600">
-            Generate reports for Block{blocks.length > 1 ? 's' : ''} {blocks.map(block => block.blockNum).join(', ')}
-          </p>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Block
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-md p-2"
-                value={selectedBlock}
-                onChange={(e) => setSelectedBlock(e.target.value)}
-              >
-                <option value="all">All Blocks</option>
+          <div className="mb-6">
+            <Select value={selectedBlock} onValueChange={setSelectedBlock}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select block" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Blocks</SelectItem>
                 {blocks.map((block) => (
-                  <option key={block.blockNum} value={block.blockNum}>
+                  <SelectItem key={block.blockNum} value={block.blockNum}>
                     Block {block.blockNum}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-            </div>
-    <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Report Type
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-wrap gap-4 mb-4">
+            {Object.entries(selectedSections).map(([key, value]) => (
+              <label key={key} className="flex items-center gap-2 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  checked={value}
+                  onChange={() => setSelectedSections(s => ({ ...s, [key]: !s[key] }))}
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                {key.charAt(0).toUpperCase() + key.slice(1)}
               </label>
-              <select
-                className="w-full border border-gray-300 rounded-md p-2"
-                value={selectedReport}
-                onChange={(e) => setSelectedReport(e.target.value)}
-              >
-                <option value="all">All Students</option>
-                <option value="registered">Registered Students</option>
-                <option value="unregistered">Unregistered Students</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Report Preview */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold">Report Preview</h2>
-            <div className="flex gap-4">
-              <button
-                onClick={() => handleGenerateReport('pdf')}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-              >
-                <FaFilePdf /> PDF
-              </button>
-              <button
-                onClick={() => handleGenerateReport('excel')}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-              >
-                <FaFileExcel /> Excel
-              </button>
-              <button
-                onClick={() => handleGenerateReport('print')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                <FaPrint /> Print
-              </button>
-            </div>
+            ))}
           </div>
 
-          {/* Preview Table */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Block
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Room
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {getFilteredStudents().map((student, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">{student.userName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {`${student.Fname} ${student.Lname}`}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      Block {student.blockNum}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {student.dormId || 'Not Assigned'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        student.status === 'Registered' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {student.status || 'Not Registered'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="students">Students</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="students">
+              <div className="bg-white rounded-lg">
+                <div className="flex justify-end mb-4">
+                  <div className="flex gap-4">
+                    <Button onClick={generatePDF} variant="destructive">
+                      <FileText className="w-4 h-4 mr-2" />
+                      PDF
+                    </Button>
+                    <Button onClick={generateExcel} variant="success" className="bg-green-600 hover:bg-green-700">
+                      <FileSpreadsheet className="w-4 h-4 mr-2" />
+                      Excel
+                    </Button>
+                    <Button onClick={() => window.print()} variant="default">
+                      <Printer className="w-4 h-4 mr-2" />
+                      Print
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-[#2980b9] text-white">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Student ID Name</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Block</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Room</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Phone</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase">Emergency Contact</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {getFilteredStudents().map((student, index) => (
+                        <tr key={student.userName || index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            {student.userName}/{student.Fname} {student.Lname}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            Block {student.blockNum}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            {student.dormId || '3'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            Not Registered
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            N/A
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            {student.userName.toLowerCase()}@example.com
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            N/A
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

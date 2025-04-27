@@ -352,6 +352,22 @@ const fetchIssueByStatusForDean = async (req, res) => {
     });
   }
 };
+const getWholeMaintainanceIssue = async (req, res) => {
+  try {
+    
+    const maintenanceIssues = await MaintenanceIssue.find();
+    res.status(200).json({
+      success: true,  
+      data: maintenanceIssues,
+    });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      message: "Server error, please try again later.",
+      error: e.message,
+    });
+  }
+};
 module.exports = {
   SubmitMaintenanceIssue,
   fetchAllMaintenanceIssueForDean,
@@ -361,4 +377,5 @@ module.exports = {
   fetchPendingStatusMaintenanceIssue,
   VerificationOFIssue,
   fetchIssueByStatusForDean,
+  getWholeMaintainanceIssue
 };

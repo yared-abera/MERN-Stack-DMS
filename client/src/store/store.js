@@ -10,6 +10,7 @@ import feedBackSlice from './feedBack/feedBack'
 import attendanceSlice from './attendance/attendance-Slice'
 import ControlSlice from './control/controlSclice.jsx'
 import chatReducer from './chat/chatSlice'
+import dormReducer from './dormSlice';
 
 import blockReducer from "./blockSlice";
 const store = configureStore({
@@ -26,6 +27,7 @@ const store = configureStore({
         attendance:attendanceSlice,
         control:ControlSlice,
         chat: chatReducer,
+        dorm: dormReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

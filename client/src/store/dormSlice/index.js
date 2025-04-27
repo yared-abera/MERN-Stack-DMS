@@ -140,6 +140,10 @@ const dormSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      .addCase(getMaintenanceIssueDormsSubmmitedByProctor.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getDormStatistics.pending, (state) => {
         state.loading = true;
         state.error = null;
