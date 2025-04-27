@@ -81,7 +81,7 @@ function NavBar() {
             className="flex-shrink-0"
           >
             <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 animate-gradient">
-              wkudms
+              WKU DMS
             </h1>
           </motion.div>
 

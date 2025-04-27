@@ -15,7 +15,22 @@ const messageSchema = new mongoose.Schema({
   },
   message: {
     type: String,
-    required: true,
+    required: function() {
+      // Message is required only if there's no file
+      return !this.fileUrl;
+    },
+    trim: true
+  },
+  fileUrl: {
+    type: String,
+    trim: true
+  },
+  fileName: {
+    type: String,
+    trim: true
+  },
+  fileType: {
+    type: String,
     trim: true
   },
   timestamp: {

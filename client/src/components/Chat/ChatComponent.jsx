@@ -1,116 +1,143 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
 import {
   getChatRoom,
   sendMessage,
-  getMessages,
   markAsRead,
-  addMessage
+  addMessage,
+  incrementUnreadCount,
+  resetUnreadCount,
+  getUnreadCount,
+  getMessages,
 } from '../../store/chat/chatSlice';
 import { toast } from 'sonner';
+import { format, isToday, isYesterday } from 'date-fns';
+import Message from '../common/Message';
+import ChatInput from '../common/ChatInput';
+import { SocketContext } from '../../context/SocketContext';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000';
-
-const ChatComponent = ({ currentUserId, receiverId, userRole }) => {
+const ChatComponent = ({ currentUserId, receiverId }) => {
   const [message, setMessage] = useState('');
   const [socketError, setSocketError] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
   const dispatch = useDispatch();
-  const socketRef = useRef();
   const messagesEndRef = useRef(null);
-  
-  const { currentRoom, messages, loading, error } = useSelector((state) => state.chat);
+  const socket = useContext(SocketContext);
 
-  // Initialize socket connection
+  const { currentRoom, messages, loading } = useSelector((state) => state.chat);
+
+  // Initialize chat room and socket event handlers
   useEffect(() => {
-    // Initialize chat room
+    // Get initial unread count
+    if (currentUserId) {
+      dispatch(getUnreadCount(currentUserId));
+    }
+
+    // Get or create chat room
     dispatch(getChatRoom({ userId: currentUserId, receiverId }))
       .unwrap()
-      .then((response) => {
-        if (!response.success) {
-          toast.error(response.message || 'Failed to load chat room');
+      .then((data) => {
+        if (data.success) {
+          dispatch(markAsRead({ 
+            roomId: data.data._id, 
+            userId: currentUserId
+          }));
         }
       })
       .catch((err) => {
-        const errorMessage = err?.message || 'Error loading chat room';
-        toast.error(errorMessage);
-        setSocketError(errorMessage);
+        toast.error(err?.message || 'Failed to load chat room');
       });
 
-    // Connect to Socket.IO with explicit configuration
-    socketRef.current = io(SOCKET_URL, {
-      transports: ['websocket'],
-      autoConnect: true,
-      withCredentials: true,
-      auth: { 
-        userId: currentUserId,
-        token: localStorage.getItem('token')
-      }
-    });
+    // Join chat room when socket is available
+    if (socket) {
+      socket.emit('join', { 
+        userId: currentUserId, 
+        receiverId 
+      });
 
-    // Socket event handlers
-    socketRef.current.on('connect', () => {
-      setIsConnected(true);
-      setSocketError(null);
-      
-      // Join the room
-      socketRef.current.emit('join', { userId: currentUserId, receiverId });
-    });
-
-    socketRef.current.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-      const errorMessage = 'Connection failed. Please check your internet connection.';
-      setSocketError(errorMessage);
-      setIsConnected(false);
-      toast.error(errorMessage);
-    });
-
-    // Listen for new messages
-    socketRef.current.on('message', (newMessage) => {
-      if (newMessage && newMessage.message) {
-        dispatch(addMessage(newMessage));
-        if (newMessage.receiver === currentUserId && currentRoom?._id) {
-          dispatch(markAsRead({ roomId: currentRoom._id, userId: currentUserId }));
+      // Handle incoming messages
+      const handleNewMessage = (newMessage) => {
+        console.log('Received message:', newMessage);
+        if (newMessage?.message || newMessage?.fileUrl) {
+          dispatch(addMessage(newMessage));
+          
+          // Update unread count for new messages
+          if (newMessage.sender !== currentUserId) {
+            if (document.hidden) {
+              dispatch(incrementUnreadCount());
+            } else {
+              dispatch(markAsRead({ 
+                roomId: currentRoom?._id, 
+                userId: currentUserId 
+              }));
+            }
+          }
+          // Scroll to bottom on new message
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
-      }
-    });
+      };
 
-    // Error handling
-    socketRef.current.on('error', (error) => {
-      console.error('Socket error:', error);
-      const errorMessage = error.message || 'An error occurred with the chat connection';
-      setSocketError(errorMessage);
-      toast.error(errorMessage);
-    });
+      socket.on('message', handleNewMessage);
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
+      // Cleanup socket event listeners
+      return () => {
+        socket.off('message', handleNewMessage);
+      };
+    }
+  }, [currentUserId, receiverId, dispatch, currentRoom?._id, socket]);
+
+  // Handle visibility change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && currentRoom?._id) {
+        dispatch(markAsRead({ 
+          roomId: currentRoom._id, 
+          userId: currentUserId 
+        }));
       }
     };
-  }, [currentUserId, receiverId, dispatch]);
 
-  // Scroll to bottom when messages update
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [currentRoom?._id, currentUserId, dispatch]);
+
+  // Scroll handling
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Handle message sending
+  // Periodically update unread count
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (currentUserId) {
+        dispatch(getUnreadCount(currentUserId));
+      }
+    }, 30000); // Every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [currentUserId, dispatch]);
+
+  // Fetch messages periodically to ensure sync
+  useEffect(() => {
+    if (currentRoom?._id) {
+      const interval = setInterval(() => {
+        dispatch(getMessages(currentRoom._id));
+        // Update unread count
+        dispatch(getUnreadCount(currentUserId));
+      }, 30000); // Every 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [currentRoom?._id, currentUserId, dispatch]);
+
+  // Message sending handler
   const handleSendMessage = async (e) => {
     e.preventDefault();
     const trimmedMessage = message.trim();
-    
-    if (!trimmedMessage) return;
-    if (!isConnected) {
-      toast.error('Not connected to chat server. Please try again.');
-      return;
-    }
-    if (!currentRoom?._id) {
-      toast.error('Chat room not initialized. Please try again.');
-      return;
-    }
+    if (!trimmedMessage || !currentRoom?._id) return;
 
+    // Create message object
     const messageData = {
       roomId: currentRoom._id,
       senderId: currentUserId,
@@ -118,19 +145,102 @@ const ChatComponent = ({ currentUserId, receiverId, userRole }) => {
       message: trimmedMessage
     };
 
+    // Optimistic update
+    const tempMessage = {
+      _id: `temp-${Date.now()}`,
+      message: trimmedMessage,
+      sender: currentUserId,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Add message locally
+    dispatch(addMessage(tempMessage));
+    setMessage('');
+
     try {
-      const result = await dispatch(sendMessage(messageData)).unwrap();
-      if (result.success) {
-        socketRef.current.emit('sendMessage', messageData);
-        setMessage('');
-      } else {
+      // Send via Socket.IO
+      socket.emit('sendMessage', messageData);
+
+      // Also send via HTTP for persistence
+      const result = await dispatch(
+        sendMessage(messageData)
+      ).unwrap();
+
+      if (!result.success) {
         toast.error(result.message || 'Failed to send message');
       }
     } catch (err) {
-      const errorMessage = err?.message || 'Error sending message';
-      toast.error(errorMessage);
-      setSocketError(errorMessage);
+      toast.error(err?.message || 'Failed to send message');
     }
+  };
+
+  // Function to format date for separator
+  const formatDateSeparator = (timestamp) => {
+    try {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) return '';
+
+      if (isToday(date)) {
+        return 'Today';
+      } else if (isYesterday(date)) {
+        return 'Yesterday';
+      }
+      return format(date, 'MMMM d, yyyy');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  };
+
+  // Group messages by date
+  const renderMessages = () => {
+    if (!messages?.length) {
+      return (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          No messages yet
+        </div>
+      );
+    }
+
+    let currentDate = null;
+    const messageGroups = [];
+    
+    messages.forEach((msg, index) => {
+      try {
+        if (!msg.timestamp) return;
+        
+        const messageDate = new Date(msg.timestamp);
+        if (isNaN(messageDate.getTime())) return;
+        
+        const messageDateString = messageDate.toDateString();
+
+        // Only add date separator if it's a new date
+        if (currentDate !== messageDateString) {
+          currentDate = messageDateString;
+          messageGroups.push(
+            <div key={`date-${msg.timestamp}`} className="flex justify-center my-4">
+              <span className="bg-gray-200 dark:bg-gray-700 px-4 py-1 rounded-full text-sm">
+                {formatDateSeparator(msg.timestamp)}
+              </span>
+            </div>
+          );
+        }
+
+        // Add the message
+        messageGroups.push(
+          <Message 
+            key={msg._id || `msg-${index}`} 
+            message={msg} 
+            currentUserId={currentUserId} 
+          />
+        );
+      } catch (error) {
+        console.error('Error rendering message:', error);
+      }
+    });
+
+    return messageGroups;
   };
 
   if (loading) {
@@ -142,79 +252,25 @@ const ChatComponent = ({ currentUserId, receiverId, userRole }) => {
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-lg">
-      {/* Chat Header */}
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Chat</h2>
-        {socketError && (
-          <p className="text-sm text-red-500">{socketError}</p>
-        )}
-        {!isConnected && (
-          <p className="text-sm text-yellow-500">Reconnecting...</p>
-        )}
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
-      </div>
-
-      {/* Messages Area */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        {messages && messages.length > 0 ? (
-          messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`mb-4 ${
-                msg.sender === currentUserId ? 'text-right' : 'text-left'
-              }`}
-            >
-              <div
-                className={`inline-block p-2 rounded-lg ${
-                  msg.sender === currentUserId
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200'
-                }`}
-              >
-                <p className="break-words max-w-[300px]">{msg.message}</p>
-                <span className="text-xs opacity-75">
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </span>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            No messages yet
+    <div className="flex flex-col h-full">
+      {/* Messages container */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <span>Loading messages...</span>
           </div>
+        ) : (
+          <>
+            {renderMessages()}
+            <div ref={messagesEndRef} />
+          </>
         )}
-        <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 p-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            disabled={!isConnected || !currentRoom}
-          />
-          <button
-            type="submit"
-            className={`px-4 py-2 text-white rounded-lg focus:outline-none ${
-              isConnected && currentRoom
-                ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!isConnected || !currentRoom}
-          >
-            Send
-          </button>
-        </div>
-      </form>
+      {/* Chat input */}
+      <ChatInput receiverId={receiverId} />
     </div>
   );
 };
 
-export default ChatComponent; 
+export default ChatComponent;

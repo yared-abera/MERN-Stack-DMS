@@ -236,7 +236,7 @@ const fetchPendingStatusMaintenanceIssue = async (req, res) => {
 const VerificationOFIssue = async (req, res) => {
   try {
     const { id,  status } = req.body; // assuming `id` is the _id of the subdocument and `value` is the new status
- 
+ console.log(id,status)
 
     // Find the document with the matching subdocument id and update the status field
     const updatedDoc = await MaintenanceIssue.findOneAndUpdate(
@@ -246,7 +246,7 @@ const VerificationOFIssue = async (req, res) => {
     );
 
     if (!updatedDoc) {
-      return res.status(404).json({
+      return res.json({
         success: false,
         message: "Issue not found.",
       });

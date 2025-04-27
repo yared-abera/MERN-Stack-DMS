@@ -11,6 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { setUpdateAllocation } from "../../store/common/sidebarSlice";
 
 const customStyles = {
   headCells: {
@@ -176,14 +178,14 @@ export default function ProctorViewInfo() {
       },
       { 
         name: "Status",
-        selector: (row) => row.status || "Not Registered",
+        selector: (row) => row.status,
         sortable: true,
         width: '150px',
         cell: (row) => (
           <span className={`px-2 py-1 rounded-full text-sm ${
-            row.status === 'Registered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+            row.status === true ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
           }`}>
-            {row.status || "Not Registered"}
+            {row.status === true ? "Registered" : "Not Registered"}
           </span>
         )
       },
@@ -198,9 +200,6 @@ export default function ProctorViewInfo() {
                 ...row,
                 lastUpdated: new Date().toISOString()
               };
-              
-              // Update the student in the database
-              dispatch(updateStudent(updatedStudent));
               
               // Set selected student and open dialog
               setSelectedStudent(updatedStudent);
@@ -380,41 +379,178 @@ export default function ProctorViewInfo() {
         </div>
       </div>
 
-      {/* View Dialog */}
+      {/* View Student Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold">Student Details</DialogTitle>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-xl font-bold">Student Details</DialogTitle>
           </DialogHeader>
           {selectedStudent && (
-            <div className="grid grid-cols-1 gap-3 p-3">
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-600 text-sm">Student ID</p>
-                <p className="text-gray-900">{selectedStudent.userName}</p>
+            <div className="space-y-6 p-6 overflow-y-auto">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Personal Information */}
+                <div className="flex-1 space-y-6">
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                    <h3 className="text-lg font-semibold text-blue-900 mb-4 border-b border-blue-200 pb-2">Personal Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="font-semibold text-gray-600">Student ID</p>
+                        <p className="text-gray-900">{selectedStudent.userName}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Full Name</p>
+                        <p className="text-gray-900">{`${selectedStudent.Fname} ${selectedStudent.Lname}`}</p>
+                      </div>
+                      {selectedStudent.Mname && (
+                        <div>
+                          <p className="font-semibold text-gray-600">Middle Name</p>
+                          <p className="text-gray-900">{selectedStudent.Mname}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-gray-600">Gender</p>
+                        <p className="text-gray-900">{selectedStudent.sex}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Email</p>
+                        <p className="text-gray-900">{selectedStudent.email || "Not provided"}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Phone</p>
+                        <p className="text-gray-900">{selectedStudent.phoneNum || "Not provided"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Academic Information */}
+                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                    <h3 className="text-lg font-semibold text-green-900 mb-4 border-b border-green-200 pb-2">Academic Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="font-semibold text-gray-600">Student Type</p>
+                        <p className="text-gray-900">{selectedStudent.studCategory}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Stream</p>
+                        <p className="text-gray-900">{selectedStudent.stream}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Department</p>
+                        <p className="text-gray-900">{selectedStudent.department || "Not specified"}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Batch</p>
+                        <p className="text-gray-900">{selectedStudent.batch || "Not specified"}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">College</p>
+                        <p className="text-gray-900">{selectedStudent.collage || "Not specified"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dormitory and Registration Information */}
+                <div className="flex-1 space-y-6">
+                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
+                    <h3 className="text-lg font-semibold text-purple-900 mb-4 border-b border-purple-200 pb-2">Dormitory Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="font-semibold text-gray-600">Block Number</p>
+                        <p className="text-gray-900">{selectedStudent.blockNum}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Dorm Number</p>
+                        <p className="text-gray-900">{selectedStudent.dormId || "Not assigned"}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Registration Status</p>
+                        <p className={`${selectedStudent.status === true ? 'text-green-600 font-semibold' : 'text-yellow-600'}`}>
+                          {selectedStudent.status === true ? "Registered" : "Not Registered"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Key Holder</p>
+                        <p className="text-gray-900">{selectedStudent.keyHolder === true ? "Yes" : "No"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Emergency Contact */}
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
+                    <h3 className="text-lg font-semibold text-amber-900 mb-4 border-b border-amber-200 pb-2">Emergency Contact</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="font-semibold text-gray-600">Emergency Contact</p>
+                        <p className="text-gray-900">{selectedStudent.emergencyContactNumber || "Not provided"}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Parent Name</p>
+                        <p className="text-gray-900">
+                          {selectedStudent.parentFirstName || selectedStudent.parentLastName ? 
+                            `${selectedStudent.parentFirstName || ""} ${selectedStudent.parentLastName || ""}` : 
+                            "Not provided"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Parent Phone</p>
+                        <p className="text-gray-900">{selectedStudent.parentPhone || "Not provided"}</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-600">Parent Address</p>
+                        <p className="text-gray-900">{selectedStudent.parentAddress || "Not provided"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Registration Details */}
+                  {selectedStudent.status === true && (
+                    <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
+                      <h3 className="text-lg font-semibold text-teal-900 mb-4 border-b border-teal-200 pb-2">Registration Details</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <p className="font-semibold text-gray-600">Arrival Date</p>
+                          <p className="text-gray-900">{selectedStudent.arrivalDate ? 
+                            new Date(selectedStudent.arrivalDate).toLocaleDateString() : 
+                            "Not recorded"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-600">Registered By</p>
+                          <p className="text-gray-900">{selectedStudent.registeredBy || "Not recorded"}</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-600">Last Updated</p>
+                          <p className="text-gray-900">{selectedStudent.lastUpdated ? 
+                            new Date(selectedStudent.lastUpdated).toLocaleString() : 
+                            "Not recorded"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-600 text-sm">Name</p>
-                <p className="text-gray-900">{`${selectedStudent.Fname} ${selectedStudent.Lname}`}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-600 text-sm">Student Type</p>
-                <p className="text-gray-900">{selectedStudent.studCategory}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-600 text-sm">Block & Dorm</p>
-                <p className="text-gray-900">Block {selectedStudent.blockNum}, Room {selectedStudent.dormId}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-600 text-sm">Gender</p>
-                <p className="text-gray-900">{selectedStudent.gender}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-600 text-sm">Contact Info</p>
-                <p className="text-gray-900">
-                  {selectedStudent.phone || 'Phone: Not provided'}
-                  <br />
-                  {selectedStudent.email || 'Email: Not provided'}
-                </p>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                {!selectedStudent.status && (
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => {
+                      setIsViewDialogOpen(false);
+                      dispatch(setUpdateAllocation());
+                    }}
+                  >
+                    Register Student
+                  </Button>
+                )}
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setIsViewDialogOpen(false)}
+                >
+                  Close
+                </Button>
               </div>
             </div>
           )}
@@ -423,14 +559,14 @@ export default function ProctorViewInfo() {
 
       {/* Registration Dialog */}
       <Dialog open={isRegistrationDialogOpen} onOpenChange={setIsRegistrationDialogOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="px-6 py-4 border-b">
             <DialogTitle className="text-xl font-bold">Student Registration</DialogTitle>
           </DialogHeader>
           {selectedStudent && (
-            <div className="space-y-6 p-6">
+            <div className="space-y-6 p-6 overflow-y-auto">
               {/* Existing Student Info */}
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
                 <div>
                   <p className="font-semibold text-gray-600">Student ID</p>
                   <p className="text-gray-900">{selectedStudent.userName}</p>
@@ -450,7 +586,7 @@ export default function ProctorViewInfo() {
               </div>
 
               {/* Registration Form */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="font-semibold text-gray-600">Arrival Date</label>
                   <input
@@ -523,7 +659,7 @@ export default function ProctorViewInfo() {
                     onChange={(e) => setRegistrationForm({...registrationForm, address: e.target.value})}
                   />
                 </div>
-                <div className="col-span-2 space-y-2">
+                <div className="col-span-1 sm:col-span-2 space-y-2">
                   <label className="font-semibold text-gray-600">Additional Information</label>
                   <textarea
                     className="w-full p-2 border rounded-md"

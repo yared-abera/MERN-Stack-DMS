@@ -1,11 +1,14 @@
 import { SidebarTrigger } from "../ui/sidebar";
-import DarkMode from "@/components/common/darkMode";
-import AvatarComponent from "@/components/common/avatar";
+import { CalendarX, Search } from "lucide-react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import { useEffect, useState } from "react";
+import DarkMode from "../common/darkMode";
+import AvatarComponent from "../common/avatar";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleUser } from "@/store/user-slice/userSlice";
-import { Link } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import ChatIcon from "../common/ChatIcon";
+
 export default function Header() {
 
   const [ThisUser, setThisUser] = useState('');
@@ -29,28 +32,27 @@ export default function Header() {
       const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar default state
     
       return (
-        <nav
-          className={`fixed top-0 left-0 h-20 shadow-md flex items-center px-4 md:px-6 dark:bg-black bg-white justify-between transition-all duration-300 ${
-            isSidebarOpen ? "w-[calc(100%-16rem)] md:left-64" : " left-16 md:w-[calc(100%-4rem)]"
-          }`}
-        >
-          {/* Sidebar Trigger */}
-          <div className="flex items-center">
-            <SidebarTrigger onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-          </div>
+        <header className="sticky top-0 w-full overflow-auto px-4 py-6 z-10 border-b shadow-md dark:bg-black bg-white mb-2">
+          <div className="flex items-center justify-between w-full">
+            {/* Left Section: Sidebar */}
+            <div className="flex items-center">
+              <SidebarTrigger />
+            </div>
 
-          <div className="w-full mx-auto">
-            <Link to={'/proctor/chat'}>
-            <MessageCircle/>
-            </Link>
-            
+            {/* Center Section: Search, Calendar, and Time */}
+            <div className="flex items-center flex-grow mx-4 gap-4">
+              <div>
+                <ChatIcon userRole="proctor" />
+              </div>
+            </div>
+
+            {/* Right Section: Dark Mode & Avatar */}
+            <div className="flex items-center justify-evenly gap-4">
+              <DarkMode />
+              {ThisUser && ThisUser !== '' ? <AvatarComponent ThisUser={ThisUser} /> : null}
+            </div>
           </div>
-    
-          <div className="flex items-center gap-4 ml-auto">
-            <DarkMode />
-            {ThisUser&&ThisUser!==''&& <AvatarComponent ThisUser={ThisUser}/>}
-          </div>
-        </nav>
+        </header>
       );
     }
 

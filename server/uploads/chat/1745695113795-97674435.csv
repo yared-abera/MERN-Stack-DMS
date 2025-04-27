@@ -1,0 +1,22 @@
+Fname,Mname,Lname,email,userName,phoneNum,password,sex,role,batch,isSpecial,isDisable,address
+John,Doe,Smith,john.smith@example.com,johnsmith,1234567890,password123,Male,Student,2025,No,No,123 Main St
+Jane,Anne,Doe,jane.doe@example.com,janedoe,2345678901,password123,Female,Student,2025,Yes,No,456 Elm St
+Michael,James,Brown,michael.brown@example.com,mikebrown,3456789012,password123,Male,Student,2024,No,No,789 Maple St
+Emily,Jane,Johnson,emily.johnson@example.com,emilyj,4567890123,password123,Female,Student,2024,Yes,No,101 Pine St
+Chris,Robert,Wilson,chris.wilson@example.com,chriswilson,5678901234,password123,Male,Student,2023,No,Yes,202 Oak St
+Olivia,Marie,Moore,olivia.moore@example.com,oliviamoore,6789012345,password123,Female,Student,2023,Yes,No,303 Birch St
+Daniel,Joseph,Taylor,daniel.taylor@example.com,danielt,7890123456,password123,Male,Student,2025,No,No,404 Cedar St
+Sophia,Grace,Anderson,sophia.anderson@example.com,sophiaa,8901234567,password123,Female,Student,2025,Yes,No,505 Spruce St
+Matthew,David,Thomas,matthew.thomas@example.com,matthewt,9012345678,password123,Male,Student,2024,No,Yes,606 Aspen St
+Ava,Elizabeth,Jackson,ava.jackson@example.com,avajackson,0123456789,password123,Female,Student,2024,Yes,No,707 Willow St
+Joshua,Michael,Harris,joshua.harris@example.com,joshharris,1357924680,password123,Male,Student,2023,No,No,808 Fir St
+Mia,Sophia,Martinez,mia.martinez@example.com,miamartinez,2468013579,password123,Female,Student,2023,Yes,No,909 Larch St
+James,William,Clark,james.clark@example.com,jamesc,3579135790,password123,Male,Student,2025,No,No,111 Hemlock St
+Isabella,Chloe,Robinson,isabella.robinson@example.com,izzyrobinson,4680246802,password123,Female,Student,2025,Yes,No,222 Poplar St
+Ethan,Alexander,Lee,ethan.lee@example.com,ethanlee,5791357913,password123,Male,Student,2024,No,Yes,333 Chestnut St
+Charlotte,Madison,Wright,charlotte.wright@example.com,charlottew,6802468024,password123,Female,Student,2024,Yes,No,444 Walnut St
+Alexander,Daniel,Hall,alexander.hall@example.com,alexhall,7913579135,password123,Male,Student,2023,No,No,555 Cherry St
+Amelia,Emily,Young,amelia.young@example.com,ameliayoung,8024680246,password123,Female,Student,2023,Yes,No,666 Magnolia St
+Logan,Noah,Scott,logan.scott@example.com,loganscott,9135791357,password123,Male,Student,2025,No,Yes,777 Maplewood St
+Ella,Harper,Adams,ella.adams@example.com,ellaharp,0246802468,password123,Female,Student,2025,Yes,No,888 River St
+Liam,Lucas,Baker,liam.baker@example.com,liambaker,1358024680,password123,Male,Student,2024,No,No,999 Hill St

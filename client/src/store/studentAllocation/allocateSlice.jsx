@@ -42,21 +42,48 @@ export const UpdateStudent=createAsyncThunk('UpdateStudent/get',async({id,formDa
 
 })
 
-export const UpdateStudentByStudent=createAsyncThunk('UpdateStudent/get',async({id,formData})=>{
+// export const UpdateStudentByStudent=createAsyncThunk('UpdateStudent/get',async({id,formData},{ rejectWithValue })=>{
     
-    console.log(id,formData);
+//     console.log(id,formData);
     
-    try {
-        const response=await axios.put(`http://localhost:9000/api/student/updateByStud/${id}`, formData, {
-            withCredentials:true
-        });
+//     try {
+//         const response=await axios.put(`http://localhost:9000/api/student/updateByStud/${id}`, formData, {
+//             withCredentials:true
+//         });
+//         console.log(response.data,"response of student update by student data from slice");
+//         return response.data
         
-        return response.data
-    } catch (error) {
-        return rejectWithValue(error.response.data);
-    }
+//     } catch (error) {
+//         return rejectWithValue(error.response.data);
+//     }
 
-})
+// })
+
+
+export const UpdateStudentByStudent = createAsyncThunk(
+    'UpdateStudent/get',
+    async ({ id,  formData }, { rejectWithValue }) => {
+      console.log(id, formData);
+  
+      try {
+        const response = await axios.put(
+          `http://localhost:9000/api/student/updateByStud/${id}`, 
+          formData ,          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            withCredentials: true,
+          }
+        );
+        console.log(response.data, "response of student update by student data from slice");
+        return response.data;
+        
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );
+  
 
 export const DeleteStudent=createAsyncThunk('DeleteStudent/get',async({ id,blockNum,dormId,sex})=>{
    

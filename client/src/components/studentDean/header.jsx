@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SearchStudents } from "@/store/common/data";
 import { getSingleUser } from "@/store/user-slice/userSlice";
 import { Link } from "react-router-dom";
+import ChatIcon from "../common/ChatIcon";
 
 export default function Header() {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -18,6 +19,10 @@ export default function Header() {
   const [time, setTime] = useState("");
   const [ThisUser, setThisUser] = useState('');
   const {user}=useSelector(state=>state.auth)
+
+  // Get unread messages count from redux store
+  const { unreadCount } = useSelector(state => state.chat);
+console.log(unreadCount,"unreadCount");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -152,10 +157,7 @@ export default function Header() {
           </div>
 
           <div>
-            <Link to={'/dean/chat'}>
-            <MessageCircle/>
-            </Link>
-            
+            <ChatIcon userRole="studentDean" />
           </div>
         </div>
 
