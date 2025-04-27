@@ -234,6 +234,9 @@ export default function ManageAccount() {
     });
   };
 
+
+  console.log(formData,"formDtaa");
+  
   const handleEditSubmit = (event) => {
     event.preventDefault();
     dispatch(UpdateUser({ id: selectedUser._id, formData: editFormData })).then((data) => {
@@ -346,9 +349,9 @@ export default function ManageAccount() {
   };
 
   return (
-    <div className="min-h-screen w-full p-4 flex flex-col mt-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto w-full">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="min-h-screen w-full p-4 flex flex-col mt-16 bg-gray-50 overflow-hidden">
+      <div className="max-w-7xl mx-auto w-[90%]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center w-[80%] mb-6  gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
             <p className="text-gray-500">Manage user accounts and permissions</p>
@@ -573,8 +576,8 @@ export default function ManageAccount() {
                   <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="student dean">Student Dean</SelectItem>
-                    <SelectItem value="proctor manager">Proctor Manager</SelectItem>
+                    <SelectItem value="studentDean">Student Dean</SelectItem>
+                    <SelectItem value="proctorManager">Proctor Manager</SelectItem>
                     <SelectItem value="proctor">Proctor</SelectItem>
                   </SelectContent>
                 </Select>

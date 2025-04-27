@@ -44,7 +44,7 @@ import DeanMaintenanceIssue from "./pages/studentDean/DeanMaintenanceIssue";
 import ProfileManagement from "./pages/proctorManager/ProfileManagementPage";
 import ResetPassword from "./components/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
-
+ 
 import CommentHover from "./pages/student/myCommnt";
 import ProctorAccount from "./pages/proctor/account";
 import ProctorControleComponent from "./components/proctor/attendanceControl";
@@ -59,9 +59,13 @@ import AdminChat from "./pages/Admin/adminChat";
 import ProctorManagerChat from "./pages/proctorManager/ProctorManagerChat";
 import ProctorChat from "./pages/proctor/proctorChat/ProctorChat";
 import StudentDeanChat from "./pages/studentDean/StudentDeanChat";
+import StudentDeanGenerateReport from "./pages/studentDean/generateReport";
+
 import { SocketProvider } from "./context/SocketContext";
 
-import StudentDeanGenerateReport from "./pages/studentDean/generateReport";
+
+import { motion } from "framer-motion";
+import { Atom, Orbit, Sparkles } from "lucide-react";
 
 function App() {
   const theme = useSelector((state) => state.theme.mode);
@@ -96,17 +100,117 @@ function App() {
     }
   }, [theme]);
 
-  if (isLoading) {
-    console.log(isLoading, "isLoading");
 
+
+  if (isLoading) {
     return (
-      <div>
-        <h1 className="w-[100px] h-[20px] rounded-full text-center bg-black">
-          Loading...
-        </h1>
-      </div>
+      <motion.div
+        className="fixed inset-0 bg-background/90 backdrop-blur-lg flex items-center justify-center z-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div className="relative flex flex-col items-center gap-6">
+          {/* Animated atom icon with orbiting electrons */}
+          <motion.div
+            animate={{
+              rotate: 360,
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="text-primary"
+          >
+            <Atom size={64} strokeWidth={1.5} />
+          </motion.div>
+  
+          {/* Orbiting sparkles */}
+          <motion.div
+            className="absolute top-0 left-0 w-full h-full"
+            animate={{
+              rotate: -360,
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            <motion.div
+              className="absolute top-4 left-1/2"
+              animate={{
+                y: [-10, 10, -10],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+              }}
+            >
+              <Sparkles size={20} className="text-amber-400" />
+            </motion.div>
+          </motion.div>
+  
+          {/* Pulsating text with staggered dots */}
+          <motion.div
+            className="flex items-center gap-1 text-lg font-medium text-primary"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.2,
+                  delayChildren: 0.5,
+                },
+              },
+            }}
+          >
+            {"Loading".split('').map((char, i) => (
+              <motion.span
+                key={i}
+                variants={{
+                  hidden: { y: 20, opacity: 0 },
+                  visible: {
+                    y: 0,
+                    opacity: 1,
+                    transition: {
+                      y: { stiffness: 1000, velocity: -100 },
+                    },
+                  },
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
+            <motion.div className="flex gap-1">
+              {[0, 1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  animate={{
+                    y: ["0%", "-50%", "0%"],
+                    opacity: [0.2, 1, 0.2],
+                  }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                  }}
+                >
+                  .
+                </motion.span>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </motion.div>
     );
   }
+ 
+
 
   return (
     <SocketProvider>
@@ -200,11 +304,29 @@ function App() {
           <Route path="info" element={<StudentInfo />} />
           <Route path="block" element={<BlockInfo />} />
           <Route path="account" element={<StudDeanAccount />} />
-         
+          <Route path="report" element={<StudentDeanGenerateReport />} />
           <Route path="issue" element={<DeanMaintenanceIssue />} />
           <Route path="control" element={<DeanIssueContol />} />
           <Route path="chat" element={<StudentDeanChat/>} />
         </Route>
+          <Route
+            path="/dean"
+            element={
+              <CheckAuthComponent isAuthenticated={isAuthenticated} user={user}>
+                <StudentDeanLayout />
+              </CheckAuthComponent>
+            }
+          >
+            <Route path="home" element={<StudentDeanHome />} />
+            <Route path="dorm" element={<DormAllocation />} />
+            <Route path="info" element={<StudentInfo />} />
+            <Route path="block" element={<BlockInfo />} />
+            <Route path="account" element={<StudDeanAccount />} />
+           
+            <Route path="issue" element={<DeanMaintenanceIssue />} />
+            <Route path="control" element={<DeanIssueContol />} />
+            <Route path="chat" element={<StudentDeanChat/>} />
+          </Route>
 
           <Route
             path="/student"

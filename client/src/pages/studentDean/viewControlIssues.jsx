@@ -27,16 +27,11 @@ export default function DeanIssueContol() {
 
   // Effect to filter issues whenever selection, data, or user gender changes
   useEffect(() => {
-    // Ensure necessary data is available before proceeding
-    if (!allIssues || allIssues.length === 0 ) {
-      setFilteredIndividualIssues([]); // Clear filtered list if data is missing
-      return;
-    }
+ 
 
    
-    
-  
-    if (selectedOption === "All") {
+    if(allIssues&& allIssues.data && allIssues.data.length>0&&allIssues.success){
+      if (selectedOption === "All") {
         const filteredIssuesWithParentData = allIssues.data
         .map(individualIssue => {
           // Add a safety check in case Allissues is null or undefined
@@ -64,7 +59,8 @@ export default function DeanIssueContol() {
 
          
       setFilteredIndividualIssues(filteredIssuesWithParentData);
-    } else {
+    } 
+    else {
       // Use map to iterate through each main issue (parent object)
       const filteredIssuesWithParentData = allIssues.data
         .map(individualIssue => {
@@ -94,6 +90,9 @@ export default function DeanIssueContol() {
       setFilteredIndividualIssues(filteredIssuesWithParentData);
     }
 
+    }
+  
+ 
     // Dependencies: This effect should re-run if the filter criteria or the data changes
   }, [selectedOption]); // Added allIssues and userGender
     

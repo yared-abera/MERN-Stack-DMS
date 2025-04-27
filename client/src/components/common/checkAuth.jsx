@@ -32,7 +32,7 @@ export default function CheckAuthComponent({ isAuthenticated, user, children }) 
 
   // 2. Handle authenticated users
   
-  const userRole = user?.role=== "proctor manager"?'proctorManager': user?.role;
+  const userRole =user?.role;
    
   const allowedBasePath = roleBasePaths[userRole];
 

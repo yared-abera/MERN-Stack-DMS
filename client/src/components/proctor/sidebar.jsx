@@ -1,4 +1,20 @@
-import { ChartNoAxesColumn, ChevronUp, ContainerIcon, FilePen, Hammer, Home, LayoutGrid, Loader, LogOut, TowerControl, UserRoundPen, View } from "lucide-react";
+import {
+  ChartNoAxesColumn,
+  ChevronUp, // Used for dropdown indicator
+//   ContainerIcon, // Unused - removed
+  FilePen,
+  Hammer,
+  Home,
+  LayoutGrid,
+  Loader, // Used potentially for loading state, or icon
+  LogOut, // Used for logout icon
+  TowerControl,
+  UserRoundPen,
+  View,
+  // Add any other icons needed
+  AlertCircle // Good icon for error messages, could be used elsewhere
+} from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
@@ -8,17 +24,19 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarFooter,
- 
+  SidebarFooter // Removed trailing comma
 } from "../ui/sidebar"; // Assuming this path is correct
-import { setUpdateAllocation } from "@/store/common/sidebarSlice"; // Assuming this path is correct
+
+// Assuming this action is meant to update allocation somehow
+import { setUpdateAllocation } from "@/store/common/sidebarSlice";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { motion } from "framer-motion"; // Import motion
+import { motion, AnimatePresence } from "framer-motion"; // Import motion, maybe AnimatePresence if needed for exit animations
 import { toast } from "sonner";
-import { LogOutUser } from "@/store/auth-slice";
+import { LogOutUser } from "@/store/auth-slice"; // Assuming this is an async thunk
+import { useState } from "react";
 
 const ProSideBar = [
   {
@@ -43,34 +61,37 @@ const ProSideBar = [
     id: "report",
     title: "Generate Report",
     url: "/proctor/report",
-    icon:  ChartNoAxesColumn, // Consider if different icons are needed
+    icon: ChartNoAxesColumn,
   },
   {
     id: "registerStudent",
     title: "Register Student",
     url: "/proctor/register",
-    icon: FilePen, // Consider if different icons are needed
+    icon: FilePen,
   },
   {
     id: "issue",
     title: "Maintenance Issue",
     url: "/proctor/issue",
-    icon: Hammer, // Consider if different icons are needed
+    icon: Hammer,
   },
   {
+    id: "attendance", // Added ID for consistency
     title: "Attendance",
     url: "/proctor/attendance",
     icon: TowerControl,
   },
   {
+    id: "control", // Added ID for consistency
     title: "Control",
     url: "/proctor/control",
-    icon: Loader
+    icon: Loader,
   },
   {
+    id: "account", // Added ID for consistency
     title: "Account",
     url: "/proctor/account",
-    icon: UserRoundPen, // Consider if different icons are needed
+    icon: UserRoundPen,
   },
 ];
 
@@ -98,128 +119,152 @@ const menuItemVariants = {
 };
 
 export default function ProctorSideBar() {
+  // Assuming updateAllocation is a boolean or some state relevant to registration
   const updateAllocation = useSelector((state) => state.sidebar.updateAllocation);
   const location = useLocation();
   const dispatch = useDispatch();
- 
-    function HandleLogOut(){
-      dispatch(LogOutUser()).then(data=>{
-        if(data.payload.success){
-          toast.success(`${data.payload.message}`)
-        }
-        else{
-          toast.error(`${data.payload.message}`)
-        }
-      })
-  
-    }
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // State for logout loading
 
-    
+  // --- Fixed HandleLogOut function syntax and added loading state ---
+  const HandleLogOut = async () => { // Made async to handle promise
+    setIsLoggingOut(true); // Start loading state
+    try {
+        const data = await dispatch(LogOutUser()); // Use await
+
+        if (data.payload?.success) { // Use optional chaining for safety
+          toast.success(`${data.payload.message}`);
+          // Assuming LogOutUser action also handles redirecting or clearing auth state
+        } else {
+          // Handle API error message from the payload
+          const message = data.payload?.message || "Logout failed. Please try again.";
+          toast.error(message);
+          console.error("Logout failed:", message); // Log error for debugging
+        }
+    } catch (error) {
+        // Handle unexpected errors (network, action failure)
+        console.error("Logout error:", error);
+        toast.error("An error occurred during logout.");
+    } finally {
+        setIsLoggingOut(false); // End loading state
+    }
+  };
+  // --- End of Fixed HandleLogOut ---
 
   return (
-    // Added some base styling to the sidebar itself for a modern look
     <Sidebar
       variant="floating"
-      collapsible="icon"
+      collapsible="icon" // Assuming your custom sidebar component handles this prop
       className="bg-gradient-to-b from-gray-50 to-white dark:from-neutral-900 dark:to-black border-r border-gray-200 dark:border-neutral-800 shadow-lg"
     >
-      <SidebarContent className="p-2"> {/* Added padding around content */}
+      <SidebarContent className="p-2">
         <SidebarGroup>
           <SidebarGroupLabel className="px-4 pt-4 pb-2 text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 tracking-tight justify-center sm:text-xl md:text-2xl">
-            Proctor Portal {/* Changed text content for clarity */}
+            Proctor Portal
           </SidebarGroupLabel>
-          <SidebarGroupContent className="mt-2"> {/* Reduced margin top slightly */}
-            {/* Use motion.div instead of motion.ul to avoid li nesting issues */}
-            <motion.div
+          <SidebarGroupContent className="mt-6"> {/* Reduced margin top slightly */}
+            {/* Use motion.ul for list semantics and animations */}
+            <motion.ul
               className="space-y-1" // Add vertical spacing between items
               variants={sidebarVariants}
               initial="hidden"
               animate="visible"
+              // AnimatePresence could be wrapped around the mapped items
+              // if you need exit animations when items are removed/added dynamically.
+              // For static sidebar items, it's usually not needed.
             >
-              {ProSideBar.map((item) => {
-                const isActive = location.pathname === item.url;
-                return (
-                  // Use motion.div instead of motion.li to avoid nesting issues
-                  <motion.div 
-                    key={item.title} 
-                    variants={menuItemVariants}
-                    whileHover={!isActive ? { scale: 1.03, x: 4 } : {}}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                  >
-                    <SidebarMenuItem className="p-0"> {/* Remove padding from item wrapper */}
-                      <SidebarMenuButton asChild>
-                        <Link
-                          to={item.url}
-                          className={`
-                            flex items-center gap-3 px-4 py-2.5 rounded-lg w-full
-                            text-sm font-medium transition-all duration-200 ease-in-out
-                            group relative {/* Added group for potential icon animations */}
-                            ${
-                              isActive
-                                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md scale-[1.02]" // Enhanced active state
-                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white hover:scale-[1.03] hover:translate-x-1" // Enhanced hover state
-                            }
-                          `}
-                          onClick={() => {
-                            if (item.id === "registerStudent") {
-                              dispatch(setUpdateAllocation(updateAllocation)); // Keep original logic
-                            }
-                          }}
-                        >
-                          {/* Active indicator (optional, a subtle line on the left) */}
-                          {isActive && (
-                            <motion.div
-                              className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-300 dark:bg-yellow-400 rounded-r-full"
-                              layoutId="activeIndicator" // Animate layout changes smoothly
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.2 }}
-                            />
-                          )}
+              <SidebarMenu> {/* Keep SidebarMenu if it provides necessary structure */}
+                {ProSideBar.map((item) => {
+                  const isActive = location.pathname === item.url;
+                  return (
+                    // Wrap SidebarMenuItem with motion.li for animation
+                    <motion.li key={item.title} variants={menuItemVariants}>
+                      <SidebarMenuItem className="p-0"> {/* Remove padding from item wrapper */}
+                        <SidebarMenuButton asChild>
+                          <Link
+                            to={item.url}
+                            className={`
+                              flex items-center gap-3 px-4 py-2.5 rounded-lg w-full
+                              text-sm font-medium transition-all duration-200 ease-in-out
+                              group relative {/* Added group for potential icon animations */}
+                              ${
+                                isActive
+                                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md scale-[1.02]" // Enhanced active state
+                                  : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white hover:scale-[1.03] hover:translate-x-1" // Enhanced hover state
+                              }
+                            `}
+                            onClick={() => {
+                              if (item.id === "registerStudent") {
+                                dispatch(setUpdateAllocation(updateAllocation)); // Keep original logic
+                              }
+                            }}
+                            // Framer Motion hover effect (only if not active)
+                            whileHover={!isActive ? { scale: 1.03, x: 4 } : {}}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          >
+                            {/* Active indicator (optional, a subtle line on the left) */}
+                            {isActive && (
+                              <motion.div
+                                className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-300 dark:bg-yellow-400 rounded-r-full"
+                                layoutId="activeIndicator" // Animate layout changes smoothly
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                              />
+                            )}
 
-                          <item.icon className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110" />
-                          <span className="truncate"> {/* Use truncate if text might overflow */}
-                            {item.title}
-                          </span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
+                            <item.icon className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                            <span className="truncate"> {/* Use truncate if text might overflow */}
+                              {item.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </motion.li>
+                  );
+                })}
+              </SidebarMenu>
+            </motion.ul>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuButton className="w-full">
-                        <div className="flex items-center gap-2 text-center " >
-                          <LogOut className="h-5 w-5 text-center ml-5"  />
-                           
-                          <ChevronUp className="h-4 w-4 ml-auto shrink-0" />
-                        </div>
-                      </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      side="top" 
-                      className="w-48"
-                      align="start"
-                    >
-                      
-                      <DropdownMenuItem onClick={()=>HandleLogOut()}>
-                        <span>Sign out</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              {/* --- Disable trigger while logging out --- */}
+              <DropdownMenuTrigger asChild disabled={isLoggingOut}>
+                <SidebarMenuButton className="w-full">
+                  {/* --- Added text "Sign out" for expanded state --- */}
+                  <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                    {/* Icon on the left */}
+                    <LogOut className="h-5 w-5 shrink-0" />
+                    {/* Text that shows when sidebar is not collapsed */}
+                    {/* You might need to adjust this based on how your Sidebar component handles collapsed state text */}
+                    <span className="truncate">Sign out</span>
+                    {/* Chevron on the right */}
+                    <ChevronUp className="h-4 w-4 ml-auto shrink-0 text-gray-500 dark:text-gray-400" />
+                     {/* Optional: Loader icon when logging out */}
+                     {isLoggingOut && <Loader className="h-4 w-4 animate-spin ml-2" />}
+                  </div>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-48"
+                align="start"
+              >
+                {/* --- Dropdown item triggers logout --- */}
+                 {/* The dropdown item doesn't need to be disabled if the trigger is */}
+                <DropdownMenuItem onClick={HandleLogOut}>
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

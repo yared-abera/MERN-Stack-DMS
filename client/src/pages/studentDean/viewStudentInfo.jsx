@@ -135,9 +135,15 @@ const StudentInfo = () => {
       )
     );
   };
-  function HandleDeleteStudent(id, blockNum, dormId, sex) {
+  function HandleDeleteStudent(row) {
+    console.log("row", row);
+
+    const{_id:id, blockNum, dormId, sex}=row;
+    console.log(id, blockNum, dormId ,sex, "id, blockNum, dormId")
     dispatch(DeleteStudent({ id, blockNum, dormId, sex })).then((res) => {
       if (res.payload.success) {
+        setDeleteStudentId(null)
+        setDeleteUserConfirmation(false);
         toast.success(res.payload.message);
         dispatch(getAllocatedStudent()).then((res) => {
           if (res.payload) {
@@ -149,9 +155,10 @@ const StudentInfo = () => {
         toast.error(`${res.payload.message}`);
       }
 
-      setDeleteUserConfirmation(false);
-      setDeleteStudentId("");
+   
     });
+  
+  
   }
 
   // Add this function to handle student updates
@@ -392,6 +399,7 @@ const StudentInfo = () => {
       { name: "Student ID", selector: (row) => row.userName, sortable: true },
       { name: "First Name", selector: (row) => row.Fname, sortable: true },
       { name: "Last Name", selector: (row) => row.Lname, sortable: true },
+      { name: "Status", selector: (row) => row.status, sortable: true },
       {
         name: "Student Type",
         selector: (row) => row.studCategory,
@@ -443,8 +451,9 @@ const StudentInfo = () => {
                 <DropdownMenuItem
                   className="text-red-600"
                   onClick={() => {
-                    setDeleteStudentId(row);
+                     
                     setDeleteUserConfirmation(true);
+                    setDeleteStudentId(row);
                   }}
                 >
                   Delete
@@ -1011,10 +1020,7 @@ console.log(selectedStudent, "selectedStudent");
                 variant="destructive"
                 onClick={() =>
                   HandleDeleteStudent(
-                    deleteStudentId._id,
-                    deleteStudentId.blockNum,
-                    deleteStudentId.dormId,
-                    deleteStudentId.sex
+                    deleteStudentId
                   )
                 }
               >

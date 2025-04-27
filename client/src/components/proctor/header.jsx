@@ -29,28 +29,39 @@ export default function Header() {
       console.log("No user ID available (StudDean)");
     }
   }, [user]);
-      const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Sidebar default state
-    
+      
       return (
-        <header className="sticky top-0 w-full overflow-auto px-4 py-6 z-10 border-b shadow-md dark:bg-black bg-white mb-2">
-          <div className="flex items-center justify-between w-full">
+        <header className="sticky top-0 w-full overflow-hidden px-4 py-6 z-10 border-b shadow-md dark:bg-black bg-slate-50 mb-2">
+          <div className="flex items-center  w-full  ">
             {/* Left Section: Sidebar */}
-            <div className="flex items-center">
-              <SidebarTrigger />
+            <div className="flex items-center   ">
+            <SidebarTrigger />
+
+             
             </div>
 
             {/* Center Section: Search, Calendar, and Time */}
-            <div className="flex items-center flex-grow mx-4 gap-4">
-              <div>
-                <ChatIcon userRole="proctor" />
-              </div>
-            </div>
+
+            <div className="flex justify-evenly w-full ">
+
+            <div className="pt-2">
+          <ChatIcon userRole="proctor" />
+          </div>
 
             {/* Right Section: Dark Mode & Avatar */}
+
+            <div>
+            <DarkMode />
+            </div>
+           
+
+            </div>
+
             <div className="flex items-center justify-evenly gap-4">
-              <DarkMode />
+              
               {ThisUser && ThisUser !== '' ? <AvatarComponent ThisUser={ThisUser} /> : null}
             </div>
+         
           </div>
         </header>
       );

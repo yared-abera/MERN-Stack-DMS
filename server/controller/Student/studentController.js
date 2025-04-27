@@ -3,7 +3,9 @@ const bcryptjs = require("bcryptjs");
 const mongoose = require("mongoose");
 const Block = require("../../model/block/index");
 const SearchHistory = require("../../model/user/recentSearchedUser");
-const bcrypt=require('bcryptjs')
+const Control = require("../../model/control/control-Model");
+const FeedBack=require('../../model/feedback/index')
+const bcrypt = require("bcryptjs");
 const InsertStudent = async (req, res) => {
   try {
     const {
@@ -30,7 +32,7 @@ const InsertStudent = async (req, res) => {
 
     const stud = req.body;
     console.log(stud, "stud");
- 
+
     // Check if username or email already exists
     const existingStudentByUsername = await Student.findOne({ userName });
     if (existingStudentByUsername) {
@@ -155,7 +157,6 @@ const updateStudent = async (req, res) => {
       "sex",
       "studCategory",
       "userName",
-
     ];
     const updates = {};
     updatableFields.forEach((field) => {
@@ -274,10 +275,6 @@ const updateStudent = async (req, res) => {
   }
 };
 
-
-
-
- 
 const updateByStudent = async (req, res) => {
   const { id } = req.params;
   const formData = req.body;
@@ -309,17 +306,16 @@ const updateByStudent = async (req, res) => {
     // Send successful response
     res.status(200).json({
       success: true,
-      message: 'Student updated successfully',
-      data: updatedStudent
+      message: "Student updated successfully",
+      data: updatedStudent,
     });
-
   } catch (error) {
     // Handle different error types
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
         message: "Validation Error",
-        error: error.message
+        error: error.message,
       });
     }
 
@@ -327,12 +323,112 @@ const updateByStudent = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: error.message
+      error: error.message,
     });
   }
 };
- 
- 
+
+// const DeleteStudent = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     // 1) Validate the student ID
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid student ID",
+//       });
+//     }
+
+//     // 2) Fetch the student so we know their block/dorm/sex
+//     const student = await Student.findById(id);
+//     if (!student) {
+//       return res.json({
+//         success: false,
+//         message: "Student not found",
+//       });
+//     }
+
+//     const { blockNum, dormId, sex } = student;
+//     const blockLocation = sex === "Male" ? "maleArea" : "femaleArea";
+
+//     // 3) Load the block document
+//     const block = await Block.findOne({ blockNum, location: blockLocation });
+//     if (!block) {
+//       return res.json({
+//         success: false,
+//         message: "Block not found for this student",
+//       });
+//     }
+
+//     // 4) Find the dorm inside any floor and decrement its counter
+//     let dormFound = false;
+//     for (const floor of block.floors) {
+//       const dorm = floor.dorms.find(
+//         (d) => d.dormNumber.toString() === dormId.toString()
+//       );
+//       if (dorm) {
+//         dormFound = true;
+//         // Never go below zero
+//         dorm.studentsAllocated = Math.max(0, dorm.studentsAllocated - 1);
+//         break;
+//       }
+//     }
+
+//     if (!dormFound) {
+//       return res.json({
+//         success: false,
+//         message: "Dorm not found in the specified block",
+//       });
+//     }
+
+//     // 5) Persist the updated block
+//     await block.save();
+
+//     // 6) Delete the student record from the recently searched student
+//     const deletedRecentlySearchedStudent = await SearchHistory.findOne({
+//       userId: id,
+//       role: "Student",
+//     });
+//     if (deletedRecentlySearchedStudent) {
+//       await deletedRecentlySearchedStudent.findByIdAndDelete(
+//         deletedRecentlySearchedStudent._id
+//       );
+//     }
+
+//     const deletedControl = await Control.findOne({
+//       student: id,
+//     });
+//     if (deletedControl) {
+//       await deletedControl.findByIdAndDelete(deletedControl._id);
+//     }
+
+
+//     const deletedFeedBack = await FeedBack.findOne({
+//       userId: id,
+//     });
+//     if (deletedFeedBack) {
+//       await deletedFeedBack.findByIdAndDelete(deletedControl._id);
+    
+//     // 6) Finally, delete the student record
+//     const deleted = await Student.findByIdAndDelete(id);
+//     // (we already know it existed, so `deleted` should be truthy)
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Student deleted successfully",
+//       data: deleted,
+//     });
+//   }
+//  } catch (error) {
+//     console.error("Error deleting student:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error, please try again later.",
+//     });
+//   }
+// }
+
 const DeleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -345,10 +441,10 @@ const DeleteStudent = async (req, res) => {
       });
     }
 
-    // 2) Fetch the student so we know their block/dorm/sex
+    // 2) Fetch the student
     const student = await Student.findById(id);
     if (!student) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Student not found",
       });
@@ -357,16 +453,16 @@ const DeleteStudent = async (req, res) => {
     const { blockNum, dormId, sex } = student;
     const blockLocation = sex === "Male" ? "maleArea" : "femaleArea";
 
-    // 3) Load the block document
+    // 3) Find the block
     const block = await Block.findOne({ blockNum, location: blockLocation });
     if (!block) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Block not found for this student",
       });
     }
 
-    // 4) Find the dorm inside any floor and decrement its counter
+    // 4) Update dorm allocation
     let dormFound = false;
     for (const floor of block.floors) {
       const dorm = floor.dorms.find(
@@ -374,41 +470,47 @@ const DeleteStudent = async (req, res) => {
       );
       if (dorm) {
         dormFound = true;
-        // Never go below zero
         dorm.studentsAllocated = Math.max(0, dorm.studentsAllocated - 1);
         break;
       }
     }
 
     if (!dormFound) {
-      return res.json({
+      return res.status(404).json({
         success: false,
         message: "Dorm not found in the specified block",
       });
     }
 
-    // 5) Persist the updated block
+    // 5) Save block changes
     await block.save();
 
-    // 6) Delete the student record from the recently searched student
-    const deletedRecentlySearchedStudent = await SearchHistory.findOne({
+    // 6) Delete related records
+    // Delete from SearchHistory
+    await SearchHistory.findOneAndDelete({
       userId: id,
       role: "Student",
     });
-    if (deletedRecentlySearchedStudent) {
-      await deletedRecentlySearchedStudent.findByIdAndDelete(
-        deletedRecentlySearchedStudent._id
-      );
-    }
-    // 6) Finally, delete the student record
-    const deleted = await Student.findByIdAndDelete(id);
-    // (we already know it existed, so `deleted` should be truthy)
+
+    // Delete from Control
+    await Control.findOneAndDelete({
+      student: id,
+    });
+
+    // Delete from FeedBack
+    await FeedBack.findOneAndDelete({
+      userId: id,
+    });
+
+    // 7) Delete the student
+    const deletedStudent = await Student.findByIdAndDelete(id);
 
     return res.status(200).json({
       success: true,
       message: "Student deleted successfully",
-      data: deleted,
+      data: deletedStudent,
     });
+    
   } catch (error) {
     console.error("Error deleting student:", error);
     return res.status(500).json({
@@ -417,8 +519,9 @@ const DeleteStudent = async (req, res) => {
     });
   }
 };
-
  
+ 
+
 
 const DeleteAllStudent = async (req, res) => {
   try {
@@ -444,7 +547,10 @@ const DeleteAllStudent = async (req, res) => {
         // 1) Decrement the dorm count
         const { blockNum, dormId, sex } = student;
         const blockLocation = sex === "Male" ? "maleArea" : "femaleArea";
-        const block = await Block.findOne({ blockNum, location: blockLocation });
+        const block = await Block.findOne({
+          blockNum,
+          location: blockLocation,
+        });
         if (!block) {
           failedStudents.push(studentItem._id);
           continue;
@@ -472,6 +578,14 @@ const DeleteAllStudent = async (req, res) => {
           role: "Student",
         });
 
+        await Control.deleteMany({
+          student: student._id,
+        });
+
+        await FeedBack.deleteMany({
+          userId: student._id,
+        });
+
         // 3) Finally delete the student
         const deleted = await Student.findByIdAndDelete(student._id);
         if (deleted) {
@@ -479,7 +593,6 @@ const DeleteAllStudent = async (req, res) => {
         } else {
           failedStudents.push(studentItem._id);
         }
-
       } catch (err) {
         console.error(`Error deleting student ${studentItem._id}:`, err);
         failedStudents.push(studentItem._id);
@@ -491,7 +604,6 @@ const DeleteAllStudent = async (req, res) => {
       message: "Student deletion process completed",
       data: { deletedStudents, failedStudents },
     });
-
   } catch (error) {
     console.error("Error in DeleteAllStudent:", error);
     return res.status(500).json({
@@ -501,7 +613,7 @@ const DeleteAllStudent = async (req, res) => {
     });
   }
 };
-  
+
 const fetchStuentForProctor = async (req, res) => {
   try {
     const { id } = req.params;
@@ -509,17 +621,17 @@ const fetchStuentForProctor = async (req, res) => {
     if (!id) {
       return res.json({
         success: false,
-        message: 'Proctor ID is required'
+        message: "Proctor ID is required",
       });
     }
-    console.log(id,"id")
+    console.log(id, "id");
     // Find the block assigned to the proctor using the $in operator
     const getBlock = await Block.findOne({ assignedProctors: { $in: [id] } });
 
     if (!getBlock) {
       return res.status(404).json({
         success: false,
-        message: 'Block not found for this proctor'
+        message: "Block not found for this proctor",
       });
     }
 
@@ -528,10 +640,8 @@ const fetchStuentForProctor = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: students
+      data: students,
     });
- 
-
   } catch (error) {
     console.error("Error fetching students for proctor:", error);
     return res.status(500).json({
@@ -585,7 +695,6 @@ const ChangePassword = async (req, res) => {
     });
   }
 };
- 
 
 module.exports = {
   InsertStudent,
@@ -596,5 +705,5 @@ module.exports = {
   DeleteAllStudent,
   fetchStuentForProctor,
   updateByStudent,
-  ChangePassword
+  ChangePassword,
 };
