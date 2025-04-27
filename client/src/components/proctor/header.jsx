@@ -4,6 +4,8 @@ import AvatarComponent from "@/components/common/avatar";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleUser } from "@/store/user-slice/userSlice";
+import { Link } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
 export default function Header() {
 
   const [ThisUser, setThisUser] = useState('');
@@ -35,6 +37,13 @@ export default function Header() {
           {/* Sidebar Trigger */}
           <div className="flex items-center">
             <SidebarTrigger onClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+          </div>
+
+          <div className="w-full mx-auto">
+            <Link to={'/proctor/chat'}>
+            <MessageCircle/>
+            </Link>
+            
           </div>
     
           <div className="flex items-center gap-4 ml-auto">

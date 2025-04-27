@@ -123,19 +123,18 @@ export const getSingleStudent=createAsyncThunk('student/getSingleStudent',async(
 
 })
 
-export const CompareStudentPasswordAndUpdate=createAsyncThunk('student/getSingleStudent',async({Password, id })=>{
-    console.log(Password,"password in slice")
-    console.log(id,"id in slice");
+export const CompareStudentPasswordAndUpdate=createAsyncThunk('student/changePassword',async({Password,  id })=>{
+   
      
-    // try {
-    //     const response=await axios.get(`http://localhost:9000/api/student/updatePassword/${id}/${Password}`, {
-    //         withCredentials:true
-    //     });
-    //     console.log(response.data,"response of student get from slice");
-    //     return response.data
-    // } catch (error) {
-    //     return rejectWithValue(error.response.data);
-    // }
+    try {
+        const response=await axios.put(`http://localhost:9000/api/student/updatePassword/${id}`,Password, {
+            withCredentials:true
+        });
+        console.log(response.data,"response of student get from slice");
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
 
 })
 

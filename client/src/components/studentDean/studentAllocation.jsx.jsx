@@ -121,8 +121,9 @@ export default function AllocationLast({ studAndBlockInfo }) {
       : allDorms;
 
     // Find the first available dorm (i.e. not full)
+
     const availableDorm = filteredDorms.find(
-      (d) => d.studentsAllocated < d.capacity
+      (d) => d.studentsAllocated < d.capacity&&d.dormStatus==='Available'
     );
     if (!availableDorm) {
       console.warn(`No available dorms in block ${blockNum}`);
@@ -300,7 +301,7 @@ export default function AllocationLast({ studAndBlockInfo }) {
 
     // Find the first dorm with available capacity
     const availableDorm = filteredDorms.find(
-      (d) => d.studentsAllocated < d.capacity
+      (d) => d.studentsAllocated < d.capacity&&d.dormStatus==='Available'
     );
     if (!availableDorm) {
       console.warn("No available dorms in the selected block");

@@ -508,7 +508,7 @@ const StudentInfo = () => {
       ...editData,
     });
   };
-
+console.log(selectedStudent, "selectedStudent");
   return (
     <>
       <div className="flex flex-col mt-2">
@@ -785,9 +785,16 @@ const StudentInfo = () => {
 
               {/* Address (full width) */}
               <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
-                <dt className="text-sm font-medium text-gray-500">Address</dt>
+                <dt className="text-sm font-medium text-gray-500">Country</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
-                  {selectedStudent.address}
+                  {selectedStudent.address.country}
+                </dd>
+              </div>
+
+              <div className="py-2 grid grid-cols-1 sm:grid-cols-2">
+                <dt className="text-sm font-medium text-gray-500">City</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:pl-4">
+                  {selectedStudent.address.city}
                 </dd>
               </div>
 

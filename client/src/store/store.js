@@ -1,4 +1,4 @@
- import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth-slice";
 import themeSlice from "./common/ThemeSlice";
 import sidebarReducer from "./common/sidebarSlice";
@@ -9,10 +9,10 @@ import UserSlice from './user-slice/userSlice'
 import feedBackSlice from './feedBack/feedBack'
 import attendanceSlice from './attendance/attendance-Slice'
 import ControlSlice from './control/controlSclice.jsx'
+import chatReducer from './chat/chatSlice'
 
 import blockReducer from "./blockSlice";
 const store = configureStore({
-
     reducer: {
         auth: authReducer,
         theme: themeSlice,
@@ -24,8 +24,13 @@ const store = configureStore({
         issue:MaintainanceIssueSlice,
         feedBack:feedBackSlice,
         attendance:attendanceSlice,
-        control:ControlSlice
-    }
+        control:ControlSlice,
+        chat: chatReducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }),
 })
 
 export default store

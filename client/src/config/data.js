@@ -338,7 +338,7 @@ export const StudDataSchema = {
   role: String,
 };
 export const requiredSchema = {
-  Fname: String,
+  Fname:String,
   Mname: String,
   Lname: String,
   userName: String,

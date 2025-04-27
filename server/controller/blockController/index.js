@@ -226,34 +226,7 @@ const UpdateBlock = async (req, res) => {
   }
 };
 
-// const getALLBlocks = async (req, res) => {
-//   try {
-//     const allBlocks = await Block
-//       .find()
-//       .populate({
-//         path: 'registerBy',
-//         model:'User',
-//         select: 'fName mName LName userName gender email role'    // pick whatever User fields you need
-//       })
-//       .populate({
-//         path: 'assignedProctors',
-//         model:'User',
-//         select: 'fName mName LName userName gender email role'     // same here
-//       });
-
-//     res.status(200).json({
-//       success: true,
-//       data: allBlocks,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "get All blocks failed",
-//       error: error.message,
-//     });
-//   }
-// };
-
+ 
 const getALLBlocks = async (req, res) => {
   try {
     const allBlocks = await Block.find()

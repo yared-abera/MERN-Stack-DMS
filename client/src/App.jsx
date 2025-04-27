@@ -54,6 +54,11 @@ import ProctorControl from "./pages/proctor/control";
 import ManagerControl from "./pages/proctorManager/control";
 import DeanIssueContol from "./pages/studentDean/viewControlIssues";
 import ManagerDashBoard from "./pages/proctorManager/dashborad";
+ 
+import AdminChat from "./pages/Admin/adminChat";
+import ProctorManagerChat from "./pages/proctorManager/ProctorManagerChat";
+import ProctorChat from "./pages/proctor/proctorChat/ProctorChat";
+import StudentDeanChat from "./pages/studentDean/StudentDeanChat";
 import StudentDeanGenerateReport from "./pages/studentDean/generateReport";
 
 function App() {
@@ -136,6 +141,7 @@ function App() {
           <Route path="home" element={<AdminDashboard />} />
           <Route path="manage" element={<ManageAccount />} />
           <Route path="account" element={<AdminAccount />} />
+          <Route path="chat" element={<AdminChat/>} />
         </Route>
 
         <Route
@@ -155,6 +161,7 @@ function App() {
           <Route path="Control" element={<ManagerControl />} />
           <Route path="home" element={<ManagerDashBoard/>} />
           <Route path="Account" element={<ProfileManagement />} />
+          <Route path="chat" element={<ProctorManagerChat/>} />
         </Route>
 
         <Route
@@ -174,6 +181,7 @@ function App() {
           <Route path="account" element={<ProctorAccount />} />
           <Route path="attendance" element={<ProctorAttendance />} />
           <Route path="control" element={<ProctorControl />} />
+          <Route path="chat" element={<ProctorChat/>} />
         </Route>
 
         <Route
@@ -192,6 +200,7 @@ function App() {
           <Route path="report" element={<StudentDeanGenerateReport />} />
           <Route path="issue" element={<DeanMaintenanceIssue />} />
           <Route path="control" element={<DeanIssueContol />} />
+          <Route path="chat" element={<StudentDeanChat/>} />
         </Route>
 
         <Route

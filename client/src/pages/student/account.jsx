@@ -185,8 +185,8 @@ export default function StudentAccount() {
       return;
     }
 
-    if (Password.newPassword.length < 6) {
-      toast.warning("New password must be at least 6 characters.", {
+    if (Password.newPassword.length < 5) {
+      toast.warning("New password must be at least 5 characters.", {
         icon: <AlertCircle size={16} />,
       });
       return;
@@ -608,7 +608,7 @@ export default function StudentAccount() {
                 <Input
                   id="newPassword"
                   className="text-sm md:text-base pl-10 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:ring-primary"
-                  placeholder="Enter New Password (min 6 chars)"
+                  placeholder="Enter New Password (min 5 chars)"
                   type={showNewPassword ? "text" : "password"}
                   value={Password.newPassword}
                   onChange={(e) => {

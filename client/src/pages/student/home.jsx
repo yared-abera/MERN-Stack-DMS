@@ -186,7 +186,7 @@ export default function StudentHome() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-grow p-4 space-y-3 text-sm"> {/* Styled Content, flex-grow to fill space, spacing between paragraphs */}
-                <p className="flex items-start"><MapPin className="mr-3 mt-1 w-4 h-4 text-red-400 flex-shrink-0" /> University Address, City, Country</p> {/* Address with icon */}
+                <p className="flex items-start"><MapPin className="mr-3 mt-1 w-4 h-4 text-red-400 flex-shrink-0" /> Wolkite University Address, City, Country</p> {/* Address with icon */}
                 <p className="flex items-center"><Phone className="mr-3 w-4 h-4 text-green-400" /> +123 456 7890</p> {/* Phone with icon */}
                 <p className="flex items-center"><Mail className="mr-3 w-4 h-4 text-yellow-400" /> info@university.edu</p> {/* Email with icon */}
               </CardContent>
@@ -236,7 +236,7 @@ export default function StudentHome() {
               </CardHeader>
               <CardContent className="flex-grow p-4 text-sm"> {/* Styled Content, flex-grow */}
                 <div className="flex space-x-4 justify-center"> {/* Center social icons horizontally */}
-                   <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors" aria-label="Facebook"><Facebook size={28} /></a> {/* Styled Social Icons */}
+                   <a href="https://web.facebook.com/wku.edu.et" className="text-blue-400 hover:text-blue-300 transition-colors" aria-label="Facebook"><Facebook size={28} /></a> {/* Styled Social Icons */}
                    <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors" aria-label="Twitter"><Twitter size={28} /></a>
                    <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors" aria-label="Instagram"><Instagram size={28} /></a>
                    <a href="#" className="text-blue-400 hover:text-blue-300 transition-colors" aria-label="LinkedIn"><Linkedin size={28} /></a>
