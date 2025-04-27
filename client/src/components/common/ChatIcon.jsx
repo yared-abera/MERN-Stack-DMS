@@ -50,8 +50,7 @@ const ChatIcon = ({ userRole }) => {
     return () => clearInterval(interval);
   }, [dispatch, user?.id]); // Added user?.id to dependencies
 
-  console.log('Current unread count:', unreadCount); // Debug current unread count
-
+  
   return (
     <Link to={getChatRoute()} className="relative inline-block">
       <MessageCircle className="h-6 w-6"/>

@@ -39,7 +39,7 @@ export const getAllControlIssues = createAsyncThunk(
           withCredentials: true,
         }
       );
-      console.log(respons.data, "response of student add");
+      console.log(respons.data, "response of student issue add");
 
       return respons.data;
     } catch (error) {

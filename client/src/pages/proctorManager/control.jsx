@@ -26,51 +26,51 @@ export default function ManagerControl() {
     dispatch(getAllControlIssues());
   }, [dispatch]); // Only depends on dispatch unless API needs user specifics
 
-  // Effect to filter issues whenever selection, data, or user gender changes
+ console.log(allIssues, "allIssues");
+ 
   useEffect(() => {
-    // Ensure necessary data is available before proceeding
-    if (!allIssues || allIssues.length === 0 || !userGender) {
-      setFilteredIndividualIssues([]); // Clear filtered list if data is missing
-      return;
+   
+    if(allIssues&&allIssues.data&&allIssues.data.length>0&&allIssues.success){
+      const issuesForMatchingGender = allIssues.data.filter(
+        (issueGroup) => issueGroup.student?.sex.toUpperCase() === userGender.toUpperCase()
+      );
+      
+    
+      if (selectedOption === "All") {
+        setFilteredIndividualIssues(issuesForMatchingGender);
+      } else {
+        // Use map to iterate through each main issue (parent object)
+        const filteredIssuesWithParentData = issuesForMatchingGender
+          .map(individualIssue => {
+            // Add a safety check in case Allissues is null or undefined
+            const issuesArray = individualIssue.Allissues || [];
+      
+            // Filter the nested Allissues array for the current parent issue
+            const filteredInnerIssues = issuesArray.filter(
+              s => s.status === selectedOption
+            );
+      
+            // If there are any matching specific issues within this parent...
+            if (filteredInnerIssues.length > 0) {
+    
+              return {
+                ...individualIssue, // This includes _id, student, proctor, etc.
+                Allissues: filteredInnerIssues // Replace the original Allissues with the filtered array
+              };
+            } else {
+            
+              return null;
+            }
+          })
+          // Filter out any parent issues that resulted in null (because they had no matching specific issues)
+          .filter(issue => issue !== null);
+      
+        setFilteredIndividualIssues(filteredIssuesWithParentData);
+      }
     }
 
     // 1. Filter the main list by student gender first
-    const issuesForMatchingGender = allIssues.data.filter(
-      (issueGroup) => issueGroup.student?.sex.toUpperCase() === userGender.toUpperCase()
-    );
-    
-  
-    if (selectedOption === "All") {
-      setFilteredIndividualIssues(issuesForMatchingGender);
-    } else {
-      // Use map to iterate through each main issue (parent object)
-      const filteredIssuesWithParentData = issuesForMatchingGender
-        .map(individualIssue => {
-          // Add a safety check in case Allissues is null or undefined
-          const issuesArray = individualIssue.Allissues || [];
-    
-          // Filter the nested Allissues array for the current parent issue
-          const filteredInnerIssues = issuesArray.filter(
-            s => s.status === selectedOption
-          );
-    
-          // If there are any matching specific issues within this parent...
-          if (filteredInnerIssues.length > 0) {
-  
-            return {
-              ...individualIssue, // This includes _id, student, proctor, etc.
-              Allissues: filteredInnerIssues // Replace the original Allissues with the filtered array
-            };
-          } else {
-          
-            return null;
-          }
-        })
-        // Filter out any parent issues that resulted in null (because they had no matching specific issues)
-        .filter(issue => issue !== null);
-    
-      setFilteredIndividualIssues(filteredIssuesWithParentData);
-    }
+   
 
     // Dependencies: This effect should re-run if the filter criteria or the data changes
   }, [selectedOption]); // Added allIssues and userGender

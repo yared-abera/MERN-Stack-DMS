@@ -22,8 +22,7 @@ export default function Header() {
 
   // Get unread messages count from redux store
   const { unreadCount } = useSelector(state => state.chat);
-console.log(unreadCount,"unreadCount");
-
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       setTime(new Date().toLocaleTimeString());

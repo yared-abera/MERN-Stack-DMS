@@ -36,6 +36,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion"; // Import motion, maybe AnimatePresence if needed for exit animations
 import { toast } from "sonner";
 import { LogOutUser } from "@/store/auth-slice"; // Assuming this is an async thunk
+import { useState } from "react";
 
 const ProSideBar = [
   {
