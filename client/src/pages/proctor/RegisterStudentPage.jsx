@@ -72,8 +72,7 @@ const RegisterStudentPage = () => {
     setIsOpen(openDialog);
     // When dialog opens via Redux state, if it's a new registration flow, navigate
     if (openDialog && location.pathname !== "/proctor/register") {
-      // Optional: Navigate to a specific route if needed when dialog opens via sidebar
-      // navigate("/proctor/register");
+      navigate("/proctor/register");
     }
   }, [openDialog, location.pathname, navigate]);
 

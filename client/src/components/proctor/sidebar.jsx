@@ -200,7 +200,7 @@ export default function ProctorSideBar() {
                               `}
                               onClick={() => {
                                 if (item.id === "registerStudent") {
-                                  dispatch(setUpdateAllocation(updateAllocation));
+                                  dispatch(setUpdateAllocation(true));
                                 }
                               }}
                             >
@@ -215,7 +215,16 @@ export default function ProctorSideBar() {
                                 />
                               )}
 
-                              <item.icon className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                              {/* Update icon rendering */}
+                              <div className="flex items-center justify-center w-5 h-5">
+                                <item.icon 
+                                  className={`w-full h-full transition-transform duration-200 group-hover:scale-110
+                                    ${isActive ? 'text-white' : 'text-gray-600 dark:text-gray-400'}
+                                  `}
+                                  strokeWidth={2}
+                                  size={20}
+                                />
+                              </div>
                               <span className="truncate">
                                 {item.title}
                               </span>
@@ -242,14 +251,32 @@ export default function ProctorSideBar() {
                   {/* --- Added text "Sign out" for expanded state --- */}
                   <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                     {/* Icon on the left */}
-                    <LogOut className="h-5 w-5 shrink-0" />
+                    <div className="flex items-center justify-center w-5 h-5">
+                      <LogOut 
+                        className="w-full h-full transition-transform duration-200" 
+                        strokeWidth={2}
+                        size={20}
+                      />
+                    </div>
                     {/* Text that shows when sidebar is not collapsed */}
                     {/* You might need to adjust this based on how your Sidebar component handles collapsed state text */}
                     <span className="truncate">Sign out</span>
                     {/* Chevron on the right */}
-                    <ChevronUp className="h-4 w-4 ml-auto shrink-0 text-gray-500 dark:text-gray-400" />
-                     {/* Optional: Loader icon when logging out */}
-                     {isLoggingOut && <Loader className="h-4 w-4 animate-spin ml-2" />}
+                    <div className="flex items-center ml-auto">
+                      <ChevronUp 
+                        className="w-4 h-4 text-gray-500 dark:text-gray-400" 
+                        strokeWidth={2}
+                        size={16}
+                      />
+                      {/* Optional: Loader icon when logging out */}
+                      {isLoggingOut && (
+                        <Loader 
+                          className="w-4 h-4 animate-spin ml-2" 
+                          strokeWidth={2}
+                          size={16}
+                        />
+                      )}
+                    </div>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

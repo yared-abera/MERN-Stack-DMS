@@ -385,7 +385,7 @@ useEffect(()=>{
   useEffect(() => {
     if (allIssues && allIssues.data && Array.isArray(allIssues.data)) {
       let total = 0, open = 0, closed = 0, inProgress = 0, passed = 0;
-        const filteredIssues=allIssues.data.filter(iss=>iss.student.sex.toUpperCase()===user.sex.toUpperCase())
+      const filteredIssues = allIssues.data.filter(iss => iss.student && iss.student.sex && iss.student.sex.toUpperCase() === user.sex.toUpperCase())
       filteredIssues.forEach(group => {
         if (Array.isArray(group.Allissues)) {
           group.Allissues.forEach(issue => {
@@ -403,7 +403,7 @@ useEffect(()=>{
       });
       setControlsSummary({ total, open, closed, inProgress, passed });
     }
-  }, [allIssues]);
+  }, [allIssues, user.sex]);
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();

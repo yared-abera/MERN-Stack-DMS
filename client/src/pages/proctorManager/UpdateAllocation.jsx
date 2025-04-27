@@ -127,7 +127,7 @@ export default function ViewAllocatedStudents() {
     { name: "Student ID", selector: (row) => row.userName, sortable: true },
     { name: "First Name", selector: (row) => row.Fname, sortable: true },
     { name: "Last Name", selector: (row) => row.Lname, sortable: true },
-     { name: "Gender", selector: (row) => row.sex, sortable: true }, // Added Gender column
+    { name: "Gender", selector: (row) => row.sex, sortable: true },
     {
       name: "Student Type",
       selector: (row) => row.studCategory,
@@ -135,46 +135,51 @@ export default function ViewAllocatedStudents() {
     },
     {
       name: "Block Number",
-      selector: (row) => row.blockNum, // Assuming blockNum is available on AllocatedStudent
+      selector: (row) => row.blockNum,
       sortable: true,
     },
     {
       name: "Dorm Number",
-      selector: (row) => row.dormId, // Assuming dormId is available on AllocatedStudent
+      selector: (row) => row.dormId,
       sortable: true,
+    },
+    { 
+      name: "Status",
+      selector: (row) => row.status,
+      sortable: true,
+      cell: (row) => (
+        <span className={`px-2 py-1 rounded-full text-sm ${
+          row.status === true ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+        }`}>
+          {row.status === true ? "Registered" : "Not Registered"}
+        </span>
+      )
     },
     {
       name: "Actions",
       cell: (row) => (
-
         <div className='flex flex-col gap-2'>
-
-             <button
-          onClick={() => {
-            setSelectedStudent(row); // Set the selected student
-            setShowStudentDetails(true); // Show the student details dialog
-          }}
-          className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          View Details
-        </button>
-
-        <button
-          onClick={() => {
-            setSelectedStudent(row); // Set the selected student
-            setEditAllocation(true); // Show the student details dialog
-          }}
-          className="px-2 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
-        >
-          Edit
-        </button>
-        
+          <button
+            onClick={() => {
+              setSelectedStudent(row);
+              setShowStudentDetails(true);
+            }}
+            className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            View Details
+          </button>
+          <button
+            onClick={() => {
+              setSelectedStudent(row);
+              setEditAllocation(true);
+            }}
+            className="px-2 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            Edit
+          </button>
         </div>
-       
-   
-        
       ),
-      ignoreRowClick: true, // Prevent row click from interfering with button click
+      ignoreRowClick: true,
       allowOverflow: true,
       button: true,
     },

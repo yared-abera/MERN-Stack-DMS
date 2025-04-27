@@ -8,23 +8,33 @@ import FloorCard from '@/components/proctor/FloorCard';
 export default function ProctorHomePage() {
   const dispatch = useDispatch();
   const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState({
+    blocks: true,
+    students: true
+  });
+  const [error, setError] = useState(null);
   const { list: blocks } = useSelector((state) => state.block);
   const [stats, setStats] = useState({
     totalStudents: 0,
     registeredStudents: 0,
     unregisteredStudents: 0,
     recentlyAccessed: [],
-    recentlyRegistered: []
+    recentlyRegistered: [],
+    occupancyPercentage: 0
   });
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('Fetching blocks...');
         await dispatch(fetchProctorBlocks()).unwrap();
+        console.log('Blocks fetched successfully');
+        setLoading(prev => ({ ...prev, blocks: false }));
       } catch (error) {
         console.error("Failed to fetch blocks:", error);
+        setError(`Failed to fetch blocks: ${error.message}`);
+        setLoading(prev => ({ ...prev, blocks: false }));
       }
     };
     fetchData();
@@ -32,62 +42,71 @@ export default function ProctorHomePage() {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      if (blocks.length === 0) return;
+      if (blocks.length === 0) {
+        console.log('No blocks available, skipping student fetch');
+        setLoading(prev => ({ ...prev, students: false }));
+        return;
+      }
       
       try {
+        console.log('Fetching students for proctor...');
         const response = await dispatch(getStudentForProctor(user.id)).unwrap();
-        console.log("Raw API Response:", response.data); // Debug log
+        console.log("Raw API Response:", response);
         
-        if (response.data) {
-          const proctorStudents = response.data 
-          
-          console.log("Proctor Students:", proctorStudents); // Debug log
-          
+        if (response?.data) {
+          const proctorStudents = response.data;
           setStudents(proctorStudents);
           
           // Calculate statistics
-          const registered = proctorStudents.filter(s => s.status === 'Registered');
-          console.log("Registered Students:", registered); // Debug log
+          const registered = proctorStudents.filter(s => s.status === true);
+          const unregistered = proctorStudents.filter(s => s.status === false);
           
-          // Get recently registered students (only those with registrationDate)
-          const recentlyReg = registered
-            .filter(student => {
-              console.log("Student registration date:", student.userName, student.registrationDate); // Debug log
-              return student.registrationDate;
-            })
+          // Get recently registered students (last 5)
+          const recentlyReg = proctorStudents
+            .filter(student => student.status === true && student.registrationDate)
             .sort((a, b) => new Date(b.registrationDate) - new Date(a.registrationDate))
             .slice(0, 5);
           
-          console.log("Recently Registered:", recentlyReg); // Debug log
-          
-          // Get recently accessed students (only those with lastUpdated)
+          // Get recently accessed students (last 5)
           const recentlyAcc = proctorStudents
-            .filter(student => {
-              console.log("Student last updated:", student.userName, student.lastUpdated); // Debug log
-              return student.lastUpdated;
-            })
+            .filter(student => student.lastUpdated)
             .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
             .slice(0, 5);
+  
+          const totalStudents = proctorStudents.length;
+          const registeredCount = registered.length;
           
-          console.log("Recently Accessed:", recentlyAcc); // Debug log
+          // Calculate occupancy percentage
+          const occupancyPercentage = totalStudents > 0 
+            ? Math.round((registeredCount / totalStudents) * 100) 
+            : 0;
   
           setStats({
-            totalStudents: proctorStudents.length,
-            registeredStudents: registered.length,
-            unregisteredStudents: proctorStudents.length - registered.length,
+            totalStudents: totalStudents,
+            registeredStudents: registeredCount,
+            unregisteredStudents: unregistered.length,
             recentlyRegistered: recentlyReg,
-            recentlyAccessed: recentlyAcc
+            recentlyAccessed: recentlyAcc,
+            occupancyPercentage: occupancyPercentage
+          });
+          
+          console.log('Students and stats updated successfully:', {
+            total: totalStudents,
+            registered: registeredCount,
+            unregistered: unregistered.length,
+            occupancy: occupancyPercentage
           });
         }
+        setLoading(prev => ({ ...prev, students: false }));
       } catch (error) {
         console.error("Failed to fetch students:", error);
-      } finally {
-        setLoading(false);
+        setError(`Failed to fetch students: ${error.message}`);
+        setLoading(prev => ({ ...prev, students: false }));
       }
     };
 
     fetchStudents();
-  }, [blocks, dispatch]);
+  }, [blocks, dispatch, user.id]);
 
   const handleRemoveFromList = (studentId, listType) => {
     setStats(prevStats => ({
@@ -144,10 +163,22 @@ export default function ProctorHomePage() {
     </div>
   );
 
-  if (loading) {
+  // Check if any loading state is true
+  const isLoading = Object.values(loading).some(state => state === true);
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl text-gray-600">Loading dashboard...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-xl text-gray-600 mb-4">Loading dashboard...</div>
+        <div className="text-sm text-gray-500">
+          {loading.blocks && <div>Loading blocks...</div>}
+          {loading.students && <div>Loading students...</div>}
+        </div>
+        {error && (
+          <div className="text-red-500 mt-4 text-center max-w-md">
+            Error: {error}
+          </div>
+        )}
       </div>
     );
   }
@@ -181,25 +212,25 @@ export default function ProctorHomePage() {
           <StatCard
             icon={FaUserGraduate}
             title="Total Students"
-            value={stats.totalStudents}
+            value={stats.totalStudents || 0}
             color="text-blue-600"
           />
           <StatCard
             icon={FaUserCheck}
             title="Registered Students"
-            value={stats.registeredStudents}
+            value={stats.registeredStudents || 0}
             color="text-green-600"
           />
           <StatCard
             icon={FaUserClock}
             title="Unregistered Students"
-            value={stats.unregisteredStudents}
+            value={stats.unregisteredStudents || 0}
             color="text-orange-600"
           />
           <StatCard
             icon={FaHistory}
             title="Block Occupancy"
-            value={`${Math.round((stats.registeredStudents / stats.totalStudents) * 100)}%`}
+            value={`${stats.occupancyPercentage || 0}%`}
             color="text-purple-600"
           />
         </div>
