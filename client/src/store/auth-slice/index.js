@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = 'http://localhost:9000/api';
+axios.defaults.baseURL = 'https://mern-stack-dms.onrender.com/api';
 
 const initialState = {
   user: null,
@@ -66,7 +66,7 @@ export const CreateAccount = createAsyncThunk(
     try {
       console.log("from CreateAccountSlice", formData);
       const result = await axios.post(
-        "http://localhost:9000/api/auth/account",
+        "https://mern-stack-dms.onrender.com/api/auth/account",
         formData,
         {
           withCredentials: true,
