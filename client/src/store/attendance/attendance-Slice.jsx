@@ -10,7 +10,7 @@ const initialState = {
 
 export const addAttendance = createAsyncThunk('attendance/add', async (formData, { rejectWithValue }) => {
     try {
-        const response = await axios.post('http://localhost:9000/api/attendance/add/', formData, {
+        const response = await axios.post('https://mern-stack-dms.onrender.com/api/attendance/add/', formData, {
             withCredentials: true
         });
         console.log('Add attendance response:', response.data);
@@ -25,7 +25,7 @@ export const getAttendanceNotification = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             console.log('Fetching absent students...');
-            const response = await axios.get('http://localhost:9000/api/attendance/getAbsent/', {
+            const response = await axios.get('https://mern-stack-dms.onrender.com/api/attendance/getAbsent/', {
                 withCredentials: true
             });
             console.log('Absent students response:', response.data);
