@@ -15,7 +15,7 @@ export const SubmitMaintainanceIssue = createAsyncThunk(
 
 
     const response = await axios.post(
-      "http://localhost:9000/api/maintainanceIssue/add",
+      "https://mern-stack-dms.onrender.com/api/maintainanceIssue/add",
       formData,
       {
         withCredentials: true,
@@ -33,7 +33,7 @@ export const GetAllMaintainanceIssue = createAsyncThunk(
 
 
     const response = await axios.get(
-      `http://localhost:9000/api/maintainanceIssue/get/${gender}`,
+      `https://mern-stack-dms.onrender.com/api/maintainanceIssue/get/${gender}`,
       {
         withCredentials: true,
       }
@@ -48,7 +48,7 @@ export const GetWholeMaintainanceIssueOfDean = createAsyncThunk(
 
 
     const response = await axios.get(
-      'http://localhost:9000/api/maintainanceIssue/getAll',
+      'https://mern-stack-dms.onrender.com/api/maintainanceIssue/getAll',
       {
         withCredentials: true,
       }
@@ -65,7 +65,7 @@ export const GetWholeMaintainanceIssue = createAsyncThunk(
 
 
     const response = await axios.get(
-      'http://localhost:9000/api/maintainanceIssue/getWhole',
+      'https://mern-stack-dms.onrender.com/api/maintainanceIssue/getWhole',
       {
         withCredentials: true,
       }
@@ -83,7 +83,7 @@ export const GetMainenanceIssueByStatus = createAsyncThunk(
     console.log(gender, "gender");
     console.log(selectedStatus, "selectedStatus");
     const response = await axios.get(
-      `http://localhost:9000/api/maintainanceIssue/getByStatus/${gender}/${selectedStatus}`,
+      `https://mern-stack-dms.onrender.com/api/maintainanceIssue/getByStatus/${gender}/${selectedStatus}`,
       {
         withCredentials: true,
       }
@@ -101,7 +101,7 @@ export const GetMainenanceIssueByStatusForDean = createAsyncThunk(
 
 
     const response = await axios.get(
-      `http://localhost:9000/api/maintainanceIssue/getByStatusForDean/${selectedStatus}`,
+      `https://mern-stack-dms.onrender.com/api/maintainanceIssue/getByStatusForDean/${selectedStatus}`,
       {
         withCredentials: true,
       }
@@ -120,7 +120,7 @@ export const GetPendingStatusMaintenaceIssue = createAsyncThunk(
   "get/GetPendingStatusMaintenaceIssue",
   async ({ status, id }) => {
     const response = await axios.get(
-      `http://localhost:9000/api/maintainanceIssue/getPendingStatus/${status}/${id}`,
+      `https://mern-stack-dms.onrender.com/api/maintainanceIssue/getPendingStatus/${status}/${id}`,
       {
         withCredentials: true,
       }
@@ -134,7 +134,7 @@ export const GetMaintenanceIssueForAuser = createAsyncThunk(
   "getOne/MaintainanceIssue",
   async ({ id, Model }) => {
     const response = await axios.get(
-      `http://localhost:9000/api/maintainanceIssue/getOne/${id}/${Model}`,
+      `https://mern-stack-dms.onrender.com/api/maintainanceIssue/getOne/${id}/${Model}`,
 
     );
     return response.data;
@@ -150,7 +150,7 @@ export const VerificationIssue = createAsyncThunk(
 
     console.log(verifyId, "verifyID")
     const response = await axios.put(
-      'http://localhost:9000/api/maintainanceIssue/verify/', verifyId,
+      'https://mern-stack-dms.onrender.com/api/maintainanceIssue/verify/', verifyId,
       {
         withCredentials: true,
       }
