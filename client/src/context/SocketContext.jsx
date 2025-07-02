@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:9000';
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'https://mern-stack-dms.onrender.com';
 
 export const SocketContext = createContext(null);
 
