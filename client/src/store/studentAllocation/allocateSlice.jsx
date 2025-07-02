@@ -14,7 +14,7 @@ export const InsertAllocatedStudent=createAsyncThunk('student/allocation',async(
 
       
         
-        const respons=await axios.post('http://localhost:9000/api/student/insert',updatedStudent,{
+        const respons=await axios.post('https://mern-stack-dms.onrender.com/api/student/insert',updatedStudent,{
             withCredentials:true
         })
      console.log(respons.data,"response of student add");
@@ -31,7 +31,7 @@ export const UpdateStudent=createAsyncThunk('UpdateStudent/get',async({id,formDa
     console.log(id,formData);
     
     try {
-        const response=await axios.put(`http://localhost:9000/api/student/update/${id}`, formData, {
+        const response=await axios.put(`https://mern-stack-dms.onrender.com/api/student/update/${id}`, formData, {
             withCredentials:true
         });
         
@@ -67,7 +67,7 @@ export const UpdateStudentByStudent = createAsyncThunk(
   
       try {
         const response = await axios.put(
-          `http://localhost:9000/api/student/updateByStud/${id}`, 
+          `https://mern-stack-dms.onrender.com/api/student/updateByStud/${id}`, 
           formData ,          {
             headers: {
               'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export const DeleteStudent=createAsyncThunk('DeleteStudent/get',async({ id,block
     
     try {
        
-        const response=await axios.delete(`http://localhost:9000/api/student/delete/${id}`,{blockNum,dormId,sex}, {
+        const response=await axios.delete(`https://mern-stack-dms.onrender.com/api/student/delete/${id}`,{blockNum,dormId,sex}, {
             withCredentials:true
         });
         
@@ -106,7 +106,7 @@ export const DeleteAllStudent = createAsyncThunk(
     'DeleteAllStudent/deleteAll',
     async (StudentData, { rejectWithValue }) => {
       try {
-        const response = await axios.delete(`http://localhost:9000/api/student/deleteAll`, {
+        const response = await axios.delete(`https://mern-stack-dms.onrender.com/api/student/deleteAll`, {
           data: StudentData, // Pass the array in the data property of the config object
           withCredentials: true
         });
@@ -124,7 +124,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
     
     
     try {
-        const response=await axios.get('http://localhost:9000/api/student/get', {
+        const response=await axios.get('https://mern-stack-dms.onrender.com/api/student/get', {
             withCredentials:true
         });
         
@@ -139,7 +139,7 @@ export const getAllocatedStudent=createAsyncThunk('student/get',async()=>{
 export const getSingleStudent=createAsyncThunk('student/getSingleStudent',async({id})=>{
      
     try {
-        const response=await axios.get(`http://localhost:9000/api/student/getOne/${id}`, {
+        const response=await axios.get(`https://mern-stack-dms.onrender.com/api/student/getOne/${id}`, {
             withCredentials:true
         });
         console.log(response.data,"response of student get from slice");
@@ -154,7 +154,7 @@ export const CompareStudentPasswordAndUpdate=createAsyncThunk('student/changePas
    
      
     try {
-        const response=await axios.put(`http://localhost:9000/api/student/updatePassword/${id}`,Password, {
+        const response=await axios.put(`https://mern-stack-dms.onrender.com/api/student/updatePassword/${id}`,Password, {
             withCredentials:true
         });
         console.log(response.data,"response of student get from slice");
@@ -169,7 +169,7 @@ export const CompareStudentPasswordAndUpdate=createAsyncThunk('student/changePas
 
 export const updateStudent=createAsyncThunk('student/update',async({studentId,updatedData})=>{
     try {
-        const response=await axios.put(`http://localhost:9000/api/student/update/${studentId}`,updatedData,{
+        const response=await axios.put(`https://mern-stack-dms.onrender.com/api/student/update/${studentId}`,updatedData,{
             withCredentials:true
         })  
         console.log(response.data,"response of student update");
@@ -182,7 +182,7 @@ export const updateStudent=createAsyncThunk('student/update',async({studentId,up
 
 export const getStudentForProctor=createAsyncThunk('getstudent/forProctor',async(id)=>{
     try {
-                const response=await axios.get(`http://localhost:9000/api/student/getForProctor/${id}` ,{
+                const response=await axios.get(`https://mern-stack-dms.onrender.com/api/student/getForProctor/${id}` ,{
                     withCredentials:true
                 })  
                 console.log(response.data,"response of student update");
