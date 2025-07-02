@@ -10,7 +10,7 @@ const initialState = {
 export const getAllUser = createAsyncThunk("getAll/user", async () => {
   try {
     const respoens = await axios.get(
-      "http://localhost:9000/api/user/getAll",
+      "https://mern-stack-dms.onrender.com/api/user/getAll",
       {
         withCredentials: true,
         headers: {
@@ -31,7 +31,7 @@ export const getSingleUser = createAsyncThunk("getOne/user", async (id) => {
   try {
     console.log(id);
     
-    const response = await axios.get(`http://localhost:9000/api/user/getOne/${id}`, {
+    const response = await axios.get(`https://mern-stack-dms.onrender.com/api/user/getOne/${id}`, {
       withCredentials: true,
     });
     return response.data;
@@ -44,7 +44,7 @@ export const getSingleUser = createAsyncThunk("getOne/user", async (id) => {
 export const UpdateUser = createAsyncThunk("Update/user", async ({formData,id}) => {
   try {
     
-    const response = await axios.put(`http://localhost:9000/api/user/update/${id}`,formData ,{
+    const response = await axios.put(`https://mern-stack-dms.onrender.com/api/user/update/${id}`,formData ,{
       withCredentials: true,
     });
     return response.data;
@@ -57,7 +57,7 @@ export const UpdateUser = createAsyncThunk("Update/user", async ({formData,id}) 
 export const updateUserStatus = createAsyncThunk("updateStatus/user", async ({id, status}) => {
   try {
     const response = await axios.put(
-      `http://localhost:9000/api/user/update/${id}`,
+      `https://mern-stack-dms.onrender.com/api/user/update/${id}`,
       { status },
       { withCredentials: true }
     );
@@ -71,7 +71,7 @@ export const updateUserStatus = createAsyncThunk("updateStatus/user", async ({id
 export const deleteUser = createAsyncThunk("delete/user", async (id) => {
   try {
     const response = await axios.delete(
-      `http://localhost:9000/api/user/delete/${id}`,
+      `https://mern-stack-dms.onrender.com/api/user/delete/${id}`,
       { withCredentials: true }
     );
     return { id, ...response.data };
@@ -83,7 +83,7 @@ export const deleteUser = createAsyncThunk("delete/user", async (id) => {
 
 export const ComparePasswordAndUpdate=createAsyncThunk('/comparePassword',async ({Password,id})=>{
   try {
-    const result= await axios.put(`http://localhost:9000/api/user/password/${id}`,Password,{
+    const result= await axios.put(`https://mern-stack-dms.onrender.com/api/user/password/${id}`,Password,{
       withCredentials: true,
      
     });
