@@ -13,7 +13,7 @@ export const reportStudentIssue = createAsyncThunk(
 
     try {
       const respons = await axios.post(
-        "http://localhost:9000/api/control/add",
+        "https://mern-stack-dms.onrender.com/api/control/add",
         formData,
         {
           withCredentials: true,
@@ -33,7 +33,7 @@ export const getAllControlIssues = createAsyncThunk(
   async () => {
     try {
       const respons = await axios.get(
-        "http://localhost:9000/api/control/get",
+        "https://mern-stack-dms.onrender.com/api/control/get",
 
         {
           withCredentials: true,
@@ -54,7 +54,7 @@ export const UpdateControlIssueSatus = createAsyncThunk(
     async (formData) => {
       try {
         const respons = await axios.put(
-            'http://localhost:9000/api/control/update',
+            'https://mern-stack-dms.onrender.com/api/control/update',
           formData,
           {
             withCredentials: true,
