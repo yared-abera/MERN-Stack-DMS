@@ -13,7 +13,7 @@ const initialState = {
 export const getRecentlySearchedUser=createAsyncThunk("getStudentById",async({role,id})=>{
   try {
     console.log(role ,id,'role id')
-    const response=await axios.get(`http://localhost:9000/api/recentuser/SearchStudent/${role}/${id}`,{
+    const response=await axios.get(`https://mern-stack-dms.onrender.com/api/recentuser/SearchStudent/${role}/${id}`,{
       withCredentials:true
     })
     return response.data
@@ -34,7 +34,7 @@ export const AddRecentlySearchedUser=createAsyncThunk("AddRecentlySearchedUser",
   
   try {
     console.log(userName,role,'userName,role')
-    const response=await axios.post('http://localhost:9000/api/recentuser/add',{userName,role,id},{
+    const response=await axios.post('https://mern-stack-dms.onrender.com/api/recentuser/add',{userName,role,id},{
       withCredentials:true
     })
     console.log(response.data,'response.data')
